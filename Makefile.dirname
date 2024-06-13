@@ -1,0 +1,2 @@
+DOTDIR_NAME ?= .dotfiles
+DOTDIR_PATH ?= ${HOME}/.dotfiles

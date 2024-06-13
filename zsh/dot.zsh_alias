@@ -1,0 +1,258 @@
+#!/usr/bin/env zsh
+# vim: set ft=zsh ts=2 sw=2 sts=0 noet :
+
+## Alias configuration
+#
+# expand aliases before completing
+#
+setopt complete_aliases # aliased ls needs if file/dir completions work
+
+alias where="command -v"
+alias h="history 25"
+alias j="jobs -l"
+
+if [[ -x "`whence -- nvim`" ]]; then
+	alias vi="nvim"
+	alias vim="nvim"
+elif [[ -x "`whence -- mvim`" ]]; then
+	alias vi="mvim -v"
+	alias vim="mvim -v"
+elif [[ -x "`whence -- vim`" ]]; then
+	alias vi="vim"
+fi
+
+case "${OSTYPE}" in
+freebsd*)	alias ls="ls -GwD '%Y/%m/%d %T'" ;;
+darwin*)	alias ls="ls -Gw" ;;
+linux*)		alias ls="ls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S" ;;
+esac
+
+if [[ -x "`whence -- gnuls`" ]]; then
+	alias ls="gnuls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S"
+elif [[ -x "`whence -- gls`" ]]; then
+	alias ls="gls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S"
+fi
+
+alias la="ls -a"
+alias lf="ls -FA"
+alias li="ls -ai"
+alias ll="ls -FAlh"
+
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+
+if [[ -x "`whence -- colordiff`" ]]; then
+	alias diff="colordiff"
+elif [[ -x "`whence -- cdiff`" ]]; then
+	alias diff="cdiff"
+fi
+
+if [[ -x "`whence -- free`" ]]; then
+	alias free="free -h"
+fi
+
+alias du="du -h"
+alias df="df -h"
+
+alias su="su -l"
+
+if [[ -x "`whence -- tree`" ]]; then
+	alias tree="tree --charset ASCII"
+fi
+
+if [[ -x "`whence -- hub`" ]]; then
+	alias git="hub"
+fi
+
+if [[ -x "`whence -- htop`" ]]; then
+	alias top="htop"
+fi
+
+if [[ -x "`whence -- lftp`" ]]; then
+	alias ftp="lftp"
+fi
+
+if [[ -x "`whence -- cpanm`" ]]; then
+	alias cpan="cpanm"
+fi
+
+if [[ -x "`whence -- qo`" ]]; then
+	alias qo="qo -g -x"
+fi
+
+if [[ -x "`whence -- valgrind`" ]]; then
+	alias valgrind="valgrind --leak-check=full"
+fi
+
+if [[ "x${DISTRIB_ID}" = "xUbuntu" ]]; then
+	if [[ -x "`whence -- zpool`" ]]; then
+		alias zpool="sudo zpool"
+	fi
+	if [[ -x "`whence -- zfs`" ]]; then
+		alias zfs="sudo zfs"
+	fi
+fi
+
+function psall () {
+	if [[ -x "`whence -- pstree`" ]]; then
+		pstree -aA
+	else
+		case "${OSTYPE}" in
+		freebsd*)
+			ps -auxww | grep -v "ps -auxww"
+			;;
+		linux*|darwin*)
+			ps auxww | grep -v "ps auxww"
+			;;
+		esac
+	fi
+}
+
+function psgrep () {
+	if [[ -x "`whence -- pstree`" ]]; then
+		pstree -s $*
+	else
+		case "${OSTYPE}" {
+		darwin*)
+			echo "USER       PID %CPU %MEM      VSZ    RSS  TT  STAT STARTED      TIME COMMAND"
+			ps auxww | grep -v grep | grep -v "ps auxww" | grep $*
+			;;
+		freebsd*)
+			echo "USER     PID %CPU %MEM   VSZ   RSS  TT  STAT STARTED      TIME COMMAND"
+			ps -auxww | grep -v grep | grep -v "ps -auxww" | grep $*
+			;;
+		linux*)
+			echo "USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND"
+			ps auxww | grep -v grep | grep -v "ps auxww" | grep $*
+			;;
+		}
+	fi
+}
+
+function psuser () {
+	if [[ -x "`whence -- pstree`" ]]; then
+		pstree -u ${USER}
+	else
+		case "${OSTYPE}" {
+		darwin*)
+			echo "USER       PID %CPU %MEM      VSZ    RSS  TT  STAT STARTED      TIME COMMAND"
+			ps auxww | grep -v grep | grep -v "ps auxww" | grep ${USER}
+			;;
+		freebsd*)
+			echo "USER     PID %CPU %MEM   VSZ   RSS  TT  STAT STARTED      TIME COMMAND"
+			ps -auxww | grep -v grep | grep -v "ps -auxww" | grep ${USER}
+			;;
+		linux*)
+			echo "USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND"
+			ps auxww | grep -v grep | grep -v "ps auxww" | grep ${USER}
+			;;
+		}
+	fi
+}
+
+if [[ -x "`whence -- svn`" ]]; then
+	if [[ -x "`whence -- colordiff`" ]]; then
+		alias svndiff='svn diff --diff-cmd colordiff -x "-y -w -i -u"'
+	else
+		alias svndiff='svn diff --diff-cmd diff -x -w "-y -i -u"'
+	fi
+fi
+
+case "${OSTYPE}" in
+linux*)
+	if [[ -f "/etc/arch-release" ]]; then
+		alias updatepacman="sudo pacman -Sy"
+	fi
+	;;
+darwin*)
+	if [[ -x "`whence -- port`" ]]; then
+		alias updateports="sudo port selfupdate; sudo port outdated"
+	elif [[ -x "`whence -- brew`" ]]; then
+		alias updatebrew="brew update; brew outdated"
+	fi
+	;;
+freebsd*)
+	if [[ -x "`whence -- sudo`" ]]; then
+		if [[ -d "/usr/ports/.git" ]]; then
+			if [[ -x "`whence -- git`" ]]; then
+				alias updateports="pushd -q /usr/ports; sudo git pull; sudo make fetchindex; popd -q"
+			fi
+		elif [[ -d "/usr/ports/.svn" ]]; then
+			if [[ -x "`whence -- svn`" ]]; then
+				alias updateports="sudo svn up /usr/ports"
+			elif [[ -x "`whence -- svnlite`" ]]; then
+				alias updateports="sudo svnlite up /usr/ports"
+			fi
+		else
+			if [[ -x "`whence -- portshaker`" ]]; then
+				if [[ -x "`whence -- portversion`" ]]; then
+					alias updateports="sudo portshaker; sudo portversion -vl'<'"
+				elif [[ -x "`whence -- portmaster`" ]]; then
+					alias updateports="sudo portshaker; sudo portmaster -L"
+				elif [[ -x "`whence -- pkg`" ]]; then
+					alias updateports="sudo portshaker; sudo pkg version -vl'<'"
+				else
+					alias updateports="sudo portshaker; sudo pkg_version -vl'<'"
+				fi
+			fi
+		fi
+	else
+		echo "Require security/sudo"
+	fi
+	;;
+esac
+
+case "${OSTYPE}" in
+freebsd*)
+	if [[ -x "`whence -- sudo`" ]] && [[ -x "`whence -- portshaker`" ]] && [[ -x "`whence -- poudriere`" ]]; then
+		build-poudriere() {
+			if [[ ! -r "/usr/local/etc/poudriere.d/bulks/$2" ]]; then
+				echo "not bulk exists $2"
+				return 1
+			fi
+			sudo portshaker
+			if [[ -z $3 ]]; then
+				sudo poudriere bulk -j $1 -f /usr/local/etc/poudriere.d/bulks/$2
+			else
+				sudo poudriere bulk -j $1 -f /usr/local/etc/poudriere.d/bulks/$2 -z $3
+			fi
+			#sudo rsync -av --delete -e 'ssh -l pkg -i /usr/local/etc/poudriere.d/ssh/id_rsa' /usr/local/poudriere/data/packages/ www.tmfam.com:/repos/
+		}
+	fi
+	;;
+esac
+
+case "${OSTYPE}" in
+freebsd*)
+	if [[ -x "`whence -p rbenv`" ]]; then
+		alias "rbenv install"='MAKE_OPTS="-j `sysctl -n hw.ncpu`" RUBY_CONFIGURE_OPTS="--enable-shared" rbenv install'
+	fi
+	;;
+esac
+
+if [[ -x "`whence -- wget`" ]]; then
+	alias wget-mirror="wget -r -np -m -k"
+fi
+
+if [[ -x "`whence -- tmux`" ]] && [[ -n "$TMUX" ]]; then
+	function mosh_tmux() {
+		eval server=\${$#}
+		tmux new-window -n $server "mosh $@"
+	}
+	alias mosh=mosh_tmux
+fi
+
+if [[ -n "${WSLENV}" ]]; then
+	function open() {
+		if [ $# != 1 ]; then
+			explorer.exe .
+		else
+			if [ -e $1 ]; then
+				cmd.exe /c start $(wslpath -w $1) 2> /dev/null
+			else
+				echo "open: $1 : No such file or directory"
+			fi
+		fi
+	}
+fi
