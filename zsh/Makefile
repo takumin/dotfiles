@@ -1,4 +1,4 @@
-include ../Makefile.dirname
+include ../Makefile.env
 
 DIRS = \
 	${HOME}/.zsh \

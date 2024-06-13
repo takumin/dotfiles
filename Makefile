@@ -1,6 +1,6 @@
-include Makefile.dirname
+include Makefile.env
 
-SUBDIRS := $(shell find . -mindepth 1 -maxdepth 1 -type d -not -name '.git' -printf '%f\n')
+SUBDIRS := $(shell find . -mindepth 2 -maxdepth 2 -type f -name 'Makefile' -printf '%h\n')
 
 .PHONY: default
 default: install
@@ -19,4 +19,4 @@ ${SUBDIRS}:
 	@${MAKE} --no-print-directory -C $@ ${MAKECMDGOALS}
 
 ${DOTDIR_PATH}:
-	@ln -fs ${CURDIR} $@
+	@ln -s ${CURDIR} $@
