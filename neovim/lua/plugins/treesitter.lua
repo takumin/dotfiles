@@ -21,7 +21,7 @@ return {
     'RRethy/nvim-treesitter-endwise',
     main = 'nvim-treesitter.configs',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    event = { 'BufNewFile', 'BufRead' },
+    event = 'InsertEnter',
     opts = {
       endwise = {
         enable = true,
