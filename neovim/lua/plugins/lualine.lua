@@ -4,7 +4,7 @@ return {
     dependencies = {
       'nvim-tree/nvim-web-devicons',
     },
-    event = 'BufReadPost',
+    event = 'UIEnter',
     opts = {
       options = {
         -- theme = 'iceberg_dark',
