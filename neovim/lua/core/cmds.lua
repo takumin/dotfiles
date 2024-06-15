@@ -35,3 +35,9 @@ vim.api.nvim_create_autocmd({'FileType'}, {
     vim.opt.expandtab = false
   end
 })
+vim.api.nvim_create_autocmd({'FileType'}, {
+  pattern = {'sh', 'bash', 'zsh'},
+  callback = function()
+    vim.opt.expandtab = false
+  end
+})
