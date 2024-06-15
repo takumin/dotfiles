@@ -1,13 +1,13 @@
 return {
   {
     'numToStr/Comment.nvim',
-    event = "UIEnter",
+    event = 'UIEnter',
     opts = {
       toggler = {
-        line = "<C-K>",
+        line = '<C-K>',
       },
       opleader = {
-        line = "<C-K>",
+        line = '<C-K>',
       },
     },
   },
