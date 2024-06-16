@@ -14,7 +14,10 @@
 --     'rmehri01/onenord.nvim',
 --     lazy = false,
 --     priority = 1000,
---     opts = {},
+--     config = function()
+--       require("onenord").setup({})
+--       vim.cmd([[colorscheme onenord]])
+--     end,
 --   },
 -- }
 
@@ -24,6 +27,7 @@ return {
     lazy = false,
     priority = 1000,
     config = function()
+      require("tokyonight").setup({})
       vim.cmd([[colorscheme tokyonight-night]])
     end,
   },
