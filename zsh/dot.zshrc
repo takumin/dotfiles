@@ -327,6 +327,12 @@ fi
 if [[ -x "$(whence -- aqua)" ]]; then
 	source <(aqua completion zsh)
 fi
+# 1password-cli completion
+#
+if [[ -x "$(whence -- op)" ]]; then
+	source <(op completion zsh)
+	compdef _op op
+fi
 # lima completion
 #
 if [[ -x "$(whence -- limactl)" ]]; then
