@@ -15,12 +15,10 @@ if [[ -e "${HOME}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/s
 	export SSH_AUTH_SOCK="${HOME}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh"
 fi
 
-## ssh-tpm-agent
+## 1password
 #
-if [[ -x "$(whence -- ssh-tpm-agent)" ]]; then
-	if [[ -e "$(ssh-tpm-agent --print-socket)" ]]; then
-		export SSH_AUTH_SOCK="$(ssh-tpm-agent --print-socket)"
-	fi
+if [[ -r "${HOME}/.1password/agent.sock" ]]; then
+	export SSH_AUTH_SOCK="${HOME}/.1password/agent.sock"
 fi
 
 ## keychain
