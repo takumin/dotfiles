@@ -30,10 +30,10 @@ ${HOME}/.ssh/config: config
 
 ${HOME}/.ssh/config.d/aws-ssm.conf:
 	@if [ -f "/usr/local/sessionmanagerplugin/bin/session-manager-plugin" ]; then \
-		cp ./config.aws-ssm $@; \
+		ln -s ../../${DOTDIR_NAME}/ssh/config.aws-ssm $@; \
 	fi
 
 ${HOME}/.ssh/config.d/vagrant.conf:
 	@if [ -f "${HOME}/.vagrant.d/insecure_private_key" ]; then \
-		cp ./config.vagrant $@; \
+		cp ../../${DOTDIR_NAME}/ssh/config.vagrant $@; \
 	fi
