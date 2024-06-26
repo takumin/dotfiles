@@ -25,28 +25,6 @@ Host bitbucket.org
 	Port			443
 
 ################################################################################
-# AWS SSM Session Manager
-################################################################################
-
-host i-* mi-*
-	ProxyCommand		sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
-	UserKnownHostsFile	/dev/null
-	StrictHostKeyChecking	no
-	LogLevel		FATAL
-
-################################################################################
-# Vagrant/Libvirt
-################################################################################
-
-Host vagrant
-	HostName		172.28.128.2
-	User			vagrant
-	UserKnownHostsFile	/dev/null
-	IdentityFile		~/.vagrant.d/insecure_private_key
-	StrictHostKeyChecking	no
-	LogLevel		FATAL
-
-################################################################################
 # mDNS Local Network
 ################################################################################
 
