@@ -1,0 +1,82 @@
+# vim: set ft=sshconfig ts=8 sw=8 sts=0 noet :
+
+################################################################################
+# Includes
+################################################################################
+
+Include ~/.ssh/config.d/*.conf
+
+################################################################################
+# GitHub
+################################################################################
+
+Host github.com
+	User			git
+	HostName		ssh.github.com
+	Port			443
+
+################################################################################
+# BitBucket
+################################################################################
+
+Host bitbucket.org
+	User			git
+	HostName		altssh.bitbucket.org
+	Port			443
+
+################################################################################
+# AWS SSM Session Manager
+################################################################################
+
+host i-* mi-*
+	ProxyCommand		sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
+	UserKnownHostsFile	/dev/null
+	StrictHostKeyChecking	no
+	LogLevel		FATAL
+
+################################################################################
+# Vagrant/Libvirt
+################################################################################
+
+Host vagrant
+	HostName		172.28.128.2
+	User			vagrant
+	UserKnownHostsFile	/dev/null
+	IdentityFile		~/.vagrant.d/insecure_private_key
+	StrictHostKeyChecking	no
+	LogLevel		FATAL
+
+################################################################################
+# mDNS Local Network
+################################################################################
+
+host *.local
+	UserKnownHostsFile	/dev/null
+	StrictHostKeyChecking	no
+	LogLevel		FATAL
+
+################################################################################
+# Localhost
+################################################################################
+
+Host localhost
+	UserKnownHostsFile	/dev/null
+	StrictHostKeyChecking	no
+	LogLevel		FATAL
+
+################################################################################
+# All
+################################################################################
+
+Host *
+	SendEnv			TERM TERM_PROGRAM COLORTERM
+	AddKeysToAgent		yes
+	Compression		yes
+	ForwardX11		no
+	ForwardAgent		yes
+	TCPKeepAlive		yes
+	ServerAliveInterval	60
+	ServerAliveCountMax	5
+	ControlMaster		auto
+	ControlPath		~/.ssh/masters-%r@%h:%p
+	ControlPersist		30
