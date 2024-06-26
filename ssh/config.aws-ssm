@@ -1,0 +1,11 @@
+# vim: set ft=sshconfig ts=8 sw=8 sts=0 noet :
+
+################################################################################
+# AWS SSM Session Manager
+################################################################################
+
+host i-* mi-*
+	ProxyCommand		sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
+	UserKnownHostsFile	/dev/null
+	StrictHostKeyChecking	no
+	LogLevel		FATAL

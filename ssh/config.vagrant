@@ -1,0 +1,14 @@
+# vim: set ft=sshconfig ts=8 sw=8 sts=0 noet :
+
+################################################################################
+# Vagrant/Libvirt
+################################################################################
+
+Host vagrant
+	HostName		172.28.128.2
+	User			vagrant
+	UserKnownHostsFile	/dev/null
+	StrictHostKeyChecking	no
+	LogLevel		FATAL
+	IdentityFile		~/.vagrant.d/insecure_private_key
+	IdentitiesOnly		yes
