@@ -27,6 +27,7 @@ brew "coreutils"
 brew "cosign"
 brew "curl"
 brew "dagger"
+brew "deno"
 brew "devcontainer"
 brew "diffutils"
 brew "direnv"
@@ -116,6 +117,7 @@ if OS.mac?
   cask "1password"
   cask "1password-cli"
   cask "alacritty"
+  cask "discord"
   cask "firefox"
   cask "google-chrome"
   cask "google-japanese-ime"
@@ -125,8 +127,10 @@ if OS.mac?
   cask "obsidian"
   cask "raycast"
   cask "secretive"
+  cask "slack"
   cask "utm"
   cask "visual-studio-code"
+  cask "zoom"
 
   mas "1Password for Safari", id: 1569813296
   mas "Microsoft Remote Desktop", id: 1295203466
