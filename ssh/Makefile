@@ -28,12 +28,12 @@ ${HOME}/.ssh/config.d:
 ${HOME}/.ssh/config: config
 	@ln -s ../${DOTDIR_NAME}/ssh/config $@
 
-${HOME}/.ssh/config.d/aws-ssm.conf:
+${HOME}/.ssh/config.d/aws-ssm.conf: config.aws-ssm
 	@if [ -f "/usr/local/sessionmanagerplugin/bin/session-manager-plugin" ]; then \
 		ln -s ../../${DOTDIR_NAME}/ssh/config.aws-ssm $@; \
 	fi
 
-${HOME}/.ssh/config.d/vagrant.conf:
+${HOME}/.ssh/config.d/vagrant.conf: config.vagrant
 	@if [ -f "${HOME}/.vagrant.d/insecure_private_key" ]; then \
-		cp ../../${DOTDIR_NAME}/ssh/config.vagrant $@; \
+		ln -s ../../${DOTDIR_NAME}/ssh/config.vagrant $@; \
 	fi
