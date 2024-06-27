@@ -424,18 +424,8 @@ fi
 
 ## w3m configuration
 #
-if [[ -n "${DESKTOP_SESSION}" ]]; then
-	if [[ -x "`whence -- google-chrome`" ]]; then
-		export BROWSER="google-chrome"
-	elif [[ -x "`whence -- chromium-browser`" ]]; then
-		export BROWSER="chromium-browser"
-	elif [[ -x "`whence -- chromium`" ]]; then
-		export BROWSER="chromium"
-	elif [[ -x "`whence -- firefox`" ]]; then
-		export BROWSER="firefox"
-	fi
-else
-	if [[ -x "`whence -- w3m`" ]]; then
+if [[ -z "${DESKTOP_SESSION}" ]]; then
+	if [[ -x "$(whence -- w3m)" ]]; then
 		export BROWSER="w3m"
 		export HTTP_HOME="http://www.google.co.jp/"
 	fi
