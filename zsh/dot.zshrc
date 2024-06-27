@@ -302,6 +302,11 @@ fi
 if [[ -x "`whence -- minikube`" ]]; then
 	source <(minikube completion zsh)
 fi
+# docker completion
+#
+if [[ -x "$(whence -- docker)" ]]; then
+	source <(docker completion zsh)
+fi
 # vault completion
 #
 if [[ -x "$(whence -- vault)" ]]; then
