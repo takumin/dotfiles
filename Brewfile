@@ -68,7 +68,6 @@ brew "marp-cli"
 brew "melange"
 brew "mise"
 brew "neovim"
-brew "nerdctl"
 brew "nfpm"
 brew "openssh"
 brew "opentofu"
@@ -114,8 +113,13 @@ brew "reviewdog/tap/reviewdog"
 brew "suzuki-shunsuke/cmdx/cmdx"
 brew "suzuki-shunsuke/ghalint/ghalint"
 
+if OS.linux?
+  brew "nerdctl"
+end
+
 if OS.mac?
   brew "mas"
+  brew "mactop" if Hardware::CPU.arm?
   brew "pam-reattach"
 
   cask "1password"
