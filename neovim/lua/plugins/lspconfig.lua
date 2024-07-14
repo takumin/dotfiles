@@ -15,6 +15,9 @@ return {
           end,
         })
       end
+      if vim.fn.executable('tsserver') == 1 then
+        require('lspconfig').tsserver.setup({})
+      end
     end,
   },
 }
