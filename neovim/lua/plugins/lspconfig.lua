@@ -18,6 +18,9 @@ return {
       if vim.fn.executable('tsserver') == 1 then
         require('lspconfig').tsserver.setup({})
       end
+      if vim.fn.executable('biome') == 1 then
+        require('lspconfig').biome.setup({})
+      end
     end,
   },
 }
