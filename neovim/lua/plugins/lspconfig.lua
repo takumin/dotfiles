@@ -16,7 +16,7 @@ return {
         })
       end
       if vim.fn.executable('tsserver') == 1 then
-        require('lspconfig').tsserver.setup({})
+        require('lspconfig').ts_ls.setup({})
       end
       if vim.fn.executable('biome') == 1 then
         require('lspconfig').biome.setup({})
