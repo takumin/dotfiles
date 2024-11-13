@@ -282,6 +282,11 @@ if [[ -x "$(whence -- goenv)" ]]; then
 	)
 	typeset -U path
 fi
+# rustup initilize
+#
+if [[ -x "$(whence -- rustup)" ]]; then
+	source <(rustup completions zsh)
+fi
 # travis ci completion
 #
 if [[ -r "${HOME}/.travis/travis.sh" ]]; then
