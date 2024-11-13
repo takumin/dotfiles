@@ -6,6 +6,13 @@ return {
       if vim.fn.executable('gopls') == 1 then
         require('lspconfig').gopls.setup({})
       end
+      if vim.fn.executable('rust-analyzer') == 1 then
+        require('lspconfig').rust_analyzer.setup({
+          on_attach = function(client, bufnr)
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+          end
+        })
+      end
       if vim.fn.executable('terraform-ls') == 1 then
         require('lspconfig').terraformls.setup({})
         vim.api.nvim_create_autocmd({"BufWritePre"}, {
