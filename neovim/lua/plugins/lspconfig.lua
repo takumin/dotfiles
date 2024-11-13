@@ -8,9 +8,22 @@ return {
       end
       if vim.fn.executable('rust-analyzer') == 1 then
         require('lspconfig').rust_analyzer.setup({
+          settings = {
+            ["rust-analyzer"] = {
+              check = {
+                command = "clippy",
+              },
+            },
+          },
           on_attach = function(client, bufnr)
             vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-          end
+          end,
+        })
+        vim.api.nvim_create_autocmd({"BufWritePre"}, {
+          pattern = {"*.rs"},
+          callback = function()
+            vim.lsp.buf.format()
+          end,
         })
       end
       if vim.fn.executable('terraform-ls') == 1 then
