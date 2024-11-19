@@ -41,6 +41,17 @@ return {
       if vim.fn.executable('biome') == 1 then
         require('lspconfig').biome.setup({})
       end
+      if vim.fn.executable('yaml-language-server') == 1 then
+        require('lspconfig').yamlls.setup({
+          settings = {
+            yaml = {
+              schemas = {
+                ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+              },
+            },
+          },
+        })
+      end
     end,
   },
 }
