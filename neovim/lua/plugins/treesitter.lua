@@ -18,7 +18,8 @@ return {
     },
   },
   {
-    'RRethy/nvim-treesitter-endwise',
+    -- see also: https://github.com/RRethy/nvim-treesitter-endwise/pull/42
+    'metiulekm/nvim-treesitter-endwise',
     main = 'nvim-treesitter.configs',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
     event = 'InsertEnter',
