@@ -6,6 +6,20 @@ return {
       if vim.fn.executable('gopls') == 1 then
         require('lspconfig').gopls.setup({})
       end
+      if vim.fn.executable('pylsp') == 1 then
+        require('lspconfig').pylsp.setup({
+          settings = {
+            pylsp = {
+              plugins = {
+                pycodestyle = {
+                  -- ignore = {'W391'},
+                  maxLineLength = 100
+                }
+              }
+            }
+          }
+        })
+      end
       if vim.fn.executable('rust-analyzer') == 1 then
         require('lspconfig').rust_analyzer.setup({
           settings = {
