@@ -1,8 +1,17 @@
 return {
   {
+    'lukas-reineke/lsp-format.nvim',
+  },
+  {
     'neovim/nvim-lspconfig',
+    dependencies = { 'lukas-reineke/lsp-format.nvim' },
     event = { 'BufRead', 'BufNewFile' },
     config = function()
+      if vim.fn.executable('clangd') == 1 then
+        require('lspconfig').clangd.setup({
+          on_attach = require("lsp-format").on_attach
+        })
+      end
       if vim.fn.executable('gopls') == 1 then
         require('lspconfig').gopls.setup({})
       end
@@ -29,24 +38,12 @@ return {
               },
             },
           },
-          on_attach = function(client, bufnr)
-            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-          end,
-        })
-        vim.api.nvim_create_autocmd({"BufWritePre"}, {
-          pattern = {"*.rs"},
-          callback = function()
-            vim.lsp.buf.format()
-          end,
+          on_attach = require("lsp-format").on_attach
         })
       end
       if vim.fn.executable('terraform-ls') == 1 then
-        require('lspconfig').terraformls.setup({})
-        vim.api.nvim_create_autocmd({"BufWritePre"}, {
-          pattern = {"*.tf", "*.tfvars"},
-          callback = function()
-            vim.lsp.buf.format()
-          end,
+        require('lspconfig').terraformls.setup({
+          on_attach = require("lsp-format").on_attach
         })
       end
       if vim.fn.executable('tsserver') == 1 then
