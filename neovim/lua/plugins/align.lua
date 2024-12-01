@@ -1,7 +1,7 @@
 return {
-  {
-    'echasnovski/mini.align',
-    event = 'UIEnter',
-    config = true,
-  },
+	{
+		"echasnovski/mini.align",
+		event = "UIEnter",
+		config = true,
+	},
 }

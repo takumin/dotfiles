@@ -11,12 +11,6 @@ if vim.fn.has('termguicolors') == 1 then
   if vim.env.COLORTERM == 'truecolor' then
     -- True Colorsを有効にする ( GUI用の色設定を使う )
     vim.opt.termguicolors = true
-    -- tmux環境用の設定
-    if vim.env.TMUX then
-      -- TODO: 以下vim用設定をneovimでどうやるか
-      -- let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-      -- let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-    end
   end
 end
 -- タイトルを表示する
