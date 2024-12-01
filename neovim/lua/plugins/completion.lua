@@ -147,6 +147,17 @@ return {
 				})
 			end
 
+			if vim.fn.executable("ruby-lsp") == 1 then
+				require("lspconfig").ruby_lsp.setup({
+					capabilities = capabilities,
+
+					init_options = {
+						formatter = "standard",
+						linters = { "standard" },
+					},
+				})
+			end
+
 			if vim.fn.executable("pylsp") == 1 then
 				require("lspconfig").pylsp.setup({
 					capabilities = capabilities,
