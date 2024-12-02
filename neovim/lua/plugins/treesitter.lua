@@ -7,6 +7,8 @@ return {
 		opts = {
 			auto_install = true,
 			ensure_installed = {
+				-- Vimdocを開く時エラーになるため
+				"vimdoc",
 				-- neovimのLua設定ファイルを開く時、自動でインストールされないため
 				"lua",
 				-- gitcommitでdiff表示している場合、自動でインストールされないため
