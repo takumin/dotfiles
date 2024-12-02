@@ -9,14 +9,14 @@ return {
 				lua = { "stylua" },
 				go = { "goimports", "gofumpt" },
 				python = { "ruff_fix", "isort", "black", stop_after_first = true },
-				javascript = { "biome-check", "prettierd", "prettier", stop_after_first = true },
-				javascriptreact = { "biome-check", "prettierd", "prettier", stop_after_first = true },
-				typescript = { "biome-check", "prettierd", "prettier", stop_after_first = true },
-				typescriptreact = { "biome-check", "prettierd", "prettier", stop_after_first = true },
-				html = { "biome-check", "prettierd", "prettier", stop_after_first = true },
-				css = { "biome-check", "prettierd", "prettier", stop_after_first = true },
-				json = { "biome-check", "prettierd", "prettier", stop_after_first = true },
-				jsonc = { "biome-check", "prettierd", "prettier", stop_after_first = true },
+				javascript = { "biome", "prettierd", "prettier", stop_after_first = true },
+				javascriptreact = { "biome", "prettierd", "prettier", stop_after_first = true },
+				typescript = { "biome", "prettierd", "prettier", stop_after_first = true },
+				typescriptreact = { "biome", "prettierd", "prettier", stop_after_first = true },
+				html = { "biome", "prettierd", "prettier", stop_after_first = true },
+				css = { "biome", "prettierd", "prettier", stop_after_first = true },
+				json = { "biome", "prettierd", "prettier", stop_after_first = true },
+				jsonc = { "biome", "prettierd", "prettier", stop_after_first = true },
 				yaml = { "yamlfmt", "yamlfix", stop_after_first = true },
 				toml = { "taplo", stop_after_first = true },
 				hcl = { "hcl", stop_after_first = true },
@@ -31,8 +31,8 @@ return {
 			},
 			-- Customize formatters
 			formatters = {
-				shfmt = {
-					prepend_args = { "-i", "2" },
+				biome = {
+					args = { "check", "--write", "--stdin-file-path", "$FILENAME" },
 				},
 			},
 		},
