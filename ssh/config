@@ -47,6 +47,8 @@ Host localhost
 ################################################################################
 
 Host *
+	IdentityFile		~/.ssh/pubkeys.d/takumiiinn@gmail.com.pub
+	IdentitiesOnly		yes
 	SendEnv			TERM TERM_PROGRAM COLORTERM
 	AddKeysToAgent		yes
 	Compression		yes
