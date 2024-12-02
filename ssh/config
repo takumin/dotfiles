@@ -56,5 +56,5 @@ Host *
 	ServerAliveInterval	60
 	ServerAliveCountMax	5
 	ControlMaster		auto
-	ControlPath		~/.ssh/masters-%r@%h:%p
+	ControlPath		~/.ssh/session.d/masters-%r@%h:%p
 	ControlPersist		30
