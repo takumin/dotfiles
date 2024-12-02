@@ -1,0 +1,36 @@
+# vim: ft=gitconfig noet :
+[include]
+	path = ~/.config/git/accounts
+[color]
+	ui = true
+[core]
+  attributesFile = ~/.config/git/attributes
+	excludesfile = ~/.config/git/ignore
+	autocrlf = input
+[sendemail]
+	smtpserver = msmtp
+[alias]
+	st = status
+	df = diff
+	ci = commit
+	co = checkout
+	pl = pull
+	delete-merged-branches = !git branch --merged | grep -vE '^\\*|main$|master$|develop$' | xargs -I % git branch -d %
+[push]
+	default = simple
+[fetch]
+	prune = true
+[merge]
+	ff = false
+[pull]
+	ff = only
+[init]
+	defaultBranch = main
+[commit]
+	verbose = true
+	gpgsign = true
+[gpg]
+	format = ssh
+[diff "lockb"]
+	textconv = bun
+	binary = true

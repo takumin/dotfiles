@@ -1,0 +1,8 @@
+# vim: ft=gitignore :
+.DS_Store
+.hg
+.svn
+.bak
+.envrc
+.bundle
+tags

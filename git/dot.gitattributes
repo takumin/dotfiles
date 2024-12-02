@@ -1,0 +1,16 @@
+# vim: ft=gitattributes :
+
+# Markdown
+*.md text eol=lf
+
+# Go
+*.go text eol=lf
+
+# JSON/TOML/YAML
+*.json text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Bun
+*.lockb binary diff=lockb
