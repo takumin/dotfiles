@@ -25,6 +25,10 @@ return {
 			local cmp = require("cmp")
 
 			cmp.setup({
+				completion = {
+					completeopt = "menu,menuone,noinsert",
+				},
+
 				snippet = {
 					expand = function(args)
 						vim.snippet.expand(args.body)
@@ -39,7 +43,6 @@ return {
 				mapping = cmp.mapping.preset.insert({
 					["<C-b>"] = cmp.mapping.scroll_docs(-4),
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-Space>"] = cmp.mapping.complete(),
 					["<C-e>"] = cmp.mapping.abort(),
 
 					["<CR>"] = cmp.mapping(function(fallback)
@@ -54,7 +57,7 @@ return {
 
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
-							cmp.select_next_item()
+							cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
 						else
 							fallback()
 						end
@@ -62,7 +65,7 @@ return {
 
 					["<S-Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
-							cmp.select_prev_item()
+							cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
 						else
 							fallback()
 						end
@@ -80,6 +83,9 @@ return {
 			})
 
 			cmp.setup.cmdline({ "/", "?" }, {
+				completion = {
+					completeopt = "menu,menuone,noinsert,noselect",
+				},
 				mapping = cmp.mapping.preset.cmdline(),
 				sources = {
 					{ name = "buffer" },
@@ -87,6 +93,9 @@ return {
 			})
 
 			cmp.setup.cmdline(":", {
+				completion = {
+					completeopt = "menu,menuone,noinsert,noselect",
+				},
 				mapping = cmp.mapping.preset.cmdline(),
 				sources = cmp.config.sources({
 					{ name = "path" },
