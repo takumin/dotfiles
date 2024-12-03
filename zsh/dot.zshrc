@@ -266,6 +266,11 @@ fi
 if [[ -x "`whence -- direnv`" ]]; then
 	eval "$(direnv hook zsh)"
 fi
+# lefthook completion
+#
+if [[ -x "$(whence -- lefthook)" ]]; then
+	source <(lefthook completion zsh)
+fi
 # anyenv initilize
 #
 if [[ -x "$(whence -- anyenv)" ]]; then
