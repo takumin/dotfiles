@@ -496,19 +496,18 @@ fi
 if [[ -r "/usr/share/google-cloud-sdk/completion.zsh.inc" ]]; then
 	source "/usr/share/google-cloud-sdk/completion.zsh.inc"
 fi
-# tabtab pnpm completion
+# pnpm completion
 #
-if [[ -r "${HOME}/.config/tabtab/zsh/__tabtab.zsh" ]]; then
-	source "${HOME}/.config/tabtab/zsh/__tabtab.zsh"
-fi
-if [[ -x "`whence -- pnpm`" ]]; then
-	alias pp="pnpm"
-
-	if typeset -f _pnpm_completion > /dev/null; then
-		compdef _pnpm_completion pp
+if [[ -x "$(whence -- pnpm)" ]]; then
+	# recommends pnpm-shell-completion
+	# see also: https://github.com/g-plane/pnpm-shell-completion
+	if [[ -r "/usr/local/share/zsh/site-functions/_pnpm" ]]; then
+		source "/usr/local/share/zsh/site-functions/_pnpm"
 	fi
-fi
 
+	alias pp="pnpm"
+	compdef pp="pnpm"
+fi
 
 
 ## load user .zshrc configuration file
