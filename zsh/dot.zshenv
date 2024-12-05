@@ -25,6 +25,7 @@ path=(
 	${HOME}/.anyenv/envs/*/bin(N-/)
 	${HOME}/.anyenv/envs/*/shims(N-/)
 	${HOME}/.local/share/aquaproj-aqua/bin(N-/)
+	${HOME}/.local/share/pnpm(N-/)
 	${HOME}/.yarn/bin(N-/)
 	${HOME}/.config/yarn/global/node_modules/.bin(N-/)
 	${HOME}/.gem/ruby/*/bin(N-/)
