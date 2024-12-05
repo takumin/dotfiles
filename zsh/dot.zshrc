@@ -506,6 +506,7 @@ if [[ -x "$(whence -- pnpm)" ]]; then
 	fi
 
 	alias pp="pnpm"
+	alias ppx="pnpx"
 	compdef pp="pnpm"
 fi
 
