@@ -237,6 +237,12 @@ return {
 				})
 			end
 
+			if vim.fn.executable("ruff") == 1 then
+				require("lspconfig").ruff.setup({
+					capabilities = capabilities,
+				})
+			end
+
 			if vim.fn.executable("biome") == 1 then
 				require("lspconfig").biome.setup({
 					capabilities = capabilities,

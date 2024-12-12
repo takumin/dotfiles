@@ -8,7 +8,7 @@ return {
 			formatters_by_ft = {
 				lua = { "stylua" },
 				go = { "goimports", "gofumpt" },
-				python = { "ruff_fix", "isort", "black", stop_after_first = true },
+				python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
 				javascript = { "biome", "prettierd", "prettier", stop_after_first = true },
 				javascriptreact = { "biome", "prettierd", "prettier", stop_after_first = true },
 				typescript = { "biome", "prettierd", "prettier", stop_after_first = true },
