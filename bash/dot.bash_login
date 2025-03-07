@@ -1,0 +1,23 @@
+#!/bin/bash
+# vim: set ft=bash noet :
+
+## tmux
+#
+# if [[ -x "`which tmux`"]]; then
+# 	if [[ -z "$TMUX" ]]; then
+# 		if [ -z `tmux ls` ] ; then
+# 			exec tmux -2u
+# 		else
+# 			exec tmux -2u attach
+# 		fi
+# 	fi
+# fi
+
+## screen
+#
+# if [[ -x "`which screen`" ]]; then
+# 	case "$TERM" in
+# 	*256color)	exec screen -T screen-256color -S main -U -xRR ;;
+# 	*)		exec screen -S main -U -xRR ;;
+# 	esac
+# fi

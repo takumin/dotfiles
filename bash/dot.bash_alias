@@ -1,0 +1,40 @@
+#!/bin/bash
+# vim: set ft=bash noet :
+
+## Alias configuration
+#
+alias h="history 25"
+alias j="jobs -l"
+
+if [[ "${EDITOR}" == "nvim" ]]; then
+	alias vi="nvim"
+	alias vim="nvim"
+elif [[ "${EDITOR}" == "vim" ]]; then
+	alias vi="vim"
+fi
+
+case "${OSTYPE}" in
+freebsd*) alias ls="ls -GwD '%Y/%m/%d %T'" ;;
+darwin*) alias ls="ls -Gw" ;;
+linux*) alias ls="ls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S" ;;
+esac
+
+if [[ -x "$(command -v gnuls)" ]]; then
+	alias ls="gnuls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S"
+elif [[ -x "$(command -v gls)" ]]; then
+	alias ls="gls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S"
+fi
+
+alias la="ls -a"
+alias lf="ls -FA"
+alias li="ls -ai"
+alias ll="ls -FAlh"
+
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+
+alias du="du -h"
+alias df="df -h"
+
+alias su="su -l"
