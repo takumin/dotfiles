@@ -454,6 +454,14 @@ if [[ -x "$(whence -- gotpm)" ]]; then
 		compdef _gotpm gotpm
 	fi
 fi
+# runpodctl completion
+#
+if [[ -x "$(whence -- runpodctl)" ]]; then
+	if completion="$(runpodctl completion zsh 2>/dev/null)"; then
+		source <(echo "${completion}")
+		compdef _runpodctl runpodctl
+	fi
+fi
 # aws_completer completion
 #
 if [[ -x "$(whence -- aws_completer)" ]]; then
