@@ -528,6 +528,10 @@ fi
 #
 export PYTHONUSERBASE="${HOME}/.usr"
 
+## pnpm configuration
+#
+export PNPM_HOME="${HOME}/.local/share/pnpm"
+
 ## golang configuration
 #
 export GOPATH="${HOME}/.usr"
