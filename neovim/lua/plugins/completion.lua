@@ -208,6 +208,13 @@ return {
 				})
 			end
 
+			-- TODO: タグジャンプが出来ないため無効化
+			-- if vim.fn.executable("ruff") == 1 then
+			-- 	require("lspconfig").ruff.setup({
+			-- 		capabilities = capabilities,
+			-- 	})
+			-- end
+
 			if vim.fn.executable("pylsp") == 1 then
 				require("lspconfig").pylsp.setup({
 					capabilities = capabilities,
@@ -233,12 +240,6 @@ return {
 
 			if vim.fn.executable("typescript-language-server") == 1 then
 				require("lspconfig").ts_ls.setup({
-					capabilities = capabilities,
-				})
-			end
-
-			if vim.fn.executable("ruff") == 1 then
-				require("lspconfig").ruff.setup({
 					capabilities = capabilities,
 				})
 			end
