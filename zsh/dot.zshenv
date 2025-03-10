@@ -115,6 +115,7 @@ fpath=(
 	/opt/vagrant/embedded/gems/*/gems/vagrant-*/contrib/zsh(N-/)
 	/usr/local/share/zsh/site-functions(N-/)
 	/usr/local/share/zsh-completions(N-/)
+	/usr/share/zsh/vendor-completions(N-/)
 	"$fpath[@]"(N)
 )
 typeset -U fpath
