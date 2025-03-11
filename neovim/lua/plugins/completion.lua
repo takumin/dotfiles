@@ -232,6 +232,12 @@ return {
 				})
 			end
 
+			if vim.fn.executable("csharp-ls") == 1 then
+				require("lspconfig").csharp_ls.setup({
+					capabilities = capabilities,
+				})
+			end
+
 			if vim.fn.executable("terraform-ls") == 1 then
 				require("lspconfig").terraformls.setup({
 					capabilities = capabilities,
