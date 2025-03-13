@@ -13,6 +13,7 @@ return {
 				javascriptreact = { "biome", "prettierd", "prettier", stop_after_first = true },
 				typescript = { "biome", "prettierd", "prettier", stop_after_first = true },
 				typescriptreact = { "biome", "prettierd", "prettier", stop_after_first = true },
+				cs = { "csharpier" },
 				html = { "biome", "prettierd", "prettier", stop_after_first = true },
 				css = { "biome", "prettierd", "prettier", stop_after_first = true },
 				json = { "biome", "prettierd", "prettier", stop_after_first = true },
@@ -27,7 +28,7 @@ return {
 			},
 			-- Set up format-on-save
 			format_on_save = {
-				timeout_ms = 500,
+				timeout_ms = 1000,
 			},
 			-- Customize formatters
 			formatters = {
