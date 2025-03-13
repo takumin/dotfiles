@@ -559,15 +559,13 @@ fi
 # pnpm completion
 #
 if [[ -x "$(whence -- pnpm)" ]]; then
-	# recommends pnpm-shell-completion
-	# see also: https://github.com/g-plane/pnpm-shell-completion
-	if [[ -r "/usr/local/share/zsh/site-functions/_pnpm" ]]; then
-		source "/usr/local/share/zsh/site-functions/_pnpm"
-	fi
-
 	alias pp="pnpm"
 	alias ppx="pnpx"
-	compdef pp="pnpm"
+
+	if completion="$(pnpm completion zsh 2>/dev/null)"; then
+		source <(echo "${completion}")
+		compdef pp="pnpm"
+	fi
 fi
 
 
