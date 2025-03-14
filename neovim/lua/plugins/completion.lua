@@ -208,12 +208,17 @@ return {
 				})
 			end
 
-			-- TODO: タグジャンプが出来ないため無効化
-			-- if vim.fn.executable("ruff") == 1 then
-			-- 	require("lspconfig").ruff.setup({
-			-- 		capabilities = capabilities,
-			-- 	})
-			-- end
+			if vim.fn.executable("ruff") == 1 then
+				require("lspconfig").ruff.setup({
+					capabilities = capabilities,
+
+					init_options = {
+						settings = {
+							lineLength = 120,
+						},
+					},
+				})
+			end
 
 			if vim.fn.executable("pylsp") == 1 then
 				require("lspconfig").pylsp.setup({
@@ -223,8 +228,7 @@ return {
 						pylsp = {
 							plugins = {
 								pycodestyle = {
-									-- ignore = {'W391'},
-									maxLineLength = 100,
+									maxLineLength = 120,
 								},
 							},
 						},
