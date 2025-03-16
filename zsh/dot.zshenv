@@ -767,6 +767,10 @@ export TPM2_PKCS11_LOG_LEVEL="0"
 #
 export DOTNET_CLI_TELEMETRY_OPTOUT="1"
 
+## Wrangler telemetry
+#
+export WRANGLER_SEND_METRICS="false"
+
 ## set ${REMOTEHOST} of remote client connection address
 #
 if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
