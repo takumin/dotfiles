@@ -1,6 +1,6 @@
 include Makefile.env
 
-SUBDIRS := $(shell find . -mindepth 2 -maxdepth 2 -type f -name 'Makefile' -printf '%h\n')
+SUBDIRS := $(shell find . -mindepth 2 -maxdepth 2 -type f -name 'Makefile' | awk -F '/' '{print $$2}')
 
 .PHONY: default
 default: install
