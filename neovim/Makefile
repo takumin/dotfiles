@@ -46,7 +46,11 @@ ${HOME}/.local/state/nvim/undo: ${HOME}/.local/state/nvim
 	@mkdir -p $@
 
 ${HOME}/.config/nvim/init.lua: ${HOME}/.config/nvim
-	@ln -s $(CURDIR)/init.lua $@
+	@if [ ! -L "$@" ]; then \
+		ln -s $(CURDIR)/init.lua $@; \
+	fi
 
 ${HOME}/.config/nvim/lua: ${HOME}/.config/nvim
-	@ln -s $(CURDIR)/lua $@
+	@if [ ! -L "$@" ]; then \
+		ln -s $(CURDIR)/lua $@; \
+	fi
