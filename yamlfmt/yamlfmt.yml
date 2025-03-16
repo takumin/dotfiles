@@ -1,4 +1,7 @@
 ---
+gitignore_excludes: true
+exclude:
+- pnpm-lock.yaml
 formatter:
   type: basic
   line_ending: lf
