@@ -14,6 +14,7 @@ tap "reviewdog/tap"
 tap "suzuki-shunsuke/ci-info"
 tap "suzuki-shunsuke/cmdx"
 tap "suzuki-shunsuke/ghalint"
+tap "jesseduffield/lazygit/lazygit"
 
 brew "actionlint"
 brew "aicommits"
@@ -116,6 +117,7 @@ brew "reviewdog/tap/reviewdog"
 brew "suzuki-shunsuke/ci-info/ci-info"
 brew "suzuki-shunsuke/cmdx/cmdx"
 brew "suzuki-shunsuke/ghalint/ghalint"
+brew "jesseduffield/lazygit/lazygit"
 
 if OS.linux?
   brew "nerdctl"
