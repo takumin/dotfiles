@@ -3,4 +3,7 @@ vim.loader.enable()
 -- load lua files
 require("core.opts")
 require("core.cmds")
-require("core.lazy")
+-- neovim only
+if not vim.g.vscode then
+	require("core.lazy")
+end
