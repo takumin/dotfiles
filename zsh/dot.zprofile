@@ -12,11 +12,17 @@ fi
 ## 1password
 #
 if [[ -z "${SSH_CONNECTION}" ]]; then
+	# for macos
 	if [[ -r "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
 		export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 	fi
+	# for linux
 	if [[ -r "${HOME}/.1password/agent.sock" ]]; then
 		export SSH_AUTH_SOCK="${HOME}/.1password/agent.sock"
+	fi
+	# for wsl2
+	if [[ -r "${HOME}/.ssh/agent.sock" ]]; then
+		export SSH_AUTH_SOCK="${HOME}/.ssh/agent.sock"
 	fi
 fi
 
