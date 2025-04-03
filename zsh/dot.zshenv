@@ -361,12 +361,10 @@ else
 	export VISUAL="vi"
 fi
 
-## pager of less(1) or lv(1) or more(1)
+## pager of less(1) or more(1)
 #
 if [[ -x "`whence -- less`" ]]; then
 	export PAGER="less"
-elif [[ -x "`whence -- lv`" ]]; then
-	export PAGER="lv"
 else
 	export PAGER="more"
 fi
@@ -403,12 +401,6 @@ if [[ -x "`whence -- less`" ]]; then
 	if [[ -x "`whence -- lesspipe.sh`" ]]; then
 		export LESSOPEN="|`whence -- lesspipe.sh` %s"
 	fi
-fi
-
-## lv(1) configuration
-#
-if [[ -x "`whence -- lv`" ]]; then
-	export LV="-c -la -Ou8"
 fi
 
 ## mail configuration
@@ -504,9 +496,7 @@ fi
 
 ## man configuration
 #
-if [[ -x "`whence -- lv`" ]]; then
-	export MANPAGER="lv"
-elif [[ -x "`whence -- less`" ]]; then
+if [[ -x "`whence -- less`" ]]; then
 	export MANPAGER="less"
 else
 	export MANPAGER="more"
