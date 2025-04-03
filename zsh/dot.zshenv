@@ -673,7 +673,7 @@ esac
 ## powerline initilize
 #
 if [[ -x "`whence -- pip`" ]] && [[ -x "`whence -- powerline`" ]]; then
-	export powerline_python_path=`pip show powerline-status | grep Location | cut -f 2 -d " "`
+	export powerline_python_path="`pip show powerline-status | grep Location | cut -f 2 -d " "`"
 fi
 
 ## vagrant
