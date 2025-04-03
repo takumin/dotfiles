@@ -426,25 +426,6 @@ if [[ -z "${DESKTOP_SESSION}" ]]; then
 	fi
 fi
 
-## subversion configuration
-#
-if [[ -x "`whence -- svn`" ]]; then
-	export SVN_EDITOR="${EDITOR}"
-
-	if [[ -r "${HOME}/.ssh/id_ed25519" ]]; then
-		export SVN_SSH="ssh -q -i ${HOME}/.ssh/id_ed25519"
-	fi
-	if [[ -r "${HOME}/.ssh/id_rsa" ]]; then
-		export SVN_SSH="ssh -q -i ${HOME}/.ssh/id_rsa"
-	fi
-	if [[ -r "${HOME}/.ssh/*.key" ]]; then
-		export SVN_SSH="ssh -q -i ${HOME}/.ssh/*.key"
-	fi
-	if [[ -r "${HOME}/.vagrant.d/insecure_private_key" ]]; then
-		export SVN_SSH="ssh -q -i ${HOME}/.vagrant.d/insecure_private_key"
-	fi
-fi
-
 ## git configuration
 #
 if [[ -x "`whence -- git`" ]]; then

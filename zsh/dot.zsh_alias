@@ -151,14 +151,6 @@ function psuser () {
 	fi
 }
 
-if [[ -x "`whence -- svn`" ]]; then
-	if [[ -x "`whence -- colordiff`" ]]; then
-		alias svndiff='svn diff --diff-cmd colordiff -x "-y -w -i -u"'
-	else
-		alias svndiff='svn diff --diff-cmd diff -x -w "-y -i -u"'
-	fi
-fi
-
 case "${OSTYPE}" in
 linux*)
 	if [[ -f "/etc/arch-release" ]]; then
@@ -177,12 +169,6 @@ freebsd*)
 		if [[ -d "/usr/ports/.git" ]]; then
 			if [[ -x "`whence -- git`" ]]; then
 				alias updateports="pushd -q /usr/ports; sudo git pull; sudo make fetchindex; popd -q"
-			fi
-		elif [[ -d "/usr/ports/.svn" ]]; then
-			if [[ -x "`whence -- svn`" ]]; then
-				alias updateports="sudo svn up /usr/ports"
-			elif [[ -x "`whence -- svnlite`" ]]; then
-				alias updateports="sudo svnlite up /usr/ports"
 			fi
 		else
 			if [[ -x "`whence -- portshaker`" ]]; then
