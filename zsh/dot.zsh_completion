@@ -47,11 +47,6 @@ fi
 if [[ -x "$(whence -- rustup)" ]]; then
 	source <(rustup completions zsh)
 fi
-# travis ci completion
-#
-if [[ -r "${HOME}/.travis/travis.sh" ]]; then
-	source "${HOME}/.travis/travis.sh"
-fi
 # buf build completion
 #
 if [[ -x "$(whence -- buf)" ]]; then
