@@ -275,32 +275,10 @@ function find_venv_in_parents() {
 
 
 
-# load zsh-autosuggestions
+# loading sheldon plugins
 #
-if [[ -r "${ZDOTDIR}/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
-	source "${ZDOTDIR}/zsh-autosuggestions/zsh-autosuggestions.zsh"
-	export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=240"
-fi
-# load zsh-syntax-highlighting
-#
-if [[ -r "${ZDOTDIR}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-	source "${ZDOTDIR}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-	# bindkey '[A' history-substring-search-up
-	# bindkey '[B' history-substring-search-down
-	# bindkey -M emacs '^P' history-substring-search-up
-	# bindkey -M emacs '^N' history-substring-search-down
-	# bindkey -M vicmd 'k' history-substring-search-up
-	# bindkey -M vicmd 'j' history-substring-search-down
-fi
-# load zsh-history-substring-search
-#
-if [[ -r "${ZDOTDIR}/zsh-history-substring-search/zsh-history-substring-search.zsh" ]]; then
-	source "${ZDOTDIR}/zsh-history-substring-search/zsh-history-substring-search.zsh"
-fi
-# load zload
-#
-if [[ -r "${ZDOTDIR}/zload/zload" ]]; then
-	autoload -Uz zload
+if [[ -x "$(whence -- sheldon)" ]]; then
+	eval "$(sheldon source)"
 fi
 
 
