@@ -454,14 +454,6 @@ if [[ -x "$(whence -- gem)" ]]; then
 	export RB_USER_INSTALL="yes"
 fi
 
-## gisty configuration
-#
-if [[ -x "$(whence -- gisty)" ]]; then
-	if [[ -d "${HOME}/.gisty" ]]; then
-		export GISTY_DIR="${HOME}/.gisty"
-	fi
-fi
-
 ## GNU Screen configuration
 #
 if [[ -x "$(whence -- screen)" ]]; then
