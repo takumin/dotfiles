@@ -22,15 +22,20 @@ github = "romkatv/zsh-defer"
 
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
-use = ['{{ name }}.zsh']
 apply = ["defer"]
 
 [plugins.zsh-syntax-highlighting]
 github = "zsh-users/zsh-syntax-highlighting"
-use = ['{{ name }}.zsh']
 apply = ["defer"]
 
 [plugins.zsh-history-substring-search]
 github = "zsh-users/zsh-history-substring-search"
-use = ['{{ name }}.zsh']
+apply = ["defer"]
+
+[plugins.oh-my-zsh]
+github = "ohmyzsh/ohmyzsh"
+use = [
+  # python virtualenvwrapper
+  'plugins/virtualenvwrapper/virtualenvwrapper.plugin.zsh',
+]
 apply = ["defer"]
