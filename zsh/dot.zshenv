@@ -369,11 +369,14 @@ else
 	export PAGER="more"
 fi
 
-## ls(1) color configuration
+## bsd ls(1) color configuration
 #
 case "${OSTYPE}" in
 freebsd*|darwin*) export LSCOLORS="gxfxcxdxbxegedabagacad" ;;
 esac
+
+## gnu ls(1) color configuration
+#
 if [[ -x "$(whence -- vivid)" ]]; then
 	export LS_COLORS="$(vivid generate tokyonight-night)"
 elif [[ -x "$(whence -- dircolors)" ]]; then
