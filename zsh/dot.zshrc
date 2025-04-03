@@ -349,6 +349,11 @@ fi
 if [[ -r "${HOME}/.travis/travis.sh" ]]; then
 	source "${HOME}/.travis/travis.sh"
 fi
+# buf build completion
+#
+if [[ -x "$(whence -- buf)" ]]; then
+	source <(buf completion zsh)
+fi
 # kubectl completion
 #
 if [[ -x "`whence -- kubectl`" ]]; then
