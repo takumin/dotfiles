@@ -3,8 +3,8 @@
 
 # aws-cli completion
 #
-if [[ -r "`whence -- aws_zsh_completer.sh`" ]]; then
-	source "`whence -- aws_zsh_completer.sh`"
+if [[ -r "$(whence -- aws_zsh_completer.sh)" ]]; then
+	source "$(whence -- aws_zsh_completer.sh)"
 fi
 # golang initilize
 #
@@ -13,12 +13,12 @@ if [[ -r "/usr/local/share/zsh/site-functions/go" ]]; then
 fi
 # golangci-lint completion
 #
-if [[ -x "`whence -- golangci-lint`" ]]; then
+if [[ -x "$(whence -- golangci-lint)" ]]; then
 	source <(golangci-lint completion zsh)
 fi
 # direnv initilize
 #
-if [[ -x "`whence -- direnv`" ]]; then
+if [[ -x "$(whence -- direnv)" ]]; then
 	eval "$(direnv hook zsh)"
 fi
 # lefthook completion
@@ -54,17 +54,17 @@ if [[ -x "$(whence -- buf)" ]]; then
 fi
 # kubectl completion
 #
-if [[ -x "`whence -- kubectl`" ]]; then
+if [[ -x "$(whence -- kubectl)" ]]; then
 	source <(kubectl completion zsh)
 fi
 # kubeadm completion
 #
-if [[ -x "`whence -- kubeadm`" ]]; then
+if [[ -x "$(whence -- kubeadm)" ]]; then
 	source <(kubeadm completion zsh)
 fi
 # minikube completion
 #
-if [[ -x "`whence -- minikube`" ]]; then
+if [[ -x "$(whence -- minikube)" ]]; then
 	source <(minikube completion zsh)
 fi
 # docker completion
@@ -224,11 +224,11 @@ if [[ -x "$(whence -- aws_completer)" ]]; then
 fi
 # python pip completion
 #
-# if [[ -x "`whence -- pip`" ]]; then
-# 	eval "`pip completion --zsh --disable-pip-version-check`"
+# if [[ -x "$(whence -- pip)" ]]; then
+# 	eval "$(pip completion --zsh --disable-pip-version-check)"
 # fi
-# if [[ -x "`whence -- pip3`" ]]; then
-# 	eval "`pip3 completion --zsh --disable-pip-version-check`"
+# if [[ -x "$(whence -- pip3)" ]]; then
+# 	eval "$(pip3 completion --zsh --disable-pip-version-check)"
 # fi
 # vagrant completion
 #
