@@ -214,58 +214,6 @@ chpwd() {
 	if [[ -d "${PWD}/.bundle/bin" ]]; then
 		path=(${PWD}/.bundle/bin $path)
 	fi
-
-	# Deactivate virtual environment
-	if [[ -n "$VIRTUAL_ENV" && $PWD != ${VIRTUAL_ENV%/*} && $PWD != ${VIRTUAL_ENV%/*}/* ]]; then
-		deactivate
-	fi
-
-	# Recursively find virtual env in parent directories
-	find_venv_in_parents $PWD
-}
-
-
-
-# search python venv environment
-#
-function find_venv_in_parents() {
-	local dir=$1
-	local venv_path="$dir/.venv"
-	local pyvenv_cfg="$venv_path/pyvenv.cfg"
-
-	# Check for pyvenv.cfg in the .venv directory
-	if [[ -f $pyvenv_cfg ]]; then
-		source "$venv_path/bin/activate"
-
-	elif [[ -d $venv_path ]]; then
-		# Enumerate directories, including dotfiles
-		setopt LOCAL_OPTIONS NULL_GLOB
-		local dirs=($(ls -d "$venv_path/"*))
-		local num_dirs=${#dirs[@]}
-
-		# If there's no directory, ignore it and recursively check the parent
-		if (( num_dirs == 0 )); then
-			if [[ $dir != '/' ]]; then
-				find_venv_in_parents "$(dirname "$dir")"
-			fi
-
-		# If there's only one directory, activate it
-		elif (( num_dirs == 1 )); then
-			source "${dirs[1]}/bin/activate"
-
-		# If there are multiple directories, use peco to select one and activate it
-		elif (( num_dirs > 1 )); then
-			local selected_dir=$(printf '%s\n' "${dirs[@]}" | peco)
-			if [[ $selected_dir == $venv_path/* ]]; then
-				source "$selected_dir/bin/activate"
-			fi
-		fi
-	else
-		# If we are not in the root directory, recursively check the parent
-		if [[ $dir != '/' ]]; then
-			find_venv_in_parents "$(dirname "$dir")"
-		fi
-	fi
 }
 
 
