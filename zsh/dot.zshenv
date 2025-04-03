@@ -40,6 +40,7 @@ path=(
 	"${HOME}/Library/Application Support/JetBrains/Toolbox/scripts"(N-/)
 	/nix/var/nix/profiles/default/bin(N-/)
 	/home/linuxbrew/.linuxbrew/bin(N-/)
+	/home/linuxbrew/.linuxbrew/lib/ruby/gems/*/bin(N-/)
 	/usr/local/opt/coreutils/bin(N-/)
 	/usr/local/opt/llvm/bin(N-/)
 	/usr/local/libexec/ccache(N-/)
