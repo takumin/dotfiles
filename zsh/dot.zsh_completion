@@ -16,11 +16,6 @@ fi
 if [[ -x "$(whence -- golangci-lint)" ]]; then
 	source <(golangci-lint completion zsh)
 fi
-# direnv initilize
-#
-if [[ -x "$(whence -- direnv)" ]]; then
-	eval "$(direnv hook zsh)"
-fi
 # lefthook completion
 #
 if [[ -x "$(whence -- lefthook)" ]]; then

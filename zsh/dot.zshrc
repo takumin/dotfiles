@@ -9,6 +9,14 @@ source "${HOME}/.zshenv"
 
 
 
+# direnv initilize
+#
+if [[ -x "$(whence -- direnv)" ]]; then
+	eval "$(direnv hook zsh)"
+fi
+
+
+
 ## vscode integration
 #
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
