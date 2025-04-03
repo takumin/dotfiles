@@ -1,6 +1,7 @@
 # vim: set ft=ruby :
 
 tap "aquaproj/aqua"
+tap "bufbuild/buf"
 tap "fujiwara/tap"
 tap "go-task/tap"
 tap "hashicorp/tap"
@@ -116,6 +117,7 @@ brew "zoxide"
 brew "zsh"
 
 brew "aquaproj/aqua/aqua"
+brew "bufbuild/buf/buf"
 brew "fujiwara/tap/lambroll"
 brew "go-task/tap/go-task"
 brew "hashicorp/tap/packer"
