@@ -11,6 +11,7 @@ FILES = \
 	${HOME}/.zsh/.zlogout \
 	${HOME}/.zsh/.zprofile \
 	${HOME}/.zsh/.zsh_alias \
+	${HOME}/.zsh/.zsh_completion \
 	${HOME}/.zsh/.zshrc
 
 PLUGINS = \
@@ -55,6 +56,8 @@ ${HOME}/.zsh/.zprofile:
 	@ln -s ../${DOTDIR_NAME}/zsh/dot.zprofile $@
 ${HOME}/.zsh/.zsh_alias:
 	@ln -s ../${DOTDIR_NAME}/zsh/dot.zsh_alias $@
+${HOME}/.zsh/.zsh_completion:
+	@ln -s ../${DOTDIR_NAME}/zsh/dot.zsh_completion $@
 ${HOME}/.zsh/.zshrc:
 	@ln -s ../${DOTDIR_NAME}/zsh/dot.zshrc $@
 
