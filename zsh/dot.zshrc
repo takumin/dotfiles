@@ -208,10 +208,6 @@ esac
 #
 chpwd() {
 	ls
-
-	if [[ -d "${PWD}/.bundle/bin" ]]; then
-		path=(${PWD}/.bundle/bin $path)
-	fi
 }
 
 
