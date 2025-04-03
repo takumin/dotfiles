@@ -126,6 +126,7 @@ brew "yarn-completion"
 brew "zizmor"
 brew "zoxide"
 brew "zsh"
+brew "zsh-completions"
 
 brew "aquaproj/aqua/aqua"
 brew "bufbuild/buf/buf"
