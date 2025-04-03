@@ -307,7 +307,7 @@ fi
 
 ## reload .zshenv
 #
-source "${ZDOTDIR}/.zsh_completion"
+[[ -r "${ZDOTDIR}/.zsh_completion" ]] && source "${ZDOTDIR}/.zsh_completion"
 
 
 
