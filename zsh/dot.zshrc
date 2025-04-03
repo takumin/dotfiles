@@ -178,7 +178,19 @@ zstyle :compinstall                       filename "${ZDOTDIR}/.zshrc"
 ## completion
 #
 # compinit
-autoload -Uz compinit && compinit -u
+autoload -Uz compinit
+if [[ -f "${ZDOTDIR}/.zcompdump" ]]; then
+	local now="$(date +"%s")"
+	local updated="$(date -r "${ZDOTDIR}/.zcompdump" +"%s")"
+	local threshold="$((60 * 60 * 8))"
+	if [[ $((${now} - ${updated})) -gt ${threshold} ]]; then
+		compinit
+	else
+		compinit -C
+	fi
+else
+	compinit -iu
+fi
 # bashcompinit
 autoload -U +X bashcompinit && bashcompinit
 
