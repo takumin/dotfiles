@@ -179,11 +179,9 @@ autoload -Uz zed
 if [[ -x "$(whence -- starship)" ]]; then
 	eval "$(starship init zsh)"
 else
-	if [[ -z "${POWERLINE_COMMAND}" ]]; then
-		autoload -Uz promptinit
-		promptinit
-		prompt adam1
-	fi
+	autoload -Uz promptinit
+	promptinit
+	prompt adam1
 fi
 
 
