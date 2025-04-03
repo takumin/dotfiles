@@ -378,8 +378,10 @@ fi
 case "${OSTYPE}" in
 freebsd*|darwin*) export LSCOLORS="gxfxcxdxbxegedabagacad" ;;
 esac
-if [[ -x "`whence -- dircolors`" ]]; then
-	if [[ -r "${HOME}/.dircolors-solarized/dircolors.256dark"  ]]; then
+if [[ -x "$(whence -- vivid)" ]]; then
+	export LS_COLORS="$(vivid generate tokyonight-night)"
+elif [[ -x "$(whence -- dircolors)" ]]; then
+	if [[ -r "${HOME}/.dircolors-solarized/dircolors.256dark" ]]; then
 		eval "$(dircolors -b ${HOME}/.dircolors-solarized/dircolors.256dark)"
 	elif [[ -r "${HOME}/.dircolors" ]]; then
 		eval "$(dircolors -b ${HOME}/.dircolors)"
