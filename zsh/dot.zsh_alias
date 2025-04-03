@@ -81,6 +81,11 @@ if [[ -x "`whence -- qo`" ]]; then
 	alias qo="qo -g -x"
 fi
 
+if [[ -x "$(whence -- pnpm)" ]]; then
+	alias pp="pnpm"
+	alias ppx="pnpx"
+fi
+
 if [[ -x "`whence -- valgrind`" ]]; then
 	alias valgrind="valgrind --leak-check=full"
 fi
