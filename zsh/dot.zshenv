@@ -369,6 +369,14 @@ else
 	export PAGER="more"
 fi
 
+## man configuration
+#
+if [[ -x "$(whence -- less)" ]]; then
+	export MANPAGER="less"
+else
+	export MANPAGER="more"
+fi
+
 ## bsd ls(1) color configuration
 #
 case "${OSTYPE}" in
@@ -469,14 +477,6 @@ fi
 #		export SCREENDIR="${HOME}/.tmux/session"
 #	fi
 #fi
-
-## man configuration
-#
-if [[ -x "$(whence -- less)" ]]; then
-	export MANPAGER="less"
-else
-	export MANPAGER="more"
-fi
 
 ## terminfo/termcap entry
 #
