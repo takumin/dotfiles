@@ -17,6 +17,14 @@ fi
 
 
 
+# loading sheldon plugins
+#
+if [[ -x "$(whence -- sheldon)" ]]; then
+	eval "$(sheldon source)"
+fi
+
+
+
 ## vscode integration
 #
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
@@ -217,14 +225,6 @@ esac
 chpwd() {
 	ls
 }
-
-
-
-# loading sheldon plugins
-#
-if [[ -x "$(whence -- sheldon)" ]]; then
-	eval "$(sheldon source)"
-fi
 
 
 

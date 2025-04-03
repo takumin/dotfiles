@@ -14,6 +14,7 @@ shell = "zsh"
 
 [templates]
 defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+oh-my-zsh-fpath = 'fpath=( $(find "{{ dir }}" -type f -name "_*" | xargs dirname) $fpath )'
 
 [plugins]
 
@@ -40,4 +41,4 @@ use = [
   # python virtualenvwrapper
   'plugins/virtualenvwrapper/virtualenvwrapper.plugin.zsh',
 ]
-apply = ["defer"]
+apply = ["defer", "oh-my-zsh-fpath"]
