@@ -547,7 +547,7 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 
 ## kubernetes
 #
-if [ -r "${HOME}/.kube/config" ]; then
+if [[ -r "${HOME}/.kube/config" ]]; then
 	export KUBECONFIG="${HOME}/.kube/config"
 fi
 
@@ -559,7 +559,7 @@ export PACKER_PLUGIN_PATH="${HOME}/.packer.d/plugins"
 #
 export TF_CLI_ARGS_plan="-parallelism=50"
 export TF_CLI_ARGS_apply="-parallelism=50"
-if [ -d "${HOME}/.cache/terraform/plugins" ]; then
+if [[ -d "${HOME}/.cache/terraform/plugins" ]]; then
 	export TF_PLUGIN_CACHE_DIR="${HOME}/.cache/terraform/plugins"
 fi
 
