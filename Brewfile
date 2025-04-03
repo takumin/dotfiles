@@ -14,6 +14,7 @@ tap "reviewdog/tap"
 tap "suzuki-shunsuke/ci-info"
 tap "suzuki-shunsuke/cmdx"
 tap "suzuki-shunsuke/ghalint"
+tap "suzuki-shunsuke/pinact"
 
 brew "actionlint"
 brew "age"
@@ -134,6 +135,7 @@ brew "reviewdog/tap/reviewdog"
 brew "suzuki-shunsuke/ci-info/ci-info"
 brew "suzuki-shunsuke/cmdx/cmdx"
 brew "suzuki-shunsuke/ghalint/ghalint"
+brew "suzuki-shunsuke/pinact/pinact"
 
 if OS.linux?
   brew "nerdctl"
