@@ -116,6 +116,7 @@ brew "yamlfmt"
 brew "yamllint"
 brew "yarn"
 brew "yarn-completion"
+brew "zizmor"
 brew "zoxide"
 brew "zsh"
 
