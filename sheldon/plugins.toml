@@ -35,6 +35,8 @@ apply = ["defer"]
 [plugins.oh-my-zsh]
 github = "ohmyzsh/ohmyzsh"
 use = [
+  # ruby bundler
+  'plugins/bundler/bundler.plugin.zsh',
   # python virtualenvwrapper
   'plugins/virtualenvwrapper/virtualenvwrapper.plugin.zsh',
 ]
