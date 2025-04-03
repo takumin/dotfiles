@@ -361,12 +361,10 @@ else
 	export VISUAL="vi"
 fi
 
-## pager of less(1) or jless(1) or lv(1) or more(1)
+## pager of less(1) or lv(1) or more(1)
 #
 if [[ -x "`whence -- less`" ]]; then
 	export PAGER="less"
-elif [[ -x "`whence -- jless`" ]]; then
-	export PAGER="jless"
 elif [[ -x "`whence -- lv`" ]]; then
 	export PAGER="lv"
 else
@@ -392,9 +390,9 @@ else
 	export LS_COLORS="di=36:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30"
 fi
 
-## less(1) or jless(1) configuration
+## less(1) configuration
 #
-if [[ -x "`whence -- less`" ]] || [[ -x "`whence -- jless`" ]]; then
+if [[ -x "`whence -- less`" ]]; then
 	# command line option
 	#export LESS="-r"
 	# ignore history file
@@ -510,8 +508,6 @@ if [[ -x "`whence -- lv`" ]]; then
 	export MANPAGER="lv"
 elif [[ -x "`whence -- less`" ]]; then
 	export MANPAGER="less"
-elif [[ -x "`whence -- jless`" ]]; then
-	export MANPAGER="jless"
 else
 	export MANPAGER="more"
 fi
