@@ -397,7 +397,7 @@ if [[ -x "$(whence -- less)" ]]; then
 	# command line option
 	#export LESS="-r"
 	# ignore history file
-	export LESSHISTFILE="${HOME}/.lesshst"
+	# export LESSHISTFILE="${HOME}/.lesshst"
 	# charset encoding
 	#export LESSCHARSET="utf-8"
 	# filter program
