@@ -776,7 +776,7 @@ export WRANGLER_SEND_METRICS="false"
 ## set ${REMOTEHOST} of remote client connection address
 #
 if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
-	export REMOTEHOST=`echo ${SSH_CLIENT} | cut -d " " -f 1`
+	export REMOTEHOST="`echo ${SSH_CLIENT} | cut -d " " -f 1`"
 fi
 
 ## load user .zshenv configuration file
