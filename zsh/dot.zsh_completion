@@ -235,12 +235,6 @@ fi
 # if [[ -x "`whence -- pip3`" ]]; then
 # 	eval "`pip3 completion --zsh --disable-pip-version-check`"
 # fi
-# powerline configuration
-if [[ -x "`whence -- python`" ]] || [[ -x "`whence -- python3`" ]] ; then
-	if [[ -r "${powerline_python_path}/powerline/bindings/zsh/powerline.zsh" ]]; then
-		source "${powerline_python_path}/powerline/bindings/zsh/powerline.zsh"
-	fi
-fi
 # vagrant completion
 #
 if [[ -d "/opt/vagrant/embedded/gems/gems" ]]; then
