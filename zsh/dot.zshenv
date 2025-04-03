@@ -490,7 +490,7 @@ if [[ -x "`whence -- infocmp`" ]]; then
 		export TERMINFO_DIRS="${HOME}/.terminfo"
 	fi
 elif [[ -r "${HOME}/.termcap" ]]; then
-	TERMCAP=$(< ${HOME}/.termcap)
+	TERMCAP="$(< ${HOME}/.termcap)"
 	export TERMCAP
 fi
 
