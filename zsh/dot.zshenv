@@ -344,16 +344,16 @@ export FTP_PASSIVE_MODE="Y"
 
 ## use ccache
 #
-if [[ -x "`whence -- ccache`" ]]; then
+if [[ -x "$(whence -- ccache)" ]]; then
 	export CCACHE_DIR="${HOME}/.ccache"
 fi
 
 ## editor of nvim(1) or vim(1) or vi(1)
 #
-if [[ -x "`whence -- nvim`" ]]; then
+if [[ -x "$(whence -- nvim)" ]]; then
 	export EDITOR="nvim"
 	export VISUAL="nvim"
-elif [[ -x "`whence -- vim`" ]]; then
+elif [[ -x "$(whence -- vim)" ]]; then
 	export EDITOR="vim"
 	export VISUAL="vim"
 else
@@ -363,7 +363,7 @@ fi
 
 ## pager of less(1) or more(1)
 #
-if [[ -x "`whence -- less`" ]]; then
+if [[ -x "$(whence -- less)" ]]; then
 	export PAGER="less"
 else
 	export PAGER="more"
@@ -390,7 +390,7 @@ fi
 
 ## less(1) configuration
 #
-if [[ -x "`whence -- less`" ]]; then
+if [[ -x "$(whence -- less)" ]]; then
 	# command line option
 	#export LESS="-r"
 	# ignore history file
@@ -398,8 +398,8 @@ if [[ -x "`whence -- less`" ]]; then
 	# charset encoding
 	#export LESSCHARSET="utf-8"
 	# filter program
-	if [[ -x "`whence -- lesspipe.sh`" ]]; then
-		export LESSOPEN="|`whence -- lesspipe.sh` %s"
+	if [[ -x "$(whence -- lesspipe.sh)" ]]; then
+		export LESSOPEN="|$(whence -- lesspipe.sh) %s"
 	fi
 fi
 
@@ -411,10 +411,10 @@ fi
 
 ## mailer agent
 #
-if [[ -x "`whence -- msmtp`" ]]; then
-	export MAIL_AGENT="`whence -- msmtp`"
-elif [[ -x "`whence -- nbsmtp`" ]]; then
-	export MAIL_AGENT="`whence -- nbsmtp`"
+if [[ -x "$(whence -- msmtp)" ]]; then
+	export MAIL_AGENT="$(whence -- msmtp)"
+elif [[ -x "$(whence -- nbsmtp)" ]]; then
+	export MAIL_AGENT="$(whence -- nbsmtp)"
 fi
 
 ## w3m configuration
@@ -428,14 +428,14 @@ fi
 
 ## git configuration
 #
-if [[ -x "`whence -- git`" ]]; then
+if [[ -x "$(whence -- git)" ]]; then
 	export GIT_EDITOR="${EDITOR}"
 	export GIT_PAGER="${PAGER}"
 fi
 
 ## ruby configuration
 #
-if [[ -x "`whence -- ruby`" ]]; then
+if [[ -x "$(whence -- ruby)" ]]; then
 	if [[ -r "${HOME}/.ssl.crt" ]]; then
 		export SSL_CERT_FILE="${HOME}/.ssl.crt"
 	elif [[ -r "/usr/local/etc/ssl/cert.pem" ]]; then
@@ -447,13 +447,13 @@ fi
 
 ## gem configuration
 #
-if [[ -x "`whence -- gem`" ]]; then
+if [[ -x "$(whence -- gem)" ]]; then
 	export RB_USER_INSTALL="yes"
 fi
 
 ## gisty configuration
 #
-if [[ -x "`whence -- gisty`" ]]; then
+if [[ -x "$(whence -- gisty)" ]]; then
 	if [[ -d "${HOME}/.gisty" ]]; then
 		export GISTY_DIR="${HOME}/.gisty"
 	fi
@@ -461,7 +461,7 @@ fi
 
 ## GNU Screen configuration
 #
-if [[ -x "`whence -- screen`" ]]; then
+if [[ -x "$(whence -- screen)" ]]; then
 	if [[ -d "${HOME}/.screen/session" ]]; then
 		export SCREENDIR="${HOME}/.screen/session"
 	fi
@@ -469,7 +469,7 @@ fi
 
 ## tmux configuration
 #
-#if [[ -x "`whence -- tmux`" ]]; then
+#if [[ -x "$(whence -- tmux)" ]]; then
 #	if [[ -d "${HOME}/.tmux/session" ]]; then
 #		export SCREENDIR="${HOME}/.tmux/session"
 #	fi
@@ -477,7 +477,7 @@ fi
 
 ## man configuration
 #
-if [[ -x "`whence -- less`" ]]; then
+if [[ -x "$(whence -- less)" ]]; then
 	export MANPAGER="less"
 else
 	export MANPAGER="more"
@@ -485,7 +485,7 @@ fi
 
 ## terminfo/termcap entry
 #
-if [[ -x "`whence -- infocmp`" ]]; then
+if [[ -x "$(whence -- infocmp)" ]]; then
 	if [[ -d "${HOME}/.terminfo" ]]; then
 		export TERMINFO_DIRS="${HOME}/.terminfo"
 	fi
@@ -514,7 +514,7 @@ export GO111MODULE="on"
 
 ## goenv
 #
-if [[ -x "`whence -- goenv`" ]]; then
+if [[ -x "$(whence -- goenv)" ]]; then
 	if [[ -d "${HOME}/.goenv" ]]; then
 		export GOENV_ROOT="${HOME}/.goenv"
 	fi
@@ -526,7 +526,7 @@ export GHQ_ROOT="${HOME}/.usr/src"
 
 ## aqua
 #
-if [[ -x "`whence -- aqua`" ]]; then
+if [[ -x "$(whence -- aqua)" ]]; then
 	AQUA_ROOT_DIR="${XDG_DATA_HOME:-"${HOME}/.local/share"}/aquaproj-aqua"
 fi
 
@@ -638,7 +638,7 @@ case "${OSTYPE}" in
 esac
 
 ## vagrant
-if [[ -x "`whence vagrant`" ]]; then
+if [[ -x "$(whence vagrant)" ]]; then
 	case "${OSTYPE}" in
 		linux*)		export VAGRANT_DEFAULT_PROVIDER="libvirt" ;;
 		*)				export VAGRANT_DEFAULT_PROVIDER="virtualbox" ;;
@@ -659,7 +659,7 @@ fi
 
 ## ROS
 #
-if [[ -x "`whence -- roscore`" ]]; then
+if [[ -x "$(whence -- roscore)" ]]; then
 	# Environment Variables - System
 	if [[ -r "/opt/ros/melodic/setup.zsh" ]]; then
 		source "/opt/ros/melodic/setup.zsh"
@@ -680,12 +680,12 @@ if [[ -x "`whence -- roscore`" ]]; then
 	fi
 	# Run
 	if [[ -z "${ROS_HOSTNAME}" ]]; then
-		export ROS_HOSTNAME="`hostname`"
+		export ROS_HOSTNAME="$(hostname)"
 	fi
 	export ROS_MASTER_URI="http://${ROS_HOSTNAME}:11311"
 	# Build
-	if [[ -x "`whence -- nproc`" ]]; then
-		export ROS_PARALLEL_JOBS="-j `nproc`"
+	if [[ -x "$(whence -- nproc)" ]]; then
+		export ROS_PARALLEL_JOBS="-j $(nproc)"
 	fi
 fi
 
@@ -716,7 +716,7 @@ fi
 ## aws-vault
 #
 if [[ -n "${WSLENV}" ]]; then
-	if [[ -x "`whence -- pass`" ]]; then
+	if [[ -x "$(whence -- pass)" ]]; then
 		export AWS_VAULT_BACKEND="pass"
 		export AWS_VAULT_PASS_PREFIX="aws-vault"
 	fi
@@ -737,7 +737,7 @@ export WRANGLER_SEND_METRICS="false"
 ## set ${REMOTEHOST} of remote client connection address
 #
 if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
-	export REMOTEHOST="`echo ${SSH_CLIENT} | cut -d " " -f 1`"
+	export REMOTEHOST="$(echo ${SSH_CLIENT} | cut -d " " -f 1)"
 fi
 
 ## load user .zshenv configuration file
