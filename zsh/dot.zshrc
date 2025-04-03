@@ -107,11 +107,6 @@ setopt share_history        # share command history data
 
 
 
-## search manual path
-#
-
-
-
 ## Completion configuration
 #
 # list color
