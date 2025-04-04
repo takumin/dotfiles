@@ -27,8 +27,25 @@ return {
 		},
 	},
 	{
-		-- see also: https://github.com/RRethy/nvim-treesitter-endwise/pull/42
-		"metiulekm/nvim-treesitter-endwise",
+		"nvim-treesitter/nvim-treesitter-context",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		event = { "BufNewFile", "BufReadPre" },
+		opts = {
+			enable = true,
+			multiwindow = false,
+			max_lines = 0,
+			min_window_height = 0,
+			line_numbers = true,
+			multiline_threshold = 20,
+			trim_scope = "outer",
+			mode = "cursor",
+			separator = nil,
+			zindex = 20,
+			on_attach = nil,
+		},
+	},
+	{
+		"RRethy/nvim-treesitter-endwise",
 		main = "nvim-treesitter.configs",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		event = "InsertEnter",
