@@ -17,6 +17,12 @@ fi
 
 
 
+# fzf integration
+#
+source <(fzf --zsh)
+
+
+
 # loading sheldon plugins
 #
 if [[ -x "$(whence -- sheldon)" ]]; then
