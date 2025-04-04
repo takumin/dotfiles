@@ -14,6 +14,7 @@ shell = "zsh"
 
 [templates]
 defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+# sheldon source is called after compinit, so fpath creates the symlink
 oh-my-zsh-fpath = '''
 if [[ ! -d "${ZDOTDIR:-"${HOME}"}/completions" ]]; then
   mkdir -p "${ZDOTDIR:-"${HOME}"}/completions"
