@@ -240,6 +240,14 @@ fi
 
 
 
+# zoxide integration
+#
+if [[ -x "$(whence -- zoxide)" ]]; then
+	eval "$(zoxide init zsh)"
+fi
+
+
+
 # `cd` after auto  `ls`
 #
 chpwd() {
