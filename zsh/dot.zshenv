@@ -107,7 +107,7 @@ typeset -U manpath
 ## Zsh function path configuration
 #
 fpath=(
-	${ZDOTDIR}/functions(N-/)
+	${ZDOTDIR}/completions(N-/)
 	${ZDOTDIR}/zsh-completions/src(N-/)
 	${ZDOTDIR}/conda-zsh-completion(N-/)
 	${ZDOTDIR}/zload(N-/)

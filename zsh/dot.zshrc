@@ -36,14 +36,6 @@ fi
 
 
 
-# loading sheldon plugins
-#
-if [[ -x "$(whence -- sheldon)" ]]; then
-	eval "$(sheldon source)"
-fi
-
-
-
 ## alias configuration
 #
 [[ -r "${ZDOTDIR}/.zsh_alias" ]] && source "${ZDOTDIR}/.zsh_alias"
@@ -244,6 +236,14 @@ fi
 #
 if [[ -x "$(whence -- zoxide)" ]]; then
 	eval "$(zoxide init zsh)"
+fi
+
+
+
+# loading sheldon plugins
+#
+if [[ -x "$(whence -- sheldon)" ]]; then
+	eval "$(sheldon source)"
 fi
 
 

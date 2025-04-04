@@ -14,12 +14,23 @@ shell = "zsh"
 
 [templates]
 defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
-oh-my-zsh-fpath = 'fpath=( $(find "{{ dir }}" -type f -name "_*" | xargs dirname) $fpath )'
+oh-my-zsh-fpath = '''
+if [[ ! -d "${ZDOTDIR:-"${HOME}"}/completions" ]]; then
+  mkdir -p "${ZDOTDIR:-"${HOME}"}/completions"
+  for f in $(find "{{ dir }}/plugins" -type f -name '_*' | sed -E 's@{{ dir }}/plugins/@@'); do
+    ln -s "{{ dir }}/plugins/$f" "${ZDOTDIR:-"${HOME}"}/completions/$(basename $f)"
+  done
+fi
+'''
 
 [plugins]
 
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
+
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
+apply = ["defer"]
 
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
