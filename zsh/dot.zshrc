@@ -17,6 +17,14 @@ fi
 
 
 
+# mise integration
+#
+if [[ -x "$(whence -- mise)" ]]; then
+	eval "$(mise activate zsh)"
+fi
+
+
+
 ## vscode integration
 #
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
