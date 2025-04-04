@@ -17,8 +17,8 @@ defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file 
 oh-my-zsh-fpath = '''
 if [[ ! -d "${ZDOTDIR:-"${HOME}"}/completions" ]]; then
   mkdir -p "${ZDOTDIR:-"${HOME}"}/completions"
-  for f in $(find "{{ dir }}/plugins" -type f -name '_*' | sed -E 's@{{ dir }}/plugins/@@'); do
-    ln -s "{{ dir }}/plugins/$f" "${ZDOTDIR:-"${HOME}"}/completions/$(basename $f)"
+  for f in $(find "{{ dir }}/plugins" -type f -name '_*'); do
+    ln -s "$f" "${ZDOTDIR:-"${HOME}"}/completions/$(basename $f)"
   done
 fi
 '''
