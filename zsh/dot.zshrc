@@ -9,7 +9,7 @@ source "${HOME}/.zshenv"
 
 
 
-# direnv initilize
+# direnv integration
 #
 if [[ -x "$(whence -- direnv)" ]]; then
 	eval "$(direnv hook zsh)"
