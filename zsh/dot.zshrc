@@ -17,22 +17,6 @@ fi
 
 
 
-# fzf integration
-#
-if [[ -x "$(whence -- fzf)" ]]; then
-	source <(fzf --zsh)
-fi
-
-
-
-# loading sheldon plugins
-#
-if [[ -x "$(whence -- sheldon)" ]]; then
-	eval "$(sheldon source)"
-fi
-
-
-
 ## vscode integration
 #
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
@@ -48,6 +32,14 @@ fi
 if [[ -n "${INTELLIJ_ENVIRONMENT_READER}" ]]; then
 	# Workaround
 	return
+fi
+
+
+
+# loading sheldon plugins
+#
+if [[ -x "$(whence -- sheldon)" ]]; then
+	eval "$(sheldon source)"
 fi
 
 
@@ -237,6 +229,14 @@ screen*)
 	}
 	;;
 esac
+
+
+
+# fzf integration
+#
+if [[ -x "$(whence -- fzf)" ]]; then
+	source <(fzf --zsh)
+fi
 
 
 
