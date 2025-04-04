@@ -19,7 +19,9 @@ fi
 
 # fzf integration
 #
-source <(fzf --zsh)
+if [[ -x "$(whence -- fzf)" ]]; then
+	source <(fzf --zsh)
+fi
 
 
 
