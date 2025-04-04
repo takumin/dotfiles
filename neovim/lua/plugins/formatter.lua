@@ -1,6 +1,9 @@
 return {
 	{
 		"stevearc/conform.nvim",
+		dependencies = {
+			"neovim/nvim-lspconfig",
+		},
 		event = { "BufWritePre" },
 		cmd = { "ConformInfo" },
 		opts = {
@@ -40,6 +43,49 @@ return {
 		init = function()
 			-- If you want the formatexpr, here is the place to set it
 			vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+
+			-- Replace default formatter to project formatter
+			vim.api.nvim_create_autocmd("BufEnter", {
+				callback = function(args)
+					local bufnr = args.buf
+					local filepath = vim.api.nvim_buf_get_name(bufnr)
+					local root = require("lspconfig.util").root_pattern(".git")(filepath)
+
+					if not root then
+						return
+					end
+
+					local formatters = {
+						{
+							detects = {
+								".prettierrc",
+								".prettierrc.json",
+								".prettierrc.yaml",
+							},
+							comformers = {
+								javascript = { "prettierd", "prettier", stop_after_first = true },
+								javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+								typescript = { "prettierd", "prettier", stop_after_first = true },
+								typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+								html = { "prettierd", "prettier", stop_after_first = true },
+								css = { "prettierd", "prettier", stop_after_first = true },
+								json = { "prettierd", "prettier", stop_after_first = true },
+								jsonc = { "prettierd", "prettier", stop_after_first = true },
+								yaml = { "prettierd", "prettier", stop_after_first = true },
+							},
+						},
+					}
+
+					for _, v in pairs(formatters) do
+						for _, f in pairs(v.detects) do
+							if vim.fn.filereadable(root .. "/" .. f) == 1 then
+								require("conform").formatters_by_ft = v.comformers
+								return
+							end
+						end
+					end
+				end,
+			})
 		end,
 	},
 }
