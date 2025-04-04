@@ -111,10 +111,10 @@ fi
 
 # 1password-cli completion
 #
-if [[ -x "$(whence -- op)" ]]; then
-	source <(op completion zsh)
-	compdef _op op
-fi
+# if [[ -x "$(whence -- op)" ]]; then
+# 	source <(op completion zsh)
+# 	compdef _op op
+# fi
 
 # lima completion
 #
