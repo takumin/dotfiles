@@ -108,10 +108,8 @@ typeset -U manpath
 #
 fpath=(
 	${ZDOTDIR}/completions(N-/)
-	${ZDOTDIR}/zsh-completions/src(N-/)
-	${ZDOTDIR}/conda-zsh-completion(N-/)
-	${ZDOTDIR}/zload(N-/)
-	${HOME}/.usr/src/github.com/motemen/ghq/zsh(N-/)
+	${HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/zsh/site-functions(N-/)
+	/home/linuxbrew/.linuxbrew/share/zsh-completions(N-/)
 	/home/linuxbrew/.linuxbrew/share/zsh/site-functions(N-/)
 	/opt/homebrew/share/zsh/site-functions(N-/)
 	/opt/vagrant/embedded/gems/*/gems/vagrant-*/contrib/zsh(N-/)
