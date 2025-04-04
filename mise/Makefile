@@ -11,9 +11,12 @@ install: \
 .PHONY: clean
 clean:
 	@rm -fr ${HOME}/.config/mise
+	@rm -fr ${HOME}/.cache/mise
+	@rm -fr ${HOME}/.local/share/mise
+	@rm -fr ${HOME}/.local/state/mise
 
 ${HOME}/.config/mise:
 	@mkdir -p $@
 ${HOME}/.config/mise/config.toml:
 	@ln -s ../../${DOTDIR_NAME}/mise/config.toml $@
-	@mise trust config.toml
+	@mise trust $(CURDIR)/config.toml
