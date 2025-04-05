@@ -29,9 +29,10 @@ fi
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
-[plugins.fzf-tab]
-github = "Aloxaf/fzf-tab"
-apply = ["defer"]
+# MEMO: Disabled because go-task completion is strange
+# [plugins.fzf-tab]
+# github = "Aloxaf/fzf-tab"
+# apply = ["defer"]
 
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
