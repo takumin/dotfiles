@@ -16,6 +16,7 @@ tap "suzuki-shunsuke/cmdx"
 tap "suzuki-shunsuke/ghalint"
 tap "suzuki-shunsuke/pinact"
 
+brew "act"
 brew "actionlint"
 brew "age"
 brew "aicommits"
