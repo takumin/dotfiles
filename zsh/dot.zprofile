@@ -66,6 +66,11 @@ if [[ -x "$(whence -- tmux)" ]]; then
 			*)          args="-u"  ;;
 		esac
 
+		# see also: https://github.com/hamano/locale-eaw/tree/master/fixtmux
+		if [[ -f "${HOME}/.usr/lib/fixtmux.so" ]]; then
+			export LD_PRELOAD="${HOME}/.usr/lib/fixtmux.so"
+		fi
+
 		if $(tmux has-session >/dev/null 2>&1); then
 			exec tmux "$args" attach
 		else
