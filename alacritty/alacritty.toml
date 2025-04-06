@@ -19,9 +19,5 @@ history = 0
 [selection]
 save_to_clipboard = true
 
-[terminal.shell]
-program = "/usr/bin/env"
-args = ["zsh", "--login"]
-
 [window]
 startup_mode = "Maximized"
