@@ -58,12 +58,13 @@ fi
 
 ## zellij
 #
-if [[ -x "$(whence -- zellij)" ]]; then
-	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
-		zellij attach -c default
-		exit
-	fi
-fi
+# TODO: The key binding settings overlap with zsh and neovim, so comment them out until the adjustments are complete.
+# if [[ -x "$(whence -- zellij)" ]]; then
+# 	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+# 		exec zellij attach -c default
+# 		exit
+# 	fi
+# fi
 
 ## tmux
 #
