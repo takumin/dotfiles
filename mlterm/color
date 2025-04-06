@@ -1,0 +1,105 @@
+
+# xoria256
+
+### xoria256
+#
+# https://gist.github.com/pasela/3422835
+#
+black      = #0c0c0c
+hl_black   = #0a0a0a
+red        = #d78787
+hl_red     = #df8787
+green      = #afd787
+hl_green   = #afdf87
+yellow     = #f7f7af
+hl_yellow  = #ffffaf
+blue       = #87afd7
+hl_blue    = #87afdf
+magenta    = #d7afd7
+hl_magenta = #dfafdf
+cyan       = #afd7d7
+hl_cyan    = #afdfdf
+white      = #e6e6e6
+hl_white   = #eeeeee
+
+### Solarized
+#
+# http://ethanschoonover.com/solarized
+#
+# black      = #073642
+# blue       = #268bd2
+# cyan       = #2aa198
+# green      = #859900
+# magenta    = #d33682
+# red        = #dc322f
+# white      = #eee8d5
+# yellow     = #b58900
+# hl_black   = #002b36
+# hl_blue    = #839496
+# hl_cyan    = #93a1a1
+# hl_green   = #586e75
+# hl_magenta = #6c71c4
+# hl_red     = #cb4b16
+# hl_white   = #fdf6e3
+# hl_yellow  = #657b83
+
+### Solarized (XTERM/HEX)
+#
+# black      = #262626
+# blue       = #0087ff
+# cyan       = #00afaf
+# green      = #5f8700
+# magenta    = #af005f
+# red        = #d70000
+# white      = #e4e4e4
+# yellow     = #af8700
+# hl_black   = #1c1c1c
+# hl_blue    = #808080
+# hl_cyan    = #8a8a8a
+# hl_green   = #585858
+# hl_magenta = #5f5faf
+# hl_red     = #d75f00
+# hl_white   = #ffffd7
+# hl_yellow  = #626262
+
+### Molokai
+#
+# https://github.com/zhou13/molokai-terminal/blob/master/xterm/Xresources
+#
+# black      = #1B1D1E
+# blue       = #266C98
+# cyan       = #AE81FF
+# green      = #82B414
+# magenta    = #AC0CB1
+# red        = #FF0044
+# white      = #CCCCCC
+# yellow     = #FD971F
+# hl_black   = #808080
+# hl_blue    = #7070F0
+# hl_cyan    = #66D9EF
+# hl_green   = #A6E22E
+# hl_magenta = #D63AE1
+# hl_red     = #F92672
+# hl_white   = #F8F8F2
+# hl_yellow  = #E6DB74
+
+### Molokai
+#
+# https://github.com/jedipunkz/dotfiles/blob/master/.Xresources.molokai
+#
+# black      = #101010
+# blue       = #30309b
+# cyan       = #3579a8
+# green      = #66aa11
+# magenta    = #7e40a5
+# red        = #960050
+# white      = #9999aa
+# yellow     = #c47f2c
+# hl_black   = #303030
+# hl_blue    = #5f5fee
+# hl_cyan    = #4eb4fa
+# hl_green   = #80ff00
+# hl_magenta = #bb88dd
+# hl_red     = #ff0090
+# hl_white   = #d0d0d0
+# hl_yellow  = #ffba68

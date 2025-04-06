@@ -1,0 +1,64 @@
+# see also:
+#   https://bitbucket.org/arakiken/mlterm/src/default/doc/ja/
+# and more:
+#   https://bitbucket.org/arakiken/mlterm/raw/default/doc/ja/README.ja
+#   https://bitbucket.org/arakiken/mlterm/raw/default/etc/main.ja
+# mlterm is true colors unsupported
+#   https://sourceforge.net/p/mlterm/bugs/74/
+
+# term name
+termtype = mlterm
+
+# window size
+geometry = 120x40
+
+# ignore inner border
+inner_border = 0
+
+# login shell
+use_login_shell = true
+
+# delimiter characters
+word_separators = " ,+"
+
+# copy PRIMARY/CLIPBOARD
+use_clipboard = true
+
+# render engine
+type_engine = cairo
+
+# anti alias
+use_anti_alias = true
+
+# unicode
+box_drawing_font = decsp
+only_use_unicode_font = true
+use_dynamic_comb = true
+
+# font size
+fontsize = 26
+
+# ignore scrollbar
+use_scrollbar = false
+
+# ignore bell
+bel_mode = none
+
+# true color
+vt_color_mode = true
+
+# Solarized dark
+# fg_color = white
+# bg_color = black
+
+# Solarized light
+# fg_color = black
+# bg_color = white
+
+# Molokai
+# fg_color = #d0d0d0
+# bg_color = #101010
+
+# xoria256
+fg_color = #d0d0d0
+bg_color = #1c1c1c

@@ -1,0 +1,39 @@
+# Default
+# DEFAULT = Ubuntu Mono
+
+# Line
+# DEC_SPECIAL = Monospace
+
+# ISO/IEC 8859
+# ISO8859_1 = Monospace
+# ISO8859_2 = Monospace
+# ISO8859_3 = Monospace
+# ISO8859_4 = Monospace
+# ISO8859_5 = Monospace
+# ISO8859_6 = Monospace
+# ISO8859_7 = Monospace
+# ISO8859_8 = Monospace
+# ISO8859_9 = Monospace
+# ISO8859_10 = Monospace
+# ISO8859_13 = Monospace
+# ISO8859_14 = Monospace
+# ISO8859_15 = Monospace
+# ISO8859_16 = Monospace
+
+# Japanese
+# JISX0201_ROMAN = Monospace
+# JISX0201_KATA = Monospace
+# JISX0208_1978 = Monospace
+# JISX0208_1983 = Monospace
+# JISX0208_1990 = Monospace
+# JISX0212_1990 = Monospace
+# JISX0213_2000_1 = Monospace
+# JISX0213_2000_2 = Monospace
+
+# Unicode
+# ISO10646_UCS4_1 = Monospace
+ISO10646_UCS4_1_FULLWIDTH = Noto Sans Mono CJK JP
+
+# Powerline
+# U+E000-E0FF = PowerlineSymbols
+# U+2B60-2BFF = PowerlineSymbols
