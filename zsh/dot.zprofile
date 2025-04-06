@@ -56,10 +56,19 @@ if [[ -z "${SSH_AUTH_SOCK}" ]]; then
 	fi
 fi
 
+## zellij
+#
+if [[ -x "$(whence -- zellij)" ]]; then
+	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+		zellij attach -c default
+		exit
+	fi
+fi
+
 ## tmux
 #
 if [[ -x "$(whence -- tmux)" ]]; then
-	if [[ -z "${TMUX}" ]]; then
+	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
 		case "$TERM" in
 			mlterm*)    args="-2u" && export TERM_PROGRAM="mlterm" ;;
 			*256color)  args="-2u" ;;
@@ -82,7 +91,7 @@ fi
 ## screen
 #
 if [[ -x "$(whence -- screen)" ]]; then
-	if [[ -z "${TMUX}" ]]; then
+	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
 		case "$TERM" in
 			mlterm*)    args="-T screen-256color -S main -U -xRR" && export TERM_PROGRAM="mlterm" ;;
 			*256color)  args="-T screen-256color -S main -U -xRR" ;;
