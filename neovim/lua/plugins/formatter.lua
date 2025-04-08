@@ -24,6 +24,7 @@ return {
 				yaml = { "yamlfmt", "yamlfix", stop_after_first = true },
 				toml = { "taplo", stop_after_first = true },
 				hcl = { "hcl", stop_after_first = true },
+				sh = { "shfmt" },
 			},
 			-- Set default options
 			default_format_opts = {
