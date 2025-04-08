@@ -20,7 +20,7 @@ fi
 
 # symlink dotfiles
 if [[ ! -L "$HOME/.dotfiles" ]]; then
-	ln -s ".usr/src/github.com/takumin/dotfiles" ".dotfiles"
+	ln -s ".usr/src/github.com/takumin/dotfiles" "$HOME/.dotfiles"
 fi
 
 # user bin dir
