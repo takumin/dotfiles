@@ -48,14 +48,17 @@ ${HOME}/.ssh/authorized_keys: ${HOME}/.ssh/pubkeys.d/takumiiinn@gmail.com.pub
 	@echo "$$(cat $<) takumiiinn@gmail.com" > $@
 
 ${HOME}/.ssh/config: config
+	@chmod 0600 $<
 	@ln -s ../${DOTDIR_NAME}/ssh/config $@
 
 ${HOME}/.ssh/config.d/aws-ssm.conf: config.aws-ssm
+	@chmod 0600 $<
 	@if [ -f "/usr/local/sessionmanagerplugin/bin/session-manager-plugin" ]; then \
 		ln -s ../../${DOTDIR_NAME}/ssh/config.aws-ssm $@; \
 	fi
 
 ${HOME}/.ssh/config.d/vagrant.conf: config.vagrant
+	@chmod 0600 $<
 	@if [ -f "${HOME}/.vagrant.d/insecure_private_key" ]; then \
 		ln -s ../../${DOTDIR_NAME}/ssh/config.vagrant $@; \
 	fi
