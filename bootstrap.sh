@@ -8,20 +8,9 @@ ARCH="$(uname -m)"
 MITAMAE_VERSION="v1.14.2"
 MITAMAE_URL="https://github.com/itamae-kitchen/mitamae/releases/download/${MITAMAE_VERSION}/mitamae-${ARCH}-${OS}"
 
-# ghq dir
-if [[ ! -d "$HOME/.usr/src/github.com/takumin" ]]; then
-	mkdir -p "$HOME/.usr/src/github.com/takumin"
-fi
-
-# clone repository
-if [[ ! -f "$HOME/.usr/src/github.com/takumin/dotfiles/.git/HEAD" ]]; then
-	git clone -q "https://github.com/takumin/dotfiles.git" "$HOME/.usr/src/github.com/takumin/dotfiles"
-fi
-
-# symlink dotfiles
-if [[ ! -L "$HOME/.dotfiles" ]]; then
-	ln -s ".usr/src/github.com/takumin/dotfiles" "$HOME/.dotfiles"
-fi
+################################################################################
+# mitamae
+################################################################################
 
 # user bin dir
 if [[ ! -d "$HOME/.usr/bin" ]]; then
@@ -54,6 +43,29 @@ fi
 if [[ ! -x "$HOME/.usr/bin/mitamae" ]]; then
 	chmod +x "$HOME/.usr/bin/mitamae"
 fi
+
+################################################################################
+# dotfiles
+################################################################################
+
+# ghq dir
+if [[ ! -d "$HOME/.usr/src/github.com/takumin" ]]; then
+	mkdir -p "$HOME/.usr/src/github.com/takumin"
+fi
+
+# clone repository
+if [[ ! -f "$HOME/.usr/src/github.com/takumin/dotfiles/.git/HEAD" ]]; then
+	git clone -q "https://github.com/takumin/dotfiles.git" "$HOME/.usr/src/github.com/takumin/dotfiles"
+fi
+
+# symlink dotfiles
+if [[ ! -L "$HOME/.dotfiles" ]]; then
+	ln -s ".usr/src/github.com/takumin/dotfiles" "$HOME/.dotfiles"
+fi
+
+################################################################################
+# homebrew
+################################################################################
 
 # install homebrew
 if [[ ! -x "$(command -v brew)" ]]; then
