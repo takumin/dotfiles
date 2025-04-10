@@ -123,175 +123,175 @@ typeset -U fpath
 
 ## Run library path configuration
 #
-typeset -xT LD_RUN_PATH ld_run_path
-ld_run_path=(
-	${HOME}/.local/lib(N-/)
-	${HOME}/.local/lib64(N-/)
-	${HOME}/.local/lib32(N-/)
-	${HOME}/.usr/lib(N-/)
-	${HOME}/.usr/lib64(N-/)
-	${HOME}/.usr/lib32(N-/)
-	# /home/linuxbrew/.linuxbrew/opt/*/lib(N-/)
-	# /home/linuxbrew/.linuxbrew/lib(N-/)
-	/usr/local/*/lib(N-/)
-	/usr/local/*/lib64(N-/)
-	/usr/local/*/lib32(N-/)
-	/usr/local/lib(N-/)
-	/usr/local/lib64(N-/)
-	/usr/local/lib32(N-/)
-	/opt/*/lib(N-/)
-	/opt/*/lib64(N-/)
-	/opt/*/lib32(N-/)
-	/opt/lib(N-/)
-	/opt/lib64(N-/)
-	/opt/lib32(N-/)
-	/usr/lib(N-/)
-	/usr/lib64(N-/)
-	/usr/lib32(N-/)
-	/lib(N-/)
-	/lib64(N-/)
-	/lib32(N-/)
-)
-typeset -U ld_run_path
+# typeset -xT LD_RUN_PATH ld_run_path
+# ld_run_path=(
+# 	${HOME}/.local/lib(N-/)
+# 	${HOME}/.local/lib64(N-/)
+# 	${HOME}/.local/lib32(N-/)
+# 	${HOME}/.usr/lib(N-/)
+# 	${HOME}/.usr/lib64(N-/)
+# 	${HOME}/.usr/lib32(N-/)
+# 	# /home/linuxbrew/.linuxbrew/opt/*/lib(N-/)
+# 	# /home/linuxbrew/.linuxbrew/lib(N-/)
+# 	/usr/local/*/lib(N-/)
+# 	/usr/local/*/lib64(N-/)
+# 	/usr/local/*/lib32(N-/)
+# 	/usr/local/lib(N-/)
+# 	/usr/local/lib64(N-/)
+# 	/usr/local/lib32(N-/)
+# 	/opt/*/lib(N-/)
+# 	/opt/*/lib64(N-/)
+# 	/opt/*/lib32(N-/)
+# 	/opt/lib(N-/)
+# 	/opt/lib64(N-/)
+# 	/opt/lib32(N-/)
+# 	/usr/lib(N-/)
+# 	/usr/lib64(N-/)
+# 	/usr/lib32(N-/)
+# 	/lib(N-/)
+# 	/lib64(N-/)
+# 	/lib32(N-/)
+# )
+# typeset -U ld_run_path
 
 ## Search library path configuration
 #
-typeset -xT LD_LIBRARY_PATH ld_library_path
-ld_library_path=(
-	${HOME}/.local/lib(N-/)
-	${HOME}/.local/lib64(N-/)
-	${HOME}/.local/lib32(N-/)
-	${HOME}/.usr/lib(N-/)
-	${HOME}/.usr/lib64(N-/)
-	${HOME}/.usr/lib32(N-/)
-	# /home/linuxbrew/.linuxbrew/opt/*/lib(N-/)
-	# /home/linuxbrew/.linuxbrew/lib(N-/)
-	/usr/local/*/lib(N-/)
-	/usr/local/*/lib64(N-/)
-	/usr/local/*/lib32(N-/)
-	/usr/local/lib(N-/)
-	/usr/local/lib64(N-/)
-	/usr/local/lib32(N-/)
-	/opt/*/lib(N-/)
-	/opt/*/lib64(N-/)
-	/opt/*/lib32(N-/)
-	/opt/lib(N-/)
-	/opt/lib64(N-/)
-	/opt/lib32(N-/)
-	/usr/lib(N-/)
-	/usr/lib64(N-/)
-	/usr/lib32(N-/)
-	/lib(N-/)
-	/lib64(N-/)
-	/lib32(N-/)
-)
-typeset -U ld_library_path
+# typeset -xT LD_LIBRARY_PATH ld_library_path
+# ld_library_path=(
+# 	${HOME}/.local/lib(N-/)
+# 	${HOME}/.local/lib64(N-/)
+# 	${HOME}/.local/lib32(N-/)
+# 	${HOME}/.usr/lib(N-/)
+# 	${HOME}/.usr/lib64(N-/)
+# 	${HOME}/.usr/lib32(N-/)
+# 	# /home/linuxbrew/.linuxbrew/opt/*/lib(N-/)
+# 	# /home/linuxbrew/.linuxbrew/lib(N-/)
+# 	/usr/local/*/lib(N-/)
+# 	/usr/local/*/lib64(N-/)
+# 	/usr/local/*/lib32(N-/)
+# 	/usr/local/lib(N-/)
+# 	/usr/local/lib64(N-/)
+# 	/usr/local/lib32(N-/)
+# 	/opt/*/lib(N-/)
+# 	/opt/*/lib64(N-/)
+# 	/opt/*/lib32(N-/)
+# 	/opt/lib(N-/)
+# 	/opt/lib64(N-/)
+# 	/opt/lib32(N-/)
+# 	/usr/lib(N-/)
+# 	/usr/lib64(N-/)
+# 	/usr/lib32(N-/)
+# 	/lib(N-/)
+# 	/lib64(N-/)
+# 	/lib32(N-/)
+# )
+# typeset -U ld_library_path
 
 ## C/C++ include path configuration
 #
-typeset -xT CPATH cpath
-cpath=(
-	${HOME}/.local/include(N-/)
-	${HOME}/.usr/include(N-/)
-	# /home/linuxbrew/.linuxbrew/opt/*/include(N-/)
-	# /home/linuxbrew/.linuxbrew/include(N-/)
-	/usr/local/*/include(N-/)
-	/usr/local/include(N-/)
-	/opt/*/include(N-/)
-	/opt/include(N-/)
-	/usr/include(N-/)
-)
-typeset -U cpath
+# typeset -xT CPATH cpath
+# cpath=(
+# 	${HOME}/.local/include(N-/)
+# 	${HOME}/.usr/include(N-/)
+# 	# /home/linuxbrew/.linuxbrew/opt/*/include(N-/)
+# 	# /home/linuxbrew/.linuxbrew/include(N-/)
+# 	/usr/local/*/include(N-/)
+# 	/usr/local/include(N-/)
+# 	/opt/*/include(N-/)
+# 	/opt/include(N-/)
+# 	/usr/include(N-/)
+# )
+# typeset -U cpath
 
 ## library path configuration
 #
-ldflags=()
-if [[ -d "/opt/homebrew/opt/ruby/lib" ]]; then
-	ldflags+=("-L/opt/homebrew/opt/ruby/lib")
-fi
-typeset -xTU LDFLAGS ldflags
+# ldflags=()
+# if [[ -d "/opt/homebrew/opt/ruby/lib" ]]; then
+# 	ldflags+=("-L/opt/homebrew/opt/ruby/lib")
+# fi
+# typeset -xTU LDFLAGS ldflags
 
 ## preprocess path configuration
 #
-cppflags=()
-if [[ -d "/opt/homebrew/opt/ruby/include" ]]; then
-	cppflags+=("-I/opt/homebrew/opt/ruby/include")
-fi
-typeset -xTU CPPFLAGS cppflags
+# cppflags=()
+# if [[ -d "/opt/homebrew/opt/ruby/include" ]]; then
+# 	cppflags+=("-I/opt/homebrew/opt/ruby/include")
+# fi
+# typeset -xTU CPPFLAGS cppflags
 
 ## pkg-config path configuration
 #
-typeset -xT PKG_CONFIG_PATH pkg_config_path
-pkg_config_path=(
-	${HOME}/.local/share/pkgconfig(N-/)
-	${HOME}/.local/libdata/pkgconfig(N-/)
-	${HOME}/.local/lib/pkgconfig(N-/)
-	${HOME}/.local/lib64/pkgconfig(N-/)
-	${HOME}/.local/lib32/pkgconfig(N-/)
-	${HOME}/.usr/share/pkgconfig(N-/)
-	${HOME}/.usr/libdata/pkgconfig(N-/)
-	${HOME}/.usr/lib/pkgconfig(N-/)
-	${HOME}/.usr/lib64/pkgconfig(N-/)
-	${HOME}/.usr/lib32/pkgconfig(N-/)
-	# /home/linuxbrew/.linuxbrew/opt/*/lib/pkgconfig(N-/)
-	# /home/linuxbrew/.linuxbrew/lib/pkgconfig(N-/)
-	/usr/local/*/share/pkgconfig(N-/)
-	/usr/local/*/libdata/pkgconfig(N-/)
-	/usr/local/*/lib/pkgconfig(N-/)
-	/usr/local/*/lib64/pkgconfig(N-/)
-	/usr/local/*/lib32/pkgconfig(N-/)
-	/usr/local/share/pkgconfig(N-/)
-	/usr/local/libdata/pkgconfig(N-/)
-	/usr/local/lib/pkgconfig(N-/)
-	/usr/local/lib64/pkgconfig(N-/)
-	/usr/local/lib32/pkgconfig(N-/)
-	/opt/*/share/pkgconfig(N-/)
-	/opt/*/libdata/pkgconfig(N-/)
-	/opt/*/lib/pkgconfig(N-/)
-	/opt/*/lib64/pkgconfig(N-/)
-	/opt/*/lib32/pkgconfig(N-/)
-	/opt/share/pkgconfig(N-/)
-	/opt/libdata/pkgconfig(N-/)
-	/opt/lib/pkgconfig(N-/)
-	/opt/lib64/pkgconfig(N-/)
-	/opt/lib32/pkgconfig(N-/)
-	/usr/share/pkgconfig(N-/)
-	/usr/libdata/pkgconfig(N-/)
-	/usr/lib/pkgconfig(N-/)
-	/usr/lib64/pkgconfig(N-/)
-	/usr/lib32/pkgconfig(N-/)
-)
-typeset -U pkg_config_path
+# typeset -xT PKG_CONFIG_PATH pkg_config_path
+# pkg_config_path=(
+# 	${HOME}/.local/share/pkgconfig(N-/)
+# 	${HOME}/.local/libdata/pkgconfig(N-/)
+# 	${HOME}/.local/lib/pkgconfig(N-/)
+# 	${HOME}/.local/lib64/pkgconfig(N-/)
+# 	${HOME}/.local/lib32/pkgconfig(N-/)
+# 	${HOME}/.usr/share/pkgconfig(N-/)
+# 	${HOME}/.usr/libdata/pkgconfig(N-/)
+# 	${HOME}/.usr/lib/pkgconfig(N-/)
+# 	${HOME}/.usr/lib64/pkgconfig(N-/)
+# 	${HOME}/.usr/lib32/pkgconfig(N-/)
+# 	# /home/linuxbrew/.linuxbrew/opt/*/lib/pkgconfig(N-/)
+# 	# /home/linuxbrew/.linuxbrew/lib/pkgconfig(N-/)
+# 	/usr/local/*/share/pkgconfig(N-/)
+# 	/usr/local/*/libdata/pkgconfig(N-/)
+# 	/usr/local/*/lib/pkgconfig(N-/)
+# 	/usr/local/*/lib64/pkgconfig(N-/)
+# 	/usr/local/*/lib32/pkgconfig(N-/)
+# 	/usr/local/share/pkgconfig(N-/)
+# 	/usr/local/libdata/pkgconfig(N-/)
+# 	/usr/local/lib/pkgconfig(N-/)
+# 	/usr/local/lib64/pkgconfig(N-/)
+# 	/usr/local/lib32/pkgconfig(N-/)
+# 	/opt/*/share/pkgconfig(N-/)
+# 	/opt/*/libdata/pkgconfig(N-/)
+# 	/opt/*/lib/pkgconfig(N-/)
+# 	/opt/*/lib64/pkgconfig(N-/)
+# 	/opt/*/lib32/pkgconfig(N-/)
+# 	/opt/share/pkgconfig(N-/)
+# 	/opt/libdata/pkgconfig(N-/)
+# 	/opt/lib/pkgconfig(N-/)
+# 	/opt/lib64/pkgconfig(N-/)
+# 	/opt/lib32/pkgconfig(N-/)
+# 	/usr/share/pkgconfig(N-/)
+# 	/usr/libdata/pkgconfig(N-/)
+# 	/usr/lib/pkgconfig(N-/)
+# 	/usr/lib64/pkgconfig(N-/)
+# 	/usr/lib32/pkgconfig(N-/)
+# )
+# typeset -U pkg_config_path
 
 ## cmake path configuration
 #
-typeset -xT CMAKE_MODULE_PATH cmake_module_path
-cmake_module_path=(
-	${HOME}/.local/share/cmake(N-/)
-	${HOME}/.local/cmake(N-/)
-	${HOME}/.usr/share/cmake(N-/)
-	${HOME}/.usr/cmake(N-/)
-	${HOME}/.cmake(N-/)
-	# /home/linuxbrew/.linuxbrew/share/cmake(N-/)
-	/usr/local/*/share/cmake(N-/)
-	/usr/local/share/cmake(N-/)
-	/opt/*/share/cmake(N-/)
-	/opt/share/cmake(N-/)
-)
-typeset -U cmake_module_path
+# typeset -xT CMAKE_MODULE_PATH cmake_module_path
+# cmake_module_path=(
+# 	${HOME}/.local/share/cmake(N-/)
+# 	${HOME}/.local/cmake(N-/)
+# 	${HOME}/.usr/share/cmake(N-/)
+# 	${HOME}/.usr/cmake(N-/)
+# 	${HOME}/.cmake(N-/)
+# 	# /home/linuxbrew/.linuxbrew/share/cmake(N-/)
+# 	/usr/local/*/share/cmake(N-/)
+# 	/usr/local/share/cmake(N-/)
+# 	/opt/*/share/cmake(N-/)
+# 	/opt/share/cmake(N-/)
+# )
+# typeset -U cmake_module_path
 
 ## ccache path configuration
 #
-typeset -xT CCACHE_PATH ccache_path
-ccache_path=(
-	${HOME}/.local/bin(N-/)
-	${HOME}/.usr/bin(N-/)
-	/home/linuxbrew/.linuxbrew/bin(N-/)
-	/usr/local/bin(N-/)
-	/usr/bin(N-/)
-	/bin(N-/)
-)
-typeset -U ccache_path
+# typeset -xT CCACHE_PATH ccache_path
+# ccache_path=(
+# 	${HOME}/.local/bin(N-/)
+# 	${HOME}/.usr/bin(N-/)
+# 	/home/linuxbrew/.linuxbrew/bin(N-/)
+# 	/usr/local/bin(N-/)
+# 	/usr/bin(N-/)
+# 	/bin(N-/)
+# )
+# typeset -U ccache_path
 
 ## cdpath
 #
