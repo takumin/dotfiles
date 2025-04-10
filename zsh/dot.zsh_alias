@@ -11,13 +11,13 @@ alias where="command -v"
 alias h="history 25"
 alias j="jobs -l"
 
-if [[ -x "`whence -- nvim`" ]]; then
+if [[ -x "$(whence -- nvim)" ]]; then
 	alias vi="nvim"
 	alias vim="nvim"
-elif [[ -x "`whence -- mvim`" ]]; then
+elif [[ -x "$(whence -- mvim)" ]]; then
 	alias vi="mvim -v"
 	alias vim="mvim -v"
-elif [[ -x "`whence -- vim`" ]]; then
+elif [[ -x "$(whence -- vim)" ]]; then
 	alias vi="vim"
 fi
 
@@ -27,9 +27,9 @@ darwin*)	alias ls="ls -Gw" ;;
 linux*)		alias ls="ls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S" ;;
 esac
 
-if [[ -x "`whence -- gnuls`" ]]; then
+if [[ -x "$(whence -- gnuls)" ]]; then
 	alias ls="gnuls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S"
-elif [[ -x "`whence -- gls`" ]]; then
+elif [[ -x "$(whence -- gls)" ]]; then
 	alias ls="gls --color=auto --show-control-chars --group-directories-first --time-style=+%Y-%m-%d\ %H:%M:%S"
 fi
 
@@ -42,13 +42,13 @@ alias grep="grep --color=auto"
 alias fgrep="fgrep --color=auto"
 alias egrep="egrep --color=auto"
 
-if [[ -x "`whence -- colordiff`" ]]; then
+if [[ -x "$(whence -- colordiff)" ]]; then
 	alias diff="colordiff"
-elif [[ -x "`whence -- cdiff`" ]]; then
+elif [[ -x "$(whence -- cdiff)" ]]; then
 	alias diff="cdiff"
 fi
 
-if [[ -x "`whence -- free`" ]]; then
+if [[ -x "$(whence -- free)" ]]; then
 	alias free="free -h"
 fi
 
@@ -57,27 +57,27 @@ alias df="df -h"
 
 alias su="su -l"
 
-if [[ -x "`whence -- tree`" ]]; then
+if [[ -x "$(whence -- tree)" ]]; then
 	alias tree="tree --charset ASCII"
 fi
 
-if [[ -x "`whence -- hub`" ]]; then
+if [[ -x "$(whence -- hub)" ]]; then
 	alias git="hub"
 fi
 
-if [[ -x "`whence -- htop`" ]]; then
+if [[ -x "$(whence -- htop)" ]]; then
 	alias top="htop"
 fi
 
-if [[ -x "`whence -- lftp`" ]]; then
+if [[ -x "$(whence -- lftp)" ]]; then
 	alias ftp="lftp"
 fi
 
-if [[ -x "`whence -- cpanm`" ]]; then
+if [[ -x "$(whence -- cpanm)" ]]; then
 	alias cpan="cpanm"
 fi
 
-if [[ -x "`whence -- qo`" ]]; then
+if [[ -x "$(whence -- qo)" ]]; then
 	alias qo="qo -g -x"
 fi
 
@@ -86,21 +86,21 @@ if [[ -x "$(whence -- pnpm)" ]]; then
 	alias ppx="pnpx"
 fi
 
-if [[ -x "`whence -- valgrind`" ]]; then
+if [[ -x "$(whence -- valgrind)" ]]; then
 	alias valgrind="valgrind --leak-check=full"
 fi
 
 if [[ "x${DISTRIB_ID}" = "xUbuntu" ]]; then
-	if [[ -x "`whence -- zpool`" ]]; then
+	if [[ -x "$(whence -- zpool)" ]]; then
 		alias zpool="sudo zpool"
 	fi
-	if [[ -x "`whence -- zfs`" ]]; then
+	if [[ -x "$(whence -- zfs)" ]]; then
 		alias zfs="sudo zfs"
 	fi
 fi
 
 function psall () {
-	if [[ -x "`whence -- pstree`" ]]; then
+	if [[ -x "$(whence -- pstree)" ]]; then
 		pstree -aA
 	else
 		case "${OSTYPE}" in
@@ -115,7 +115,7 @@ function psall () {
 }
 
 function psgrep () {
-	if [[ -x "`whence -- pstree`" ]]; then
+	if [[ -x "$(whence -- pstree)" ]]; then
 		pstree -s $*
 	else
 		case "${OSTYPE}" {
@@ -136,7 +136,7 @@ function psgrep () {
 }
 
 function psuser () {
-	if [[ -x "`whence -- pstree`" ]]; then
+	if [[ -x "$(whence -- pstree)" ]]; then
 		pstree -u ${USER}
 	else
 		case "${OSTYPE}" {
@@ -163,25 +163,25 @@ linux*)
 	fi
 	;;
 darwin*)
-	if [[ -x "`whence -- port`" ]]; then
+	if [[ -x "$(whence -- port)" ]]; then
 		alias updateports="sudo port selfupdate; sudo port outdated"
-	elif [[ -x "`whence -- brew`" ]]; then
+	elif [[ -x "$(whence -- brew)" ]]; then
 		alias updatebrew="brew update; brew outdated"
 	fi
 	;;
 freebsd*)
-	if [[ -x "`whence -- sudo`" ]]; then
+	if [[ -x "$(whence -- sudo)" ]]; then
 		if [[ -d "/usr/ports/.git" ]]; then
-			if [[ -x "`whence -- git`" ]]; then
+			if [[ -x "$(whence -- git)" ]]; then
 				alias updateports="pushd -q /usr/ports; sudo git pull; sudo make fetchindex; popd -q"
 			fi
 		else
-			if [[ -x "`whence -- portshaker`" ]]; then
-				if [[ -x "`whence -- portversion`" ]]; then
+			if [[ -x "$(whence -- portshaker)" ]]; then
+				if [[ -x "$(whence -- portversion)" ]]; then
 					alias updateports="sudo portshaker; sudo portversion -vl'<'"
-				elif [[ -x "`whence -- portmaster`" ]]; then
+				elif [[ -x "$(whence -- portmaster)" ]]; then
 					alias updateports="sudo portshaker; sudo portmaster -L"
-				elif [[ -x "`whence -- pkg`" ]]; then
+				elif [[ -x "$(whence -- pkg)" ]]; then
 					alias updateports="sudo portshaker; sudo pkg version -vl'<'"
 				else
 					alias updateports="sudo portshaker; sudo pkg_version -vl'<'"
@@ -196,7 +196,7 @@ esac
 
 case "${OSTYPE}" in
 freebsd*)
-	if [[ -x "`whence -- sudo`" ]] && [[ -x "`whence -- portshaker`" ]] && [[ -x "`whence -- poudriere`" ]]; then
+	if [[ -x "$(whence -- sudo)" ]] && [[ -x "$(whence -- portshaker)" ]] && [[ -x "$(whence -- poudriere)" ]]; then
 		build-poudriere() {
 			if [[ ! -r "/usr/local/etc/poudriere.d/bulks/$2" ]]; then
 				echo "not bulk exists $2"
@@ -216,17 +216,17 @@ esac
 
 case "${OSTYPE}" in
 freebsd*)
-	if [[ -x "`whence -p rbenv`" ]]; then
-		alias "rbenv install"='MAKE_OPTS="-j `sysctl -n hw.ncpu`" RUBY_CONFIGURE_OPTS="--enable-shared" rbenv install'
+	if [[ -x "$(whence -p rbenv)" ]]; then
+		alias "rbenv install"='MAKE_OPTS="-j $(sysctl -n hw.ncpu)" RUBY_CONFIGURE_OPTS="--enable-shared" rbenv install'
 	fi
 	;;
 esac
 
-if [[ -x "`whence -- wget`" ]]; then
+if [[ -x "$(whence -- wget)" ]]; then
 	alias wget-mirror="wget -r -np -m -k"
 fi
 
-if [[ -x "`whence -- tmux`" ]] && [[ -n "$TMUX" ]]; then
+if [[ -x "$(whence -- tmux)" ]] && [[ -n "$TMUX" ]]; then
 	function mosh_tmux() {
 		eval server=\${$#}
 		tmux new-window -n $server "mosh $@"
