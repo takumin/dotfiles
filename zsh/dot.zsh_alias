@@ -226,7 +226,7 @@ if [[ -x "$(whence -- wget)" ]]; then
 	alias wget-mirror="wget -r -np -m -k"
 fi
 
-if [[ -x "$(whence -- aria2)" ]]; then
+if [[ -x "$(whence -- aria2c)" ]]; then
 	alias tget="aria2c --seed-time=0"
 fi
 
