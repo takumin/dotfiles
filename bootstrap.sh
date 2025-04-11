@@ -19,7 +19,7 @@ fi
 
 # user bin path
 if [[ ":$PATH:" != *":$HOME/.usr/bin:"* ]]; then
-	export "$HOME/.usr/bin:$PATH"
+	export PATH="$HOME/.usr/bin:$PATH"
 fi
 
 # install mitamae
