@@ -200,6 +200,6 @@ if OS.mac?
 
   mas "Tailscale", id: 1475387142
   mas "1Password for Safari", id: 1569813296
-  mas "Microsoft Remote Desktop", id: 1295203466
+  mas "Windows App", id: 1295203466
   mas "Xcode", id: 497799835
 end
