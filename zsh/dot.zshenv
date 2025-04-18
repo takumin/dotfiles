@@ -40,6 +40,7 @@ path=(
 	${HOME}/Android/Sdk/cmdline-tools/bin(N-/)
 	"${HOME}/Library/Application Support/JetBrains/Toolbox/scripts"(N-/)
 	/nix/var/nix/profiles/default/bin(N-/)
+	/home/linuxbrew/.linuxbrew/opt/ccache/libexec(N-/)
 	/home/linuxbrew/.linuxbrew/bin(N-/)
 	/home/linuxbrew/.linuxbrew/lib/ruby/gems/*/bin(N-/)
 	/usr/local/opt/coreutils/bin(N-/)
