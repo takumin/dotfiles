@@ -1,6 +1,10 @@
 #!/usr/bin/env zsh
 # vim: set ft=zsh ts=2 sw=2 sts=0 noet :
 
+## Machine architecture
+#
+ARCH="$(uname -m)"
+
 ## Linuxbrew environment variables
 #
 case "${OSTYPE}" in
@@ -222,47 +226,51 @@ typeset -U fpath
 
 ## pkg-config path configuration
 #
-# typeset -xT PKG_CONFIG_PATH pkg_config_path
-# pkg_config_path=(
-# 	${HOME}/.local/share/pkgconfig(N-/)
-# 	${HOME}/.local/libdata/pkgconfig(N-/)
-# 	${HOME}/.local/lib/pkgconfig(N-/)
-# 	${HOME}/.local/lib64/pkgconfig(N-/)
-# 	${HOME}/.local/lib32/pkgconfig(N-/)
-# 	${HOME}/.usr/share/pkgconfig(N-/)
-# 	${HOME}/.usr/libdata/pkgconfig(N-/)
-# 	${HOME}/.usr/lib/pkgconfig(N-/)
-# 	${HOME}/.usr/lib64/pkgconfig(N-/)
-# 	${HOME}/.usr/lib32/pkgconfig(N-/)
-# 	# /home/linuxbrew/.linuxbrew/opt/*/lib/pkgconfig(N-/)
-# 	# /home/linuxbrew/.linuxbrew/lib/pkgconfig(N-/)
-# 	/usr/local/*/share/pkgconfig(N-/)
-# 	/usr/local/*/libdata/pkgconfig(N-/)
-# 	/usr/local/*/lib/pkgconfig(N-/)
-# 	/usr/local/*/lib64/pkgconfig(N-/)
-# 	/usr/local/*/lib32/pkgconfig(N-/)
-# 	/usr/local/share/pkgconfig(N-/)
-# 	/usr/local/libdata/pkgconfig(N-/)
-# 	/usr/local/lib/pkgconfig(N-/)
-# 	/usr/local/lib64/pkgconfig(N-/)
-# 	/usr/local/lib32/pkgconfig(N-/)
-# 	/opt/*/share/pkgconfig(N-/)
-# 	/opt/*/libdata/pkgconfig(N-/)
-# 	/opt/*/lib/pkgconfig(N-/)
-# 	/opt/*/lib64/pkgconfig(N-/)
-# 	/opt/*/lib32/pkgconfig(N-/)
-# 	/opt/share/pkgconfig(N-/)
-# 	/opt/libdata/pkgconfig(N-/)
-# 	/opt/lib/pkgconfig(N-/)
-# 	/opt/lib64/pkgconfig(N-/)
-# 	/opt/lib32/pkgconfig(N-/)
-# 	/usr/share/pkgconfig(N-/)
-# 	/usr/libdata/pkgconfig(N-/)
-# 	/usr/lib/pkgconfig(N-/)
-# 	/usr/lib64/pkgconfig(N-/)
-# 	/usr/lib32/pkgconfig(N-/)
-# )
-# typeset -U pkg_config_path
+typeset -xT PKG_CONFIG_PATH pkg_config_path
+pkg_config_path=(
+	# ${HOME}/.local/share/pkgconfig(N-/)
+	# ${HOME}/.local/libdata/pkgconfig(N-/)
+	# ${HOME}/.local/lib/pkgconfig(N-/)
+	# ${HOME}/.local/lib64/pkgconfig(N-/)
+	# ${HOME}/.local/lib32/pkgconfig(N-/)
+	# ${HOME}/.usr/share/pkgconfig(N-/)
+	# ${HOME}/.usr/libdata/pkgconfig(N-/)
+	# ${HOME}/.usr/lib/pkgconfig(N-/)
+	# ${HOME}/.usr/lib64/pkgconfig(N-/)
+	# ${HOME}/.usr/lib32/pkgconfig(N-/)
+	# /home/linuxbrew/.linuxbrew/opt/*/lib/pkgconfig(N-/)
+	# /home/linuxbrew/.linuxbrew/lib/pkgconfig(N-/)
+	# /opt/*/share/pkgconfig(N-/)
+	# /opt/*/libdata/pkgconfig(N-/)
+	# /opt/*/lib/pkgconfig(N-/)
+	# /opt/*/lib64/pkgconfig(N-/)
+	# /opt/*/lib32/pkgconfig(N-/)
+	# /opt/share/pkgconfig(N-/)
+	# /opt/libdata/pkgconfig(N-/)
+	# /opt/lib/pkgconfig(N-/)
+	# /opt/lib64/pkgconfig(N-/)
+	# /opt/lib32/pkgconfig(N-/)
+	/usr/local/*/share/pkgconfig(N-/)
+	/usr/local/*/lib/${ARCH}-linux-gnu/pkgconfig(N-/)
+	/usr/local/*/lib/pkgconfig(N-/)
+	/usr/local/*/libdata/pkgconfig(N-/)
+	/usr/local/*/lib64/pkgconfig(N-/)
+	/usr/local/*/lib32/pkgconfig(N-/)
+	/usr/local/share/pkgconfig(N-/)
+	/usr/local/lib/x86_64-linux-gnu/pkgconfig(N-/)
+	/usr/local/lib/aarch64-linux-gnu/pkgconfig(N-/)
+	/usr/local/lib/pkgconfig(N-/)
+	/usr/local/libdata/pkgconfig(N-/)
+	/usr/local/lib64/pkgconfig(N-/)
+	/usr/local/lib32/pkgconfig(N-/)
+	/usr/share/pkgconfig(N-/)
+	/usr/lib/${ARCH}-linux-gnu/pkgconfig(N-/)
+	/usr/lib/pkgconfig(N-/)
+	/usr/libdata/pkgconfig(N-/)
+	/usr/lib64/pkgconfig(N-/)
+	/usr/lib32/pkgconfig(N-/)
+)
+typeset -U pkg_config_path
 
 ## cmake path configuration
 #
