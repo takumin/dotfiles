@@ -15,7 +15,7 @@
 	navigate = true
 	dark = true
 	light = false
-	side-by-side = true
+	; side-by-side = true
 	line-numbers = true
 [sendemail]
 	smtpserver = msmtp
