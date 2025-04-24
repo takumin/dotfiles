@@ -7,6 +7,16 @@
   attributesFile = ~/.config/git/attributes
 	excludesfile = ~/.config/git/ignore
 	autocrlf = input
+	pager = delta --keep-plus-minus-markers
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	syntax-theme = Coldark-Dark
+	navigate = true
+	dark = true
+	light = false
+	side-by-side = true
+	line-numbers = true
 [sendemail]
 	smtpserver = msmtp
 [alias]
@@ -22,6 +32,7 @@
 	prune = true
 [merge]
 	ff = false
+	conflictstyle = zdiff3
 [pull]
 	ff = only
 [init]

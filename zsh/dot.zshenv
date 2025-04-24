@@ -372,19 +372,19 @@ fi
 
 ## pager of less(1) or more(1)
 #
-if [[ -x "$(whence -- less)" ]]; then
-	export PAGER="less"
-else
-	export PAGER="more"
-fi
+# if [[ -x "$(whence -- less)" ]]; then
+# 	export PAGER="less"
+# else
+# 	export PAGER="more"
+# fi
 
 ## man configuration
 #
-if [[ -x "$(whence -- less)" ]]; then
-	export MANPAGER="less"
-else
-	export MANPAGER="more"
-fi
+# if [[ -x "$(whence -- less)" ]]; then
+# 	export MANPAGER="less"
+# else
+# 	export MANPAGER="more"
+# fi
 
 ## bsd ls(1) color configuration
 #
@@ -448,10 +448,10 @@ fi
 
 ## git configuration
 #
-if [[ -x "$(whence -- git)" ]]; then
-	export GIT_EDITOR="${EDITOR}"
-	export GIT_PAGER="${PAGER}"
-fi
+# if [[ -x "$(whence -- git)" ]]; then
+# 	export GIT_EDITOR="${EDITOR}"
+# 	export GIT_PAGER="${PAGER}"
+# fi
 
 ## ruby configuration
 #
