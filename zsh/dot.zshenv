@@ -114,7 +114,7 @@ typeset -U manpath
 #
 fpath=(
 	${ZDOTDIR}/completions(N-/)
-	${HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/share/zsh/site-functions(N-/)
+	${HOME}/.rustup/toolchains/*/share/zsh/site-functions(N-/)
 	/home/linuxbrew/.linuxbrew/share/zsh-completions(N-/)
 	/home/linuxbrew/.linuxbrew/share/zsh/site-functions(N-/)
 	/opt/homebrew/share/zsh/site-functions(N-/)
