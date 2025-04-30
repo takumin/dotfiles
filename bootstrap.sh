@@ -5,7 +5,7 @@ set -euo pipefail
 OS="$(uname -s | tr "[:upper:]" "[:lower:]")"
 ARCH="$(uname -m)"
 
-MITAMAE_VERSION="v1.14.2"
+MITAMAE_VERSION="v1.14.3"
 MITAMAE_URL="https://github.com/itamae-kitchen/mitamae/releases/download/${MITAMAE_VERSION}/mitamae-${ARCH}-${OS}"
 
 ################################################################################
