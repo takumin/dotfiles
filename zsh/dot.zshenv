@@ -60,7 +60,6 @@ path=(
 	/opt/sbin(N-/)
 	/opt/bin(N-/)
 	/snap/bin(N-/)
-	/usr/lib/ccache/bin(N-/)
 	/usr/lib/ccache(N-/)
 	/usr/sbin(N-/)
 	/usr/bin(N-/)
