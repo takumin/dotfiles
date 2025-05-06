@@ -5,9 +5,14 @@
 #
 ARCH="$(uname -m)"
 
-## Linuxbrew environment variables
+## Homebrew environment variables
 #
 case "${OSTYPE}" in
+	darwin*)
+		if [[ -x "/opt/homebrew/bin/brew" ]]; then
+			eval "$(/opt/homebrew/bin/brew shellenv)"
+		fi
+		;;
 	linux*)
 		if [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
 			eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -43,21 +48,12 @@ path=(
 	${HOME}/.dotnet/tools(N-/)
 	${HOME}/Android/Sdk/cmdline-tools/bin(N-/)
 	"${HOME}/Library/Application Support/JetBrains/Toolbox/scripts"(N-/)
+	"${HOMEBREW_PREFIX}/opt/ccache/libexec"(N-/)
+	"${HOMEBREW_PREFIX}/opt/llvm/bin"(N-/)
+	"${HOMEBREW_PREFIX}/opt/ruby/bin"(N-/)
 	/nix/var/nix/profiles/default/bin(N-/)
-	/home/linuxbrew/.linuxbrew/opt/ccache/libexec(N-/)
-	/home/linuxbrew/.linuxbrew/bin(N-/)
-	/home/linuxbrew/.linuxbrew/lib/ruby/gems/*/bin(N-/)
-	/usr/local/opt/coreutils/bin(N-/)
-	/usr/local/opt/llvm/bin(N-/)
-	/usr/local/libexec/ccache(N-/)
-	/usr/local/*/sbin(N-/)
-	/usr/local/*/bin(N-/)
 	/usr/local/sbin(N-/)
 	/usr/local/bin(N-/)
-	/opt/homebrew/opt/libtool/libexec/gnubin(N-/)
-	/opt/homebrew/opt/ruby/bin(N-/)
-	/opt/*/sbin(N-/)
-	/opt/*/bin(N-/)
 	/opt/sbin(N-/)
 	/opt/bin(N-/)
 	/snap/bin(N-/)
