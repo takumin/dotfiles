@@ -54,6 +54,7 @@ path=(
 	"${HOMEBREW_PREFIX}/opt/llvm/bin"(N-/)
 	"${HOMEBREW_PREFIX}/opt/ruby/bin"(N-/)
 	/nix/var/nix/profiles/default/bin(N-/)
+	/usr/local/cuda/bin(N-/)
 	/usr/local/sbin(N-/)
 	/usr/local/bin(N-/)
 	/opt/sbin(N-/)
