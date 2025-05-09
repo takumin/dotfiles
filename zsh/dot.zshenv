@@ -528,9 +528,8 @@ export GHQ_ROOT="${HOME}/.usr/src"
 
 ## aqua
 #
-if [[ -x "$(whence -- aqua)" ]]; then
-	AQUA_ROOT_DIR="${XDG_DATA_HOME:-"${HOME}/.local/share"}/aquaproj-aqua"
-fi
+export AQUA_ROOT_DIR="${XDG_DATA_HOME:-"${HOME}/.local/share"}/aquaproj-aqua"
+export AQUA_KEYRING_ENABLED=true
 
 ## etcd
 #
