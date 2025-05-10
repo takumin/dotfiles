@@ -28,6 +28,7 @@
 	delete-merged-branches = !git branch --merged | grep -vE '^\\*|main$|master$|develop$' | xargs -I % git branch -d %
 [push]
 	default = simple
+	followTags = true
 [fetch]
 	prune = true
 [merge]
