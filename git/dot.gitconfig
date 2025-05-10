@@ -40,6 +40,8 @@
 [commit]
 	verbose = true
 	gpgsign = true
+[tag]
+	gpgsign = true
 [gpg]
 	format = ssh
 [diff "lockb"]
