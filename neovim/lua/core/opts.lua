@@ -2,16 +2,16 @@
 -- 表示系の設定
 --
 -- シンタックスハイライト有効化
-vim.opt.syntax = 'on'
+vim.opt.syntax = "on"
 -- True Colors関連設定
-if vim.fn.has('termguicolors') == 1 then
-  -- iTerm2等が標準で出力する環境変数をチェックする
-  -- NOTE: Alacrittyについては設定ファイルでセットしておくこと
-  -- See also: https://github.com/termstandard/colors/blob/master/README.md#checking-for-colorterm
-  if vim.env.COLORTERM == 'truecolor' then
-    -- True Colorsを有効にする ( GUI用の色設定を使う )
-    vim.opt.termguicolors = true
-  end
+if vim.fn.has("termguicolors") == 1 then
+	-- iTerm2等が標準で出力する環境変数をチェックする
+	-- NOTE: Alacrittyについては設定ファイルでセットしておくこと
+	-- See also: https://github.com/termstandard/colors/blob/master/README.md#checking-for-colorterm
+	if vim.env.COLORTERM == "truecolor" then
+		-- True Colorsを有効にする ( GUI用の色設定を使う )
+		vim.opt.termguicolors = true
+	end
 end
 -- タイトルを表示する
 vim.opt.title = true
@@ -24,7 +24,7 @@ vim.opt.wrap = true
 -- 行末、タブ、折り返し、文末などを表示する
 vim.opt.list = true
 -- 行末、タブ、折り返し、文末などの記号設定
-vim.opt.listchars = {tab='^ ', trail='-', extends='>', precedes='<'}
+vim.opt.listchars = { tab = "^ ", trail = "-", extends = ">", precedes = "<" }
 -- () [] {} がかかれたとき、対応するカッコを強調表示する
 vim.opt.showmatch = true
 -- カーソル行の強調表示
@@ -32,7 +32,7 @@ vim.opt.cursorline = true
 -- ファイル名やディレクトリを補完するときに大文字と小文字を区別しない
 vim.opt.wildignorecase = true
 -- zshのような補完にする
-vim.opt.wildmode = {'list', 'full'}
+vim.opt.wildmode = { "list", "full" }
 -- 補完候補を表示しない(上とダブるので)
 vim.opt.wildmenu = false
 -- 折りたたみ表示を無効化する
@@ -40,7 +40,7 @@ vim.opt.foldenable = false
 -- ○や□の文字が崩れる問題を回避
 -- 正しく適用されない場合は以下を参照
 -- https://gist.github.com/lo48576/194f05f9266761d6925495237594edbc
-vim.opt.ambiwidth = 'double'
+vim.opt.ambiwidth = "double"
 
 --------------------------------------------------------------------------------
 -- ステータス行の表示設定
@@ -62,13 +62,13 @@ vim.opt.incsearch = true
 -- 検索にマッチしたテキストをハイライト表示したままにする
 vim.opt.hlsearch = true
 -- ctagsファイルを再帰的に検索
-vim.opt.tags:append('../tags')
+vim.opt.tags:append("../tags")
 
 --------------------------------------------------------------------------------
 -- 編集に関する設定
 --
 -- 文字コード設定
-vim.opt.fileencodings = {'ucs-bom', 'utf-8', 'cp932', 'sjis', 'euc-jp', 'latin1'}
+vim.opt.fileencodings = { "ucs-bom", "utf-8", "cp932", "sjis", "euc-jp", "latin1" }
 -- モードライン有効化
 vim.opt.modeline = true
 -- モードラインの検索行数
@@ -86,12 +86,12 @@ vim.opt.shiftwidth = 2
 -- タブをスペースに展開する
 vim.opt.expandtab = true
 -- クリップボードにコピー
-vim.opt.clipboard = 'unnamedplus'
+vim.opt.clipboard = "unnamedplus"
 -- backspaceキーの挙動を設定する
 --   indent        : 行頭の空白の削除を許す
 --   eol           : 改行の削除を許す
 --   start         : 挿入モードの開始位置での削除を許す
-vim.opt.backspace = {'indent', 'eol', 'start'}
+vim.opt.backspace = { "indent", "eol", "start" }
 
 --------------------------------------------------------------------------------
 -- ファイル操作
@@ -99,18 +99,18 @@ vim.opt.backspace = {'indent', 'eol', 'start'}
 -- バックアップファイル有効化
 vim.opt.backup = true
 -- バックアップファイルの拡張子
-vim.opt.backupext = '.bak'
+vim.opt.backupext = ".bak"
 -- バックアップファイル作成先ディレクトリ
-vim.opt.backupdir = vim.fn.expand('~/.local/state/nvim/backup/')
+vim.opt.backupdir = vim.fn.expand("~/.local/state/nvim/backup/")
 -- バックアップファイルを作成しないディレクトリ
-vim.opt.backupskip = {'/tmp/*'}
+vim.opt.backupskip = { "/tmp/*" }
 -- スワップファイル有効化
 vim.opt.swapfile = true
 -- スワップファイル作成先ディレクトリ
-vim.opt.directory = vim.fn.expand('~/.local/state/nvim/swap/')
+vim.opt.directory = vim.fn.expand("~/.local/state/nvim/swap/")
 -- アンドゥ永続化
 vim.opt.undofile = true
 -- アンドゥファイル作成先ディレクトリ
-vim.opt.undodir = vim.fn.expand('~/.local/state/nvim/undo/')
+vim.opt.undodir = vim.fn.expand("~/.local/state/nvim/undo/")
 -- コマンド履歴記録数
 vim.opt.history = 10000
