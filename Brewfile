@@ -201,7 +201,6 @@ if OS.mac?
   cask "google-japanese-ime"
   cask "gpg-suite-no-mail"
   cask "jetbrains-toolbox"
-  cask "middleclick"
   cask "obsidian"
   cask "raycast"
   cask "secretive"
