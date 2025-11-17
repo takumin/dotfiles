@@ -199,7 +199,6 @@ if OS.mac?
   cask "font-symbols-only-nerd-font"
   cask "google-chrome"
   cask "google-japanese-ime"
-  cask "gpg-suite-no-mail"
   cask "jetbrains-toolbox"
   cask "obsidian"
   cask "raycast"
