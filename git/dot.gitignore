@@ -6,3 +6,6 @@
 .envrc
 .bundle
 tags
+
+# Claude Code
+**/.claude/settings.local.json
