@@ -46,6 +46,7 @@ path=(
 	${HOME}/.tfenv/bin(N-/)
 	${HOME}/.deno/bin(N-/)
 	${HOME}/.dotnet/tools(N-/)
+	${HOME}/.lmstudio/bin(N-/)
 	${HOME}/Android/Sdk/cmdline-tools/bin(N-/)
 	"${HOME}/Library/Application Support/JetBrains/Toolbox/scripts"(N-/)
 	"${HOMEBREW_PREFIX}/sbin"(N-/)
