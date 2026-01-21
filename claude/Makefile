@@ -14,20 +14,22 @@ install: \
 
 .PHONY: clean
 clean:
-	@rm -fr ${HOME}/.claude
-	@rm -fr ${HOME}/.claude.json
-	@rm -fr ${HOME}/.claude.json.backup
+	@rm -fr ${HOME}/.claude/agents
+	@rm -fr ${HOME}/.claude/hooks
+	@rm -fr ${HOME}/.claude/rules
+	@rm -fr ${HOME}/.claude/skills
+	@rm -fr ${HOME}/.claude/CLAUDE.md
 
 ${HOME}/.claude:
 	@mkdir -p $@
 ${HOME}/.claude/agents:
-	@mkdir -p $@
+	@ln -s ../${DOTDIR_NAME}/claude/agents $@
 ${HOME}/.claude/hooks:
-	@mkdir -p $@
+	@ln -s ../${DOTDIR_NAME}/claude/hooks $@
 ${HOME}/.claude/rules:
-	@mkdir -p $@
+	@ln -s ../${DOTDIR_NAME}/claude/rules $@
 ${HOME}/.claude/skills:
-	@mkdir -p $@
+	@ln -s ../${DOTDIR_NAME}/claude/skills $@
 
 ${HOME}/.claude/CLAUDE.md:
 	@ln -s ../${DOTDIR_NAME}/claude/CLAUDE.md $@
