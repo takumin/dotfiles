@@ -13,6 +13,12 @@ action = "Paste"
 key = "Y"
 mods = "Control"
 
+# Support Claude Code
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\n"
+
 [scrolling]
 history = 0
 
