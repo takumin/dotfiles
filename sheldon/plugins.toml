@@ -13,7 +13,13 @@
 shell = "zsh"
 
 [templates]
-defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+defer = """
+{{ hooks?.pre | nl }}
+{% for file in files %}
+zsh-defer source "{{ file }}"
+{% endfor %}
+{{ hooks?.post | nl }}
+"""
 # sheldon source is called after compinit, so fpath creates the symlink
 oh-my-zsh-fpath = '''
 if [[ ! -d "${ZDOTDIR:-"${HOME}"}/completions" ]]; then
@@ -60,3 +66,11 @@ use = [
   'plugins/virtualenvwrapper/virtualenvwrapper.plugin.zsh',
 ]
 apply = ["defer", "oh-my-zsh-fpath"]
+
+# MEMO: slow startup
+# [plugins.wrangler]
+# inline = '''
+# if [[ -x "$(whence -- wrangler)" ]]; then
+# 	zsh-defer -c 'source <(wrangler complete zsh)'
+# fi
+# '''
