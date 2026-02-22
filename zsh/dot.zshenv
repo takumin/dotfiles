@@ -737,6 +737,12 @@ export DOTNET_CLI_TELEMETRY_OPTOUT="1"
 #
 export WRANGLER_SEND_METRICS="false"
 
+## fzf
+#
+if [[ -x "$(whence -- fd)" ]]; then
+	export FZF_DEFAULT_COMMAND="fd --type f -H -E .git"
+fi
+
 ## set ${REMOTEHOST} of remote client connection address
 #
 if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
