@@ -32,6 +32,14 @@
 - Prefer incremental checks over end-to-end-only validation.
 - Write code that can be read and reviewed without running it.
 
+## Predictability
+
+- Produce the same output given the same input; eliminate hidden sources of variation.
+- Design operations so they can be re-run without changing the outcome beyond the first execution.
+- Pin external inputs at the boundary: versions, dependencies, configuration.
+- Do not rely on ambient state that may differ between environments or executions.
+- Make the order of independent operations irrelevant to the final result.
+
 ## Design for Change
 
 - Depend on abstractions, not concrete implementations.
@@ -39,6 +47,13 @@
 - Keep coupling low: a change in one module must not cascade.
 - Prefer reversible decisions; defer irreversible ones as long as practical.
 - Design units so they can be removed without requiring changes to unrelated parts.
+
+## Single Source of Truth
+
+- Represent each fact, rule, or constant in exactly one place.
+- Derive values rather than duplicating them; prefer computation over copy.
+- Do not mistake coincidental similarity for true duplication; merge only what changes for the same reason.
+- When duplication is discovered, consolidate immediately rather than synchronizing copies.
 
 ## Simplicity
 
