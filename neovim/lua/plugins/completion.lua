@@ -106,7 +106,7 @@ return {
 			})
 
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-			local vscode_server_capabilities = capabilities
+			local vscode_server_capabilities = vim.deepcopy(capabilities)
 			vscode_server_capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 			if vim.fn.executable("lua-language-server") == 1 then
@@ -140,7 +140,7 @@ return {
 					return paths
 				end
 
-				require("lspconfig").lua_ls.setup({
+				vim.lsp.config("lua_ls", {
 					capabilities = capabilities,
 
 					settings = {
@@ -157,22 +157,25 @@ return {
 						},
 					},
 				})
+				vim.lsp.enable("lua_ls")
 			end
 
 			if vim.fn.executable("bash-language-server") == 1 then
-				require("lspconfig").bashls.setup({
+				vim.lsp.config("bashls", {
 					capabilities = capabilities,
 				})
+				vim.lsp.enable("bashls")
 			end
 
 			if vim.fn.executable("clangd") == 1 then
-				require("lspconfig").clangd.setup({
+				vim.lsp.config("clangd", {
 					capabilities = capabilities,
 				})
+				vim.lsp.enable("clangd")
 			end
 
 			if vim.fn.executable("gopls") == 1 then
-				require("lspconfig").gopls.setup({
+				vim.lsp.config("gopls", {
 					capabilities = capabilities,
 
 					settings = {
@@ -181,10 +184,11 @@ return {
 						},
 					},
 				})
+				vim.lsp.enable("gopls")
 			end
 
 			if vim.fn.executable("rust-analyzer") == 1 then
-				require("lspconfig").rust_analyzer.setup({
+				vim.lsp.config("rust_analyzer", {
 					capabilities = capabilities,
 
 					settings = {
@@ -195,10 +199,11 @@ return {
 						},
 					},
 				})
+				vim.lsp.enable("rust_analyzer")
 			end
 
 			if vim.fn.executable("ruby-lsp") == 1 then
-				require("lspconfig").ruby_lsp.setup({
+				vim.lsp.config("ruby_lsp", {
 					capabilities = capabilities,
 
 					init_options = {
@@ -206,10 +211,11 @@ return {
 						linters = { "standard" },
 					},
 				})
+				vim.lsp.enable("ruby_lsp")
 			end
 
 			if vim.fn.executable("ruff") == 1 then
-				require("lspconfig").ruff.setup({
+				vim.lsp.config("ruff", {
 					capabilities = capabilities,
 
 					init_options = {
@@ -218,10 +224,11 @@ return {
 						},
 					},
 				})
+				vim.lsp.enable("ruff")
 			end
 
 			if vim.fn.executable("pylsp") == 1 then
-				require("lspconfig").pylsp.setup({
+				vim.lsp.config("pylsp", {
 					capabilities = capabilities,
 
 					settings = {
@@ -234,34 +241,39 @@ return {
 						},
 					},
 				})
+				vim.lsp.enable("pylsp")
 			end
 
 			if vim.fn.executable("csharp-ls") == 1 then
-				require("lspconfig").csharp_ls.setup({
+				vim.lsp.config("csharp_ls", {
 					capabilities = capabilities,
 				})
+				vim.lsp.enable("csharp_ls")
 			end
 
 			if vim.fn.executable("terraform-ls") == 1 then
-				require("lspconfig").terraformls.setup({
+				vim.lsp.config("terraformls", {
 					capabilities = capabilities,
 				})
+				vim.lsp.enable("terraformls")
 			end
 
 			if vim.fn.executable("typescript-language-server") == 1 then
-				require("lspconfig").ts_ls.setup({
+				vim.lsp.config("ts_ls", {
 					capabilities = capabilities,
 				})
+				vim.lsp.enable("ts_ls")
 			end
 
 			if vim.fn.executable("biome") == 1 then
-				require("lspconfig").biome.setup({
+				vim.lsp.config("biome", {
 					capabilities = capabilities,
 				})
+				vim.lsp.enable("biome")
 			end
 
 			if vim.fn.executable("yaml-language-server") == 1 then
-				require("lspconfig").yamlls.setup({
+				vim.lsp.config("yamlls", {
 					capabilities = capabilities,
 
 					settings = {
@@ -272,28 +284,32 @@ return {
 						},
 					},
 				})
+				vim.lsp.enable("yamlls")
 			end
 
 			if vim.fn.executable("vscode-json-language-server") == 1 then
-				require("lspconfig").jsonls.setup({
+				vim.lsp.config("jsonls", {
 					capabilities = vscode_server_capabilities,
 				})
+				vim.lsp.enable("jsonls")
 			end
 
 			if vim.fn.executable("vscode-html-language-server") == 1 then
-				require("lspconfig").html.setup({
+				vim.lsp.config("html", {
 					capabilities = vscode_server_capabilities,
 				})
+				vim.lsp.enable("html")
 			end
 
 			if vim.fn.executable("vscode-css-language-server") == 1 then
-				require("lspconfig").cssls.setup({
+				vim.lsp.config("cssls", {
 					capabilities = vscode_server_capabilities,
 				})
+				vim.lsp.enable("cssls")
 			end
 
 			if vim.fn.executable("vscode-eslint-language-server") == 1 then
-				require("lspconfig").eslint.setup({
+				vim.lsp.config("eslint", {
 					capabilities = vscode_server_capabilities,
 
 					on_attach = function(_, bufnr)
@@ -303,6 +319,7 @@ return {
 						})
 					end,
 				})
+				vim.lsp.enable("eslint")
 			end
 		end,
 	},
