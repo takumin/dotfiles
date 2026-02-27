@@ -1,7 +1,6 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
-		main = "nvim-treesitter.configs",
 		event = { "BufRead", "BufNewFile" },
 		build = ":TSUpdate",
 		opts = {
@@ -46,7 +45,6 @@ return {
 	},
 	{
 		"RRethy/nvim-treesitter-endwise",
-		main = "nvim-treesitter.configs",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		event = "InsertEnter",
 		opts = {
