@@ -1,7 +1,7 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
-		event = { "BufRead", "BufNewFile" },
+		lazy = false,
 		build = ":TSUpdate",
 		opts = {
 			auto_install = true,
@@ -28,7 +28,7 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter-context",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
-		event = { "BufNewFile", "BufReadPre" },
+		lazy = false,
 		opts = {
 			enable = true,
 			multiwindow = false,
@@ -46,12 +46,12 @@ return {
 	{
 		"RRethy/nvim-treesitter-endwise",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
-		event = "InsertEnter",
+		lazy = false,
 	},
 	{
 		"windwp/nvim-autopairs",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
-		event = "InsertEnter",
+		lazy = false,
 		opts = {
 			check_ts = true,
 		},
