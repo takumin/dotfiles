@@ -203,7 +203,6 @@ if OS.mac?
   cask "google-japanese-ime"
   cask "jetbrains-toolbox"
   cask "obsidian"
-  cask "secretive"
   cask "session-manager-plugin"
   cask "slack"
   cask "utm"
