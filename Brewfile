@@ -180,6 +180,9 @@ brew "suzuki-shunsuke/cmdx/cmdx"
 brew "suzuki-shunsuke/ghalint/ghalint"
 brew "suzuki-shunsuke/pinact/pinact"
 
+cask "claude-code"
+cask "codex"
+
 if OS.linux?
   brew "nerdctl"
 end
@@ -196,6 +199,7 @@ if OS.mac?
   cask "alacritty"
   cask "chatgpt"
   cask "claude"
+  cask "codex-app"
   cask "discord"
   cask "firefox"
   cask "font-symbols-only-nerd-font"
