@@ -195,6 +195,7 @@ if OS.mac?
   cask "1password-cli"
   cask "alacritty"
   cask "chatgpt"
+  cask "claude"
   cask "discord"
   cask "firefox"
   cask "font-symbols-only-nerd-font"
