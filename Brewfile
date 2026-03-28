@@ -1,7 +1,6 @@
 # vim: set ft=ruby :
 
 # Tap
-tap "aquaproj/aqua"
 tap "bufbuild/buf"
 tap "fujiwara/tap"
 tap "hashicorp/tap"
@@ -182,6 +181,7 @@ brew "hashicorp/tap/terraform-ls"
 brew "kayac/tap/ecspresso"
 
 # CI/CD & Automation
+brew "aqua"
 brew "act"
 brew "actionlint"
 brew "dagger"
@@ -190,7 +190,6 @@ brew "melange"
 brew "nfpm"
 brew "wrkflw"
 brew "zizmor"
-brew "aquaproj/aqua/aqua"
 brew "k1low/tap/octocov"
 brew "k1low/tap/runn"
 brew "lintnet/lintnet/lintnet"
