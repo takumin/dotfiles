@@ -22,17 +22,28 @@ clean:
 
 ${HOME}/.claude:
 	@mkdir -p $@
+
 ${HOME}/.claude/agents:
-	@ln -s ../${DOTDIR_NAME}/claude/agents $@
+	@if [ -d $(CURDIR)/agents ]; then \
+		ln -s ../${DOTDIR_NAME}/claude/agents $@; \
+	fi
 ${HOME}/.claude/hooks:
-	@ln -s ../${DOTDIR_NAME}/claude/hooks $@
+	@if [ -d $(CURDIR)/hooks ]; then \
+		ln -s ../${DOTDIR_NAME}/claude/hooks $@; \
+	fi
 ${HOME}/.claude/rules:
-	@ln -s ../${DOTDIR_NAME}/claude/rules $@
+	@if [ -d $(CURDIR)/rules ]; then \
+		ln -s ../${DOTDIR_NAME}/claude/rules $@; \
+	fi
 ${HOME}/.claude/skills:
-	@ln -s ../${DOTDIR_NAME}/claude/skills $@
+	@if [ -d $(CURDIR)/rules ]; then \
+		ln -s ../${DOTDIR_NAME}/claude/skills $@; \
+	fi
 
 ${HOME}/.claude/CLAUDE.md:
-	@ln -s ../${DOTDIR_NAME}/claude/CLAUDE.md $@
+	@if [ -f $(CURDIR)/CLAUDE.md ]; then \
+		ln -s ../${DOTDIR_NAME}/claude/CLAUDE.md $@; \
+	fi
 
 .PHONY: login
 login:
