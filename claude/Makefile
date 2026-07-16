@@ -8,6 +8,7 @@ install: \
 	${HOME}/.claude \
 	${HOME}/.claude/agents \
 	${HOME}/.claude/hooks \
+	${HOME}/.claude/references \
 	${HOME}/.claude/rules \
 	${HOME}/.claude/skills \
 	${HOME}/.claude/CLAUDE.md
@@ -16,6 +17,7 @@ install: \
 clean:
 	@rm -fr ${HOME}/.claude/agents
 	@rm -fr ${HOME}/.claude/hooks
+	@rm -fr ${HOME}/.claude/references
 	@rm -fr ${HOME}/.claude/rules
 	@rm -fr ${HOME}/.claude/skills
 	@rm -fr ${HOME}/.claude/CLAUDE.md
@@ -30,6 +32,10 @@ ${HOME}/.claude/agents:
 ${HOME}/.claude/hooks:
 	@if [ -d $(CURDIR)/hooks ]; then \
 		ln -s ../${DOTDIR_NAME}/claude/hooks $@; \
+	fi
+${HOME}/.claude/references:
+	@if [ -d $(CURDIR)/references ]; then \
+		ln -s ../${DOTDIR_NAME}/claude/references $@; \
 	fi
 ${HOME}/.claude/rules:
 	@if [ -d $(CURDIR)/rules ]; then \
