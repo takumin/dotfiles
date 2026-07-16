@@ -2,9 +2,11 @@
 
 These guidelines operationalize the design principles.
 
-Apply them in context. When guidelines conflict, follow the priority order defined in the design principles.
+Apply them in context.
+When guidelines conflict, follow the priority order defined in the design principles.
 
-These guidelines are technology- and context-independent. Guidance that presupposes a specific platform or system context — such as CLI tools, GUI applications, web frontends, web backends, or distributed services — is intentionally excluded and defined separately per context.
+These guidelines are technology- and context-independent.
+Guidance that presupposes a specific platform or system context — such as CLI tools, GUI applications, web frontends, web backends, or distributed services — is intentionally excluded; such guidance may be defined separately per context when needed.
 
 ## Correctness
 

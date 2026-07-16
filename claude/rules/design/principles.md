@@ -1,110 +1,156 @@
 # Design Principles
 
-These principles guide design decisions. They are decision criteria, not independent goals to maximize.
+These principles guide design decisions.
+They are decision criteria, not independent goals to maximize.
 
-Detailed operational guidelines that apply these principles are maintained in `~/.claude/references/design/guidelines.md`. Read that file before making non-trivial design decisions, performing design reviews, or resolving conflicts between principles; do not load it for tasks that involve no design decisions.
+Detailed operational guidelines that apply these principles are maintained in `~/.claude/references/design/guidelines.md`.
+Read that file, if present, before any of the following:
+
+- Making a non-trivial design decision — for example, introducing or changing a public or cross-component interface, schema, contract, or external dependency, or making a change that spans multiple modules.
+- Performing a design review.
+- Resolving a conflict between principles.
+
+Do not load it for tasks that involve no design decisions.
+
+## Conflict Priority
 
 When principles conflict, apply the following priority:
 
-1. Do not violate security, data integrity, or other non-negotiable requirements, including any applicable safety constraints. (Security by Default; the aspects of Correctness that protect authoritative state and stored data)
-2. Satisfy explicitly required behavior, invariants, acceptance criteria, and failure semantics. (Correctness; Fault Tolerance)
-3. Preserve public contracts and compatibility unless the task requires changing them. (Compatibility and Contract Evolution)
-4. Prefer the least complex reversible design that satisfies the requirement. When simplicity and reversibility conflict, prefer the reversible design if its added complexity is reasonable; otherwise prefer the simpler one. (Simplicity; Design for Change)
-5. Follow established local conventions. (Consistency)
-6. Do not add abstraction, configurability, or other mechanism beyond what a demonstrated requirement or risk justifies. (Simplicity; Abstraction; Design for Change)
+1. Do not violate security, data integrity, or requirements explicitly designated as non-negotiable.
+   (Security by Default; the aspects of Correctness that protect authoritative state and stored data)
+2. Satisfy explicitly required behavior, acceptance criteria, and failure semantics, and preserve applicable invariants.
+   Applicable invariants include both stated invariants and those inherent in the existing design.
+   (Correctness; Fault Tolerance)
+3. Preserve contracts that have consumers — public or internal — and their compatibility, unless the task requires changing them.
+   (Compatibility and Contract Evolution)
+4. Prefer the least complex reversible design that satisfies the requirement.
+   When simplicity and reversibility conflict:
+   - Prefer the reversible design if its added complexity is reasonable.
+   - Otherwise prefer the simpler one.
+   (Simplicity; Design for Change)
+5. Follow established local conventions.
+   (Consistency)
+6. Do not add abstraction, configurability, or other mechanism beyond what a demonstrated requirement or risk justifies.
+   (Simplicity; Abstraction; Design for Change)
 
-Levels 4 and 6 apply Simplicity in different roles: level 4 selects among candidate designs; level 6 constrains adding mechanism to the chosen design.
+Levels 4 and 6 apply Simplicity and Design for Change in different roles:
+level 4 selects among candidate designs; level 6 constrains adding mechanism to the chosen design.
 
-The remaining principles — Separation of Concerns, Explicit over Implicit, Single Source of Truth, Predictability, Resource Awareness, and Diagnosability — are design-quality criteria, not additional priority levels. They select among designs that levels 1–6 leave open; on their own they do not justify departing from local conventions (level 5) or introducing additional mechanism (level 6). Any of them is elevated to level 2 where the requirements explicitly demand it — for example, a stated reproducibility, capacity, or observability requirement. When design-quality criteria conflict with each other, prefer the least complex reversible option (level 4).
+## Design-Quality Criteria
 
-## 1. Correctness
+The remaining principles are design-quality criteria, not additional priority levels:
+Separation of Concerns, Abstraction, Explicit over Implicit, Single Source of Truth, Predictability, Resource Awareness, and Diagnosability and Verifiability.
 
-Preserve required behavior, invariants, data integrity, and contracts.
+How design-quality criteria relate to the priority levels:
 
-A solution is not correct merely because it compiles or passes existing tests. The implementation must satisfy the stated requirements, preserve relevant invariants, handle applicable boundary and failure cases, and leave authoritative state consistent.
+- They select among designs that levels 1–6 leave open.
+- On their own, they do not justify departing from local conventions (level 5) or introducing additional mechanism (level 6).
+- Any of them is elevated to level 2 where the requirements explicitly demand it — for example, a stated reproducibility, capacity, or observability requirement.
+- When design-quality criteria conflict with each other, prefer the least complex reversible option (level 4).
 
-## 2. Security by Default
+Abstraction has two roles:
 
-Protect trust boundaries, credentials, authorization decisions, sensitive data, and security-critical operations explicitly.
+- Whether to introduce an abstraction at all is governed by level 6.
+- The shape and ownership of boundaries the design already includes are design-quality concerns.
 
-Do not weaken security controls to simplify implementation, testing, or deployment. Treat data as untrusted whenever its integrity or origin is not guaranteed, including data received from external systems, internal services, storage, configuration, plugins, tools, or generated outputs.
+## Worked Examples
 
-## 3. Compatibility and Contract Evolution
+These examples illustrate how the priority levels combine; they add no new rules.
 
-Preserve externally observable contracts unless changing them is required.
+- A refactor would be simpler if it renamed a configuration key that existing consumers read.
+  Level 3 outranks level 4: keep the key, or change it only with an explicit migration path — a simpler design does not justify breaking a consumed contract.
+- A new module could be given a plugin interface "in case other backends are added later".
+  No requirement or demonstrated risk calls for a substitution point, so level 6 rejects the interface; Design for Change alone is not a justification.
+  If a second backend later becomes a real requirement, that requirement justifies introducing the substitution point at that time.
 
-Treat APIs, persisted data, messages, configuration, command-line behavior, error semantics, and relevant operational behavior as contracts. When a contract must change, make the compatibility strategy, migration path, rollout constraints, and removal conditions explicit.
+## Principle Definitions
 
-## 4. Fault Tolerance
+Each definition fixes the intended interpretation of the name used above: the first line is the core definition, and the bullets refine it.
+The operational detail lives in the guidelines file.
+Numbered references in this document always mean the priority levels above.
 
-Assume that networks, external services, infrastructure, and dependent operations can fail, become slow, or become overloaded.
+### Correctness
 
-Failure behavior is part of correctness. Define what happens when an operation cannot complete, leave the system in a defined state, make retries safe or explicitly unsafe, and prevent recovery mechanisms from amplifying failures.
+Satisfy the stated requirements, invariants, and applicable boundary and failure cases, and leave authoritative state and stored data consistent.
 
-## 5. Simplicity
+- Compiling and passing existing tests are not evidence of correctness.
 
-Build only what is needed.
+### Security by Default
 
-Simplicity evaluates the amount of mechanism required by the current design. Prefer the least complex solution that correctly satisfies the current requirement. Avoid speculative generality, unnecessary indirection, and mechanisms that do not solve a demonstrated problem.
+Never weaken security controls for implementation, testing, or deployment convenience.
 
-Simplicity does not prohibit boundaries or abstractions that protect a demonstrated contract, invariant, or risk.
+- Treat data as untrusted whenever its integrity or origin is not guaranteed — including data from external systems, internal services, storage, configuration, plugins, tools, and generated outputs.
 
-## 6. Separation of Concerns
+### Compatibility and Contract Evolution
 
-Keep responsibilities that change for different reasons in separate units.
+Contracts include persisted data, messages, configuration, command-line behavior, error semantics, and operational behavior, not only APIs.
 
-Separate policy from mechanism, domain logic from infrastructure, and computation from side effects. Keep responsibilities together when they are operationally coupled, share the same invariants or lifecycle, and consistently change together.
+- A contract change requires an explicit migration path.
+- Compatibility mechanisms and deprecations require explicit removal conditions.
 
-Separation of Concerns determines where responsibilities belong. Abstraction determines how those responsibilities are exposed across boundaries.
+### Fault Tolerance
 
-## 7. Abstraction
+Failure behavior is part of correctness.
 
-Hide incidental complexity and expose intent through stable boundaries.
+- Leave the system in a defined state, make retries safe or explicitly unsafe, and prevent recovery mechanisms from amplifying failures.
+- Inherent failure modes of the operations involved — hangs, duplicate effects, partial failure, unbounded retry growth — count as demonstrated risks at level 6 even when no requirement names them.
+- The mechanism addressing such a risk must still be proportionate to the risk.
 
-Abstraction concerns the shape and ownership of boundaries, not the number of layers. Introduce abstractions where they clarify domain concepts, isolate volatility, prevent implementation leakage, enforce a meaningful architectural boundary, or provide a required substitution point.
+### Simplicity
 
-Do not create abstractions solely in anticipation of hypothetical reuse or change.
+The least mechanism that satisfies the current requirement.
 
-## 8. Explicit over Implicit
+- Boundaries that protect a demonstrated contract, invariant, or risk are not complexity.
 
-Make behavior traceable to explicit inputs, declared dependencies, configuration, contracts, or documented conventions.
+### Separation of Concerns
 
-Avoid hidden dependencies, ambient state, surprising side effects, and control flow that depends on initialization order, undocumented framework behavior, or other implicit conditions.
+Separate what changes for different reasons; keep together what consistently changes together.
 
-## 9. Single Source of Truth
+- Decides where responsibilities belong; Abstraction decides how they are exposed.
 
-Maintain one authoritative source for each shared semantic fact, rule, schema, or decision within its ownership boundary.
+### Abstraction
 
-Derived, cached, generated, indexed, replicated, or denormalized representations are acceptable when their relationship to the authoritative source is explicit and their synchronization, invalidation, rebuilding, or reconciliation is defined.
+The shape and ownership of boundaries, not the number of layers.
 
-## 10. Design for Change
+- Introduce one only for a demonstrated need — for example, to isolate volatility, prevent implementation leakage, or provide a required substitution point — never for hypothetical reuse.
 
-Keep the cost and scope of demonstrated or high-risk changes low.
+### Explicit over Implicit
 
-Prefer reversible decisions, stable boundaries, and localized dependencies. Isolate volatile decisions when there is evidence that they will vary or when failure to isolate them would create significant cost or risk.
+Behavior must be traceable to explicit inputs, declared dependencies, and documented contracts — not to ambient state, initialization order, or undocumented framework behavior.
 
-Design for Change is not a reason to generalize every implementation.
+### Single Source of Truth
 
-## 11. Predictability
+One authoritative source per shared fact within its ownership boundary.
 
-Make behavior reproducible and understandable.
+- Derived copies are acceptable when their synchronization is defined.
+- Narrower than DRY: do not centralize coincidentally equal values.
 
-Given the same controlled inputs and state, a system should produce the same observable result. Make unavoidable sources of variation explicit and controllable where determinism or reproducibility is required.
+### Design for Change
 
-## 12. Resource Awareness
+Prefer reversible decisions; isolate volatile decisions only with evidence they will vary.
 
-Use time, memory, I/O, concurrency, external-service capacity, and operational cost in proportion to the problem.
+- Not a reason to generalize.
 
-Choose algorithms, access patterns, and concurrency models that match expected data sizes and loads. Do not optimize speculatively, and do not accept obvious or unbounded inefficiency. Justify significant optimizations with measurement or realistic estimates.
+### Predictability
 
-## 13. Consistency
+Same controlled inputs and state, same observable result.
 
-Apply the same solution to problems with equivalent constraints, ownership, and lifecycle.
+- Make unavoidable variation explicit and controllable where reproducibility is required.
 
-Follow established local conventions unless doing so would preserve a defect, violate a higher-priority principle, or materially worsen the requested design. Prefer local consistency over repository-wide uniformity when subsystems intentionally have different architectures.
+### Resource Awareness
 
-## 14. Diagnosability and Verifiability
+Cost in proportion to the problem: neither speculative optimization nor accepted obvious or unbounded inefficiency.
 
-Make invalid states, failures, and violated assumptions easy to detect, localize, reproduce, and verify.
+- Justify significant optimizations with measurement or realistic estimates.
 
-Surface failures close to their cause, preserve actionable context, and design boundaries so behavior can be inspected and verified without relying on unrelated parts of the system.
+### Consistency
+
+Follow local conventions unless they preserve a defect or violate a higher-priority principle.
+
+- Prefer local consistency over repository-wide uniformity.
+
+### Diagnosability and Verifiability
+
+Surface failures close to their cause with actionable context.
+
+- Make behavior verifiable without relying on unrelated parts of the system.
