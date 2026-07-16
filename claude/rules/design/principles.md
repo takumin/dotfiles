@@ -6,14 +6,16 @@ Detailed operational guidelines that apply these principles are maintained in `~
 
 When principles conflict, apply the following priority:
 
-1. Do not violate security, data integrity, applicable safety constraints, or other non-negotiable requirements. (Security by Default; the data-integrity aspects of Correctness)
+1. Do not violate security, data integrity, or other non-negotiable requirements, including any applicable safety constraints. (Security by Default; the aspects of Correctness that protect authoritative state and stored data)
 2. Satisfy explicitly required behavior, invariants, acceptance criteria, and failure semantics. (Correctness; Fault Tolerance)
 3. Preserve public contracts and compatibility unless the task requires changing them. (Compatibility and Contract Evolution)
-4. Prefer the least complex reversible design that satisfies the requirement. (Simplicity; Design for Change)
+4. Prefer the least complex reversible design that satisfies the requirement. When simplicity and reversibility conflict, prefer the reversible design if its added complexity is reasonable; otherwise prefer the simpler one. (Simplicity; Design for Change)
 5. Follow established local conventions. (Consistency)
-6. Introduce additional abstraction or flexibility only when it addresses a demonstrated requirement or risk. (Simplicity; Abstraction; Design for Change)
+6. Do not add abstraction, configurability, or other mechanism beyond what a demonstrated requirement or risk justifies. (Simplicity; Abstraction; Design for Change)
 
-The remaining principles — Separation of Concerns, Explicit over Implicit, Single Source of Truth, Predictability, Resource Awareness, and Diagnosability — are design-quality criteria that operate at level 4: they inform which design is chosen among those that satisfy levels 1–3. Any of them is elevated to level 2 where the requirements explicitly demand it — for example, a stated reproducibility, capacity, or observability requirement. When design-quality criteria conflict with each other and no higher level decides, prefer the least complex reversible option.
+Levels 4 and 6 apply Simplicity in different roles: level 4 selects among candidate designs; level 6 constrains adding mechanism to the chosen design.
+
+The remaining principles — Separation of Concerns, Explicit over Implicit, Single Source of Truth, Predictability, Resource Awareness, and Diagnosability — are design-quality criteria, not additional priority levels. They select among designs that levels 1–6 leave open; on their own they do not justify departing from local conventions (level 5) or introducing additional mechanism (level 6). Any of them is elevated to level 2 where the requirements explicitly demand it — for example, a stated reproducibility, capacity, or observability requirement. When design-quality criteria conflict with each other, prefer the least complex reversible option (level 4).
 
 ## 1. Correctness
 

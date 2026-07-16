@@ -103,21 +103,13 @@ These guidelines are technology- and context-independent. Guidance that presuppo
 ## Abstraction
 
 * Name abstractions after the intent, capability, policy, or domain concept they represent, not the mechanism currently used to implement them.
-
 * Give each abstraction a clear owner and responsibility.
-
 * Expose the minimum interface necessary to satisfy callers.
-
 * Hide implementation details that callers do not need to know.
-
 * Keep implementation-specific choices behind the boundary that owns them.
-
 * Do not leak external library types, persistence schemas, transport formats, framework objects, or infrastructure concerns across architectural boundaries without a deliberate reason.
-
 * Do not add a layer of indirection unless it solves a demonstrated problem.
-
 * Introduce a project-owned interface around an external dependency only when it:
-
   * isolates domain logic;
   * protects a meaningful architectural boundary;
   * prevents external API leakage;
@@ -125,21 +117,13 @@ These guidelines are technology- and context-independent. Guidance that presuppo
   * centralizes translation, policy, or error handling;
   * addresses demonstrated volatility; or
   * materially improves verifiability without obscuring the design.
-
 * Do not create a project-owned interface solely because an implementation exists or might be replaced someday.
-
 * A single implementation may still justify an interface when it protects a meaningful architectural or contract boundary.
-
 * Prefer a concrete implementation until an abstraction has a clear responsibility and a demonstrated consumer or boundary need.
-
 * Do not generalize from a single case without evidence that the abstraction represents a stable concept.
-
 * Do not unify implementations merely because their current code shape is similar.
-
 * Keep abstractions smaller, more intentional, and more stable than the implementations behind them.
-
 * Avoid interfaces that expose every capability of the implementation rather than the needs of the caller.
-
 * Remove or collapse abstractions that no longer reduce complexity, express intent, or protect a meaningful boundary.
 
 ## Explicit over Implicit
@@ -172,7 +156,6 @@ These guidelines are technology- and context-independent. Guidance that presuppo
 * Consolidate duplicated knowledge when independent copies could become inconsistent.
 * Prefer automated synchronization when duplication is necessary.
 * Do not merge similar code or data until confirming that it represents the same semantic concept and changes for the same reason.
-* Do not create a shared abstraction merely because two implementations currently look similar.
 * Do not centralize values that are coincidentally equal but owned by different responsibilities.
 * Allow independent bounded contexts to own separate representations when their semantics, lifecycle, or authority differ.
 * Make ownership transfers and synchronization direction explicit when authority changes.
