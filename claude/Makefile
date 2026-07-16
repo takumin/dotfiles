@@ -36,7 +36,7 @@ ${HOME}/.claude/rules:
 		ln -s ../${DOTDIR_NAME}/claude/rules $@; \
 	fi
 ${HOME}/.claude/skills:
-	@if [ -d $(CURDIR)/rules ]; then \
+	@if [ -d $(CURDIR)/skills ]; then \
 		ln -s ../${DOTDIR_NAME}/claude/skills $@; \
 	fi
 
