@@ -1,5 +1,8 @@
 include ../Makefile.env
 
+SETTINGS := ${HOME}/.claude/settings.json
+FRAGMENT := $(CURDIR)/settings.yaml
+
 .PHONY: default
 default: install
 
@@ -11,7 +14,8 @@ install: \
 	${HOME}/.claude/references \
 	${HOME}/.claude/rules \
 	${HOME}/.claude/skills \
-	${HOME}/.claude/CLAUDE.md
+	${HOME}/.claude/CLAUDE.md \
+	settings
 
 .PHONY: clean
 clean:
@@ -21,6 +25,9 @@ clean:
 	@rm -fr ${HOME}/.claude/rules
 	@rm -fr ${HOME}/.claude/skills
 	@rm -fr ${HOME}/.claude/CLAUDE.md
+	@if command -v yq >/dev/null 2>&1 && [ -f ${SETTINGS} ]; then \
+		yq -i -o=json 'delpaths([load("${FRAGMENT}") | keys | .[] | [.]])' ${SETTINGS}; \
+	fi
 
 ${HOME}/.claude:
 	@mkdir -p $@
@@ -49,6 +56,15 @@ ${HOME}/.claude/skills:
 ${HOME}/.claude/CLAUDE.md:
 	@if [ -f $(CURDIR)/CLAUDE.md ]; then \
 		ln -s ../${DOTDIR_NAME}/claude/CLAUDE.md $@; \
+	fi
+
+.PHONY: settings
+settings: ${HOME}/.claude
+	@if command -v yq >/dev/null 2>&1; then \
+		[ -f ${SETTINGS} ] || echo '{}' > ${SETTINGS}; \
+		yq -i -o=json '. *= load("${FRAGMENT}")' ${SETTINGS}; \
+	else \
+		echo "yq not installed; skip ${SETTINGS}"; \
 	fi
 
 .PHONY: login

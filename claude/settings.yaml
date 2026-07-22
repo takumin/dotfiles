@@ -1,0 +1,41 @@
+---
+language: Japanese
+tui: fullscreen
+theme: dark
+agentPushNotifEnabled: true
+remoteControlAtStartup: true
+permissions:
+  allow:
+  # GitHub CLI
+  - "Bash(gh pr view:*)"
+  - "Bash(gh pr list:*)"
+  - "Bash(gh pr diff:*)"
+  - "Bash(gh pr checks:*)"
+  - "Bash(gh pr status:*)"
+  - "Bash(gh issue view:*)"
+  - "Bash(gh issue list:*)"
+  - "Bash(gh issue status:*)"
+  - "Bash(gh repo view:*)"
+  - "Bash(gh run view:*)"
+  - "Bash(gh run list:*)"
+  - "Bash(gh release view:*)"
+  - "Bash(gh release list:*)"
+  - "Bash(gh workflow view:*)"
+  - "Bash(gh workflow list:*)"
+  - "Bash(gh label list:*)"
+  - "Bash(gh search:*)"
+  - "Bash(gh status:*)"
+  # Rust
+  - "Bash(cargo b:*)"
+  - "Bash(cargo build:*)"
+  - "Bash(cargo c:*)"
+  - "Bash(cargo check:*)"
+  - "Bash(cargo clean:*)"
+  - "Bash(cargo clippy:*)"
+  - "Bash(cargo d:*)"
+  - "Bash(cargo doc:*)"
+  - "Bash(cargo fmt:*)"
+  - "Bash(cargo r:*)"
+  - "Bash(cargo run:*)"
+  - "Bash(cargo t:*)"
+  - "Bash(cargo test:*)"
