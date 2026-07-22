@@ -1,4 +1,14 @@
 ---
+# This file is a fragment for Claude Code's settings.json.
+#
+# It is NOT read by Claude Code directly. The sibling Makefile converts it
+# into JSON with `yq` and deep-merges it into ~/.claude/settings.json
+# (see the `settings` target). Each top-level key below is a settings.json
+# setting; on `make clean` these same top-level keys are removed again.
+#
+# Settings reference:
+# - en: https://code.claude.com/docs/en/settings
+# - ja: https://code.claude.com/docs/ja/settings
 language: Japanese
 tui: fullscreen
 theme: dark
