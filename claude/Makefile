@@ -1,7 +1,7 @@
 include ../Makefile.env
 
-SETTINGS := ${HOME}/.claude/settings.json
-FRAGMENT := $(CURDIR)/settings.yaml
+SETTINGS_JSON := ${HOME}/.claude/settings.json
+SETTINGS_FRAGMENT := $(CURDIR)/settings.yaml
 STATUSLINE_FRAGMENT := $(CURDIR)/statusline.yaml
 
 .PHONY: default
@@ -26,9 +26,9 @@ clean:
 	@rm -fr ${HOME}/.claude/rules
 	@rm -fr ${HOME}/.claude/skills
 	@rm -fr ${HOME}/.claude/CLAUDE.md
-	@if command -v yq >/dev/null 2>&1 && [ -f ${SETTINGS} ]; then \
-		yq -i -o=json 'delpaths([load("${FRAGMENT}") | keys | .[] | [.]])' ${SETTINGS}; \
-		yq -i -o=json 'delpaths([load("${STATUSLINE_FRAGMENT}") | keys | .[] | [.]])' ${SETTINGS}; \
+	@if command -v yq >/dev/null 2>&1 && [ -f ${SETTINGS_JSON} ]; then \
+		yq -i -o=json 'delpaths([load("${SETTINGS_FRAGMENT}") | keys | .[] | [.]])' ${SETTINGS_JSON}; \
+		yq -i -o=json 'delpaths([load("${STATUSLINE_FRAGMENT}") | keys | .[] | [.]])' ${SETTINGS_JSON}; \
 	fi
 
 ${HOME}/.claude:
@@ -63,15 +63,15 @@ ${HOME}/.claude/CLAUDE.md:
 .PHONY: settings
 settings: ${HOME}/.claude
 	@if command -v yq >/dev/null 2>&1; then \
-		[ -f ${SETTINGS} ] || echo '{}' > ${SETTINGS}; \
-		yq -i -o=json '. *= load("${FRAGMENT}")' ${SETTINGS}; \
+		[ -f ${SETTINGS_JSON} ] || echo '{}' > ${SETTINGS_JSON}; \
+		yq -i -o=json '. *= load("${SETTINGS_FRAGMENT}")' ${SETTINGS_JSON}; \
 		if command -v ccusage >/dev/null 2>&1; then \
-			yq -i -o=json '. *= load("${STATUSLINE_FRAGMENT}")' ${SETTINGS}; \
+			yq -i -o=json '. *= load("${STATUSLINE_FRAGMENT}")' ${SETTINGS_JSON}; \
 		else \
 			echo "ccusage not installed; skip statusLine"; \
 		fi; \
 	else \
-		echo "yq not installed; skip ${SETTINGS}"; \
+		echo "yq not installed; skip ${SETTINGS_JSON}"; \
 	fi
 
 .PHONY: login
