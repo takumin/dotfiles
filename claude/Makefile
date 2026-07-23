@@ -2,6 +2,7 @@ include ../Makefile.env
 
 SETTINGS := ${HOME}/.claude/settings.json
 FRAGMENT := $(CURDIR)/settings.yaml
+STATUSLINE_FRAGMENT := $(CURDIR)/statusline.yaml
 
 .PHONY: default
 default: install
@@ -27,6 +28,7 @@ clean:
 	@rm -fr ${HOME}/.claude/CLAUDE.md
 	@if command -v yq >/dev/null 2>&1 && [ -f ${SETTINGS} ]; then \
 		yq -i -o=json 'delpaths([load("${FRAGMENT}") | keys | .[] | [.]])' ${SETTINGS}; \
+		yq -i -o=json 'delpaths([load("${STATUSLINE_FRAGMENT}") | keys | .[] | [.]])' ${SETTINGS}; \
 	fi
 
 ${HOME}/.claude:
@@ -63,6 +65,11 @@ settings: ${HOME}/.claude
 	@if command -v yq >/dev/null 2>&1; then \
 		[ -f ${SETTINGS} ] || echo '{}' > ${SETTINGS}; \
 		yq -i -o=json '. *= load("${FRAGMENT}")' ${SETTINGS}; \
+		if command -v ccusage >/dev/null 2>&1; then \
+			yq -i -o=json '. *= load("${STATUSLINE_FRAGMENT}")' ${SETTINGS}; \
+		else \
+			echo "ccusage not installed; skip statusLine"; \
+		fi; \
 	else \
 		echo "yq not installed; skip ${SETTINGS}"; \
 	fi

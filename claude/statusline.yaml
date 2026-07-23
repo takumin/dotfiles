@@ -1,0 +1,14 @@
+---
+# This file is a fragment for Claude Code's settings.json, like settings.yaml.
+#
+# It is merged into ~/.claude/settings.json by the sibling Makefile's `settings`
+# target ONLY when the `ccusage` command is available (see the target). On
+# `make clean` its top-level keys are removed regardless of ccusage's presence.
+#
+# ccusage renders the status line from the session JSON piped to it on stdin.
+# Settings reference:
+# - en: https://code.claude.com/docs/en/statusline
+# - ja: https://code.claude.com/docs/ja/statusline
+statusLine:
+  type: command
+  command: ccusage statusline
