@@ -15,6 +15,7 @@ theme: dark
 agentPushNotifEnabled: true
 remoteControlAtStartup: true
 permissions:
+  defaultMode: plan
   allow:
   # Git
   - "Bash(git blame:*)"
