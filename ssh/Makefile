@@ -66,4 +66,4 @@ ${HOME}/.ssh/config.d/vagrant.conf: config.vagrant
 ${HOME}/.ssh/pubkeys.d/takumiiinn@gmail.com.pub:
 	@op item get hxmssmkgndajd3sor6lerazky4 --fields 'public key' > $@
 ${HOME}/.ssh/sigkeys.d/takumiiinn@gmail.com.sig: ${HOME}/.ssh/pubkeys.d/takumiiinn@gmail.com.pub
-	@echo "takumiiinn@gmail.com namespace=\"git\" $$(cat $<)" > $@
+	@echo "takumiiinn@gmail.com namespaces=\"git\" $$(cat $<)" > $@
