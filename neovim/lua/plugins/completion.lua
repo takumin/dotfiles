@@ -258,12 +258,67 @@ return {
 				vim.lsp.enable("terraformls")
 			end
 
+			-- TypeScript 7 replaced `tsserver.js` with a native (Go) binary that speaks LSP
+			-- directly, so `typescript-language-server` cannot serve such a workspace and
+			-- `tsgo` cannot serve a TypeScript 5 one. Decide from what the workspace ships.
+
+			---@param dir string
+			---@return "tsserver"|"native"|nil
+			local function typescript_flavor(dir)
+				if vim.fn.isdirectory(dir .. "/node_modules/typescript") == 0 then
+					return nil
+				end
+				if vim.fn.filereadable(dir .. "/node_modules/typescript/lib/tsserver.js") == 1 then
+					return "tsserver"
+				end
+				return "native"
+			end
+
+			---Wrap a server's default `root_dir` so it only attaches where `accept` holds.
+			---@param name string
+			---@param accept fun(dir: string): boolean
+			---@return fun(bufnr: integer, on_dir: fun(dir: string))
+			local function root_dir_filter(name, accept)
+				local default = vim.lsp.config[name].root_dir
+				return function(bufnr, on_dir)
+					default(bufnr, function(dir)
+						if accept(dir) then
+							on_dir(dir)
+						end
+					end)
+				end
+			end
+
 			if vim.fn.executable("typescript-language-server") == 1 then
 				vim.lsp.config("ts_ls", {
 					capabilities = capabilities,
+
+					root_dir = root_dir_filter("ts_ls", function(dir)
+						return typescript_flavor(dir) ~= "native"
+					end),
 				})
 				vim.lsp.enable("ts_ls")
 			end
+
+			-- `tsgo` ships inside the workspace, so there is no global executable to probe.
+			vim.lsp.config("tsgo", {
+				capabilities = capabilities,
+
+				-- `@typescript/native-preview` installs it as `tsgo`; TypeScript 7 as `tsc`.
+				cmd = function(dispatchers, config)
+					local root = (config or {}).root_dir or vim.fn.getcwd()
+					local bin = root .. "/node_modules/.bin/tsgo"
+					if vim.fn.executable(bin) == 0 then
+						bin = root .. "/node_modules/.bin/tsc"
+					end
+					return vim.lsp.rpc.start({ bin, "--lsp", "--stdio" }, dispatchers)
+				end,
+
+				root_dir = root_dir_filter("tsgo", function(dir)
+					return typescript_flavor(dir) == "native"
+				end),
+			})
+			vim.lsp.enable("tsgo")
 
 			if vim.fn.executable("biome") == 1 then
 				vim.lsp.config("biome", {
