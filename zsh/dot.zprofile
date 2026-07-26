@@ -50,22 +50,23 @@ fi
 
 ## terminal multiplexer auto start
 #
-# Editor integrated terminals already manage their own tabs, and AI coding
-# agents spawn a login shell to snapshot the environment, so the unconditional
-# `exec tmux` below would hijack them. Skip the auto start for both, and for
-# any login shell without an interactive terminal to attach to.
+# Editor integrated terminals already provide tabs, and AI coding agents run a
+# login shell just to snapshot the environment, so the `exec tmux` below would
+# hijack them. Set a flag rather than returning early, so the SSH_AUTH_SOCK
+# setup above keeps running for those shells.
 #
-# Set DOTFILES_NO_AUTO_MULTIPLEXER=1 to always skip, or =0 to force the auto
-# start even under an editor or an agent.
+# Respect DOTFILES_NO_AUTO_MULTIPLEXER when already set, so =0 forces the auto
+# start back on.
 if [[ -z "${DOTFILES_NO_AUTO_MULTIPLEXER+set}" ]]; then
 	DOTFILES_NO_AUTO_MULTIPLEXER=0
 
-	# editors
+	# remote and VSCode derived editors set TERM_PROGRAM without VSCODE_PID
 	if [[ -n "${VSCODE_PID}" || "${TERM_PROGRAM}" == "vscode" || -n "${INTELLIJ_ENVIRONMENT_READER}" ]]; then
 		DOTFILES_NO_AUTO_MULTIPLEXER=1
 	fi
 
-	# ai coding agents
+	# only CLAUDECODE, CLAUDE_CODE_ENTRYPOINT and AI_AGENT are confirmed; the
+	# rest are best effort, and the tty check below catches whatever is missed
 	for _agent_env in \
 		CLAUDECODE \
 		CLAUDE_CODE_ENTRYPOINT \
@@ -81,6 +82,7 @@ if [[ -z "${DOTFILES_NO_AUTO_MULTIPLEXER+set}" ]]; then
 	done
 	unset _agent_env
 
+	# an agent snapshotting the environment has no terminal to attach to
 	if [[ ! -o interactive ]] || [[ ! -t 0 ]]; then
 		DOTFILES_NO_AUTO_MULTIPLEXER=1
 	fi
