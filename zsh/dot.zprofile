@@ -56,11 +56,43 @@ if [[ -z "${SSH_AUTH_SOCK}" ]]; then
 	fi
 fi
 
+## terminal multiplexer auto start
+#
+# AI coding agents spawn a login shell to snapshot the environment, so the
+# unconditional `exec tmux` below would hijack the agent's shell. Skip the auto
+# start for those, and for any login shell without an interactive terminal to
+# attach to.
+#
+# Set DOTFILES_NO_AUTO_MULTIPLEXER=1 to always skip, or =0 to force the auto
+# start even under an agent.
+if [[ -z "${DOTFILES_NO_AUTO_MULTIPLEXER+set}" ]]; then
+	DOTFILES_NO_AUTO_MULTIPLEXER=0
+
+	for _agent_env in \
+		CLAUDECODE \
+		CLAUDE_CODE_ENTRYPOINT \
+		AI_AGENT \
+		CURSOR_AGENT \
+		GEMINI_CLI \
+		CODEX_SANDBOX \
+	; do
+		if [[ -n "${(P)_agent_env}" ]]; then
+			DOTFILES_NO_AUTO_MULTIPLEXER=1
+			break
+		fi
+	done
+	unset _agent_env
+
+	if [[ ! -o interactive ]] || [[ ! -t 0 ]]; then
+		DOTFILES_NO_AUTO_MULTIPLEXER=1
+	fi
+fi
+
 ## zellij
 #
 # TODO: The key binding settings overlap with zsh and neovim, so comment them out until the adjustments are complete.
 # if [[ -x "$(whence -- zellij)" ]]; then
-# 	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+# 	if [[ -z "$ZELLIJ" && -z "${TMUX}" && "${DOTFILES_NO_AUTO_MULTIPLEXER}" != 1 ]]; then
 # 		exec zellij attach -c default
 # 		exit
 # 	fi
@@ -69,7 +101,7 @@ fi
 ## tmux
 #
 if [[ -x "$(whence -- tmux)" ]]; then
-	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+	if [[ -z "$ZELLIJ" && -z "${TMUX}" && "${DOTFILES_NO_AUTO_MULTIPLEXER}" != 1 ]]; then
 		case "$TERM" in
 			mlterm*)    args="-2u" && export TERM_PROGRAM="mlterm" ;;
 			*256color)  args="-2u" ;;
@@ -92,7 +124,7 @@ fi
 ## screen
 #
 if [[ -x "$(whence -- screen)" ]]; then
-	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+	if [[ -z "$ZELLIJ" && -z "${TMUX}" && "${DOTFILES_NO_AUTO_MULTIPLEXER}" != 1 ]]; then
 		case "$TERM" in
 			mlterm*)    args="-T screen-256color -S main -U -xRR" && export TERM_PROGRAM="mlterm" ;;
 			*256color)  args="-T screen-256color -S main -U -xRR" ;;
