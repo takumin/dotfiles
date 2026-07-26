@@ -1,14 +1,6 @@
 #!/usr/bin/env zsh
 # vim: set ft=zsh ts=2 sw=2 sts=0 noet :
 
-## vscode
-#
-if [[ -n "${VSCODE_PID}" ]]; then
-	if [[ "${TERM_PROGRAM}" != "vscode" ]]; then
-		return
-	fi
-fi
-
 ## 1password
 #
 if [[ -z "${SSH_CONNECTION}" ]]; then
@@ -58,16 +50,22 @@ fi
 
 ## terminal multiplexer auto start
 #
-# AI coding agents spawn a login shell to snapshot the environment, so the
-# unconditional `exec tmux` below would hijack the agent's shell. Skip the auto
-# start for those, and for any login shell without an interactive terminal to
-# attach to.
+# Editor integrated terminals already manage their own tabs, and AI coding
+# agents spawn a login shell to snapshot the environment, so the unconditional
+# `exec tmux` below would hijack them. Skip the auto start for both, and for
+# any login shell without an interactive terminal to attach to.
 #
 # Set DOTFILES_NO_AUTO_MULTIPLEXER=1 to always skip, or =0 to force the auto
-# start even under an agent.
+# start even under an editor or an agent.
 if [[ -z "${DOTFILES_NO_AUTO_MULTIPLEXER+set}" ]]; then
 	DOTFILES_NO_AUTO_MULTIPLEXER=0
 
+	# editors
+	if [[ -n "${VSCODE_PID}" || "${TERM_PROGRAM}" == "vscode" || -n "${INTELLIJ_ENVIRONMENT_READER}" ]]; then
+		DOTFILES_NO_AUTO_MULTIPLEXER=1
+	fi
+
+	# ai coding agents
 	for _agent_env in \
 		CLAUDECODE \
 		CLAUDE_CODE_ENTRYPOINT \
