@@ -1,14 +1,6 @@
 #!/usr/bin/env zsh
 # vim: set ft=zsh ts=2 sw=2 sts=0 noet :
 
-## vscode
-#
-if [[ -n "${VSCODE_PID}" ]]; then
-	if [[ "${TERM_PROGRAM}" != "vscode" ]]; then
-		return
-	fi
-fi
-
 ## 1password
 #
 if [[ -z "${SSH_CONNECTION}" ]]; then
@@ -56,11 +48,51 @@ if [[ -z "${SSH_AUTH_SOCK}" ]]; then
 	fi
 fi
 
+## terminal multiplexer auto start
+#
+# Editor integrated terminals already provide tabs, and AI coding agents run a
+# login shell just to snapshot the environment, so the `exec tmux` below would
+# hijack them. Set a flag rather than returning early, so the SSH_AUTH_SOCK
+# setup above keeps running for those shells.
+#
+# Respect DOTFILES_NO_AUTO_MULTIPLEXER when already set, so =0 forces the auto
+# start back on.
+if [[ -z "${DOTFILES_NO_AUTO_MULTIPLEXER+set}" ]]; then
+	DOTFILES_NO_AUTO_MULTIPLEXER=0
+
+	# remote and VSCode derived editors set TERM_PROGRAM without VSCODE_PID
+	if [[ -n "${VSCODE_PID}" || "${TERM_PROGRAM}" == "vscode" || -n "${INTELLIJ_ENVIRONMENT_READER}" ]]; then
+		DOTFILES_NO_AUTO_MULTIPLEXER=1
+	fi
+
+	# only CLAUDECODE, CLAUDE_CODE_ENTRYPOINT and AI_AGENT are confirmed; the
+	# rest are best effort, and the tty check below catches whatever is missed
+	for _agent_env in \
+		CLAUDECODE \
+		CLAUDE_CODE_ENTRYPOINT \
+		AI_AGENT \
+		CURSOR_AGENT \
+		GEMINI_CLI \
+		CODEX_SANDBOX \
+	; do
+		if [[ -n "${(P)_agent_env}" ]]; then
+			DOTFILES_NO_AUTO_MULTIPLEXER=1
+			break
+		fi
+	done
+	unset _agent_env
+
+	# an agent snapshotting the environment has no terminal to attach to
+	if [[ ! -o interactive ]] || [[ ! -t 0 ]]; then
+		DOTFILES_NO_AUTO_MULTIPLEXER=1
+	fi
+fi
+
 ## zellij
 #
 # TODO: The key binding settings overlap with zsh and neovim, so comment them out until the adjustments are complete.
 # if [[ -x "$(whence -- zellij)" ]]; then
-# 	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+# 	if [[ -z "$ZELLIJ" && -z "${TMUX}" && "${DOTFILES_NO_AUTO_MULTIPLEXER}" != 1 ]]; then
 # 		exec zellij attach -c default
 # 		exit
 # 	fi
@@ -69,7 +101,7 @@ fi
 ## tmux
 #
 if [[ -x "$(whence -- tmux)" ]]; then
-	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+	if [[ -z "$ZELLIJ" && -z "${TMUX}" && "${DOTFILES_NO_AUTO_MULTIPLEXER}" != 1 ]]; then
 		case "$TERM" in
 			mlterm*)    args="-2u" && export TERM_PROGRAM="mlterm" ;;
 			*256color)  args="-2u" ;;
@@ -92,7 +124,7 @@ fi
 ## screen
 #
 if [[ -x "$(whence -- screen)" ]]; then
-	if [[ -z "$ZELLIJ" && -z "${TMUX}" ]]; then
+	if [[ -z "$ZELLIJ" && -z "${TMUX}" && "${DOTFILES_NO_AUTO_MULTIPLEXER}" != 1 ]]; then
 		case "$TERM" in
 			mlterm*)    args="-T screen-256color -S main -U -xRR" && export TERM_PROGRAM="mlterm" ;;
 			*256color)  args="-T screen-256color -S main -U -xRR" ;;
