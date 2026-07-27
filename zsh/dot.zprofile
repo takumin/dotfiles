@@ -61,7 +61,14 @@ if [[ -z "${DOTFILES_NO_AUTO_MULTIPLEXER+set}" ]]; then
 	DOTFILES_NO_AUTO_MULTIPLEXER=0
 
 	# remote and VSCode derived editors set TERM_PROGRAM without VSCODE_PID
-	if [[ -n "${VSCODE_PID}" || "${TERM_PROGRAM}" == "vscode" || -n "${INTELLIJ_ENVIRONMENT_READER}" ]]; then
+	if [[ -n "${VSCODE_PID}" || "${TERM_PROGRAM}" == "vscode" ]]; then
+		DOTFILES_NO_AUTO_MULTIPLEXER=1
+	fi
+
+	# JetBrains needs both markers: TERMINAL_EMULATOR is the integrated terminal
+	# itself, INTELLIJ_ENVIRONMENT_READER is the throwaway shell the IDE runs to
+	# snapshot the environment
+	if [[ "${TERMINAL_EMULATOR}" == "JetBrains-JediTerm" || -n "${INTELLIJ_ENVIRONMENT_READER}" ]]; then
 		DOTFILES_NO_AUTO_MULTIPLEXER=1
 	fi
 
