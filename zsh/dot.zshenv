@@ -339,10 +339,6 @@ export LC_MESSAGES="ja_JP.UTF-8"
 export LC_ALL="ja_JP.UTF-8"
 export LANGUAGE="ja_JP.UTF-8"
 
-## Timezone configuration
-#
-export TZ="Asia/Tokyo"
-
 ## size of block
 #
 export BLOCKSIZE="K"
