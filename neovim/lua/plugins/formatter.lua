@@ -1,3 +1,177 @@
+-- Formatter groups shared by several filetypes.
+-- A stop_after_first group is a set of alternatives and only needs one of its
+-- members; the members of any other group run in sequence and are all required.
+-- stop_after_first picks the first *available* formatter regardless of whether it
+-- handles the filetype, so biome may only front the filetypes it actually supports.
+local biome_chain = { "biome", "prettierd", "prettier", stop_after_first = true }
+local prettier_chain = { "prettierd", "prettier", stop_after_first = true }
+local yaml_chain = { "yamlfmt", "yamlfix", stop_after_first = true }
+
+-- Single source of truth for every filetype. `run` is used as is; `chain` lists
+-- the groups to try in preference order when a project config pins nothing, and
+-- only chain entries can be pinned.
+local filetypes = {
+	{ fts = { "lua" }, run = { "stylua" } },
+	{ fts = { "go" }, run = { "goimports", "gofumpt" } },
+	{ fts = { "python" }, run = { "ruff_fix", "ruff_format", "ruff_organize_imports" } },
+	{ fts = { "cs" }, run = { "csharpier" } },
+	{ fts = { "toml" }, run = { "taplo", stop_after_first = true } },
+	{ fts = { "hcl" }, run = { "hcl", stop_after_first = true } },
+	{ fts = { "sh" }, run = { "shfmt" } },
+	{ fts = { "javascript", "javascriptreact" }, chain = { biome_chain } },
+	{ fts = { "typescript", "typescriptreact" }, chain = { biome_chain } },
+	{ fts = { "html" }, chain = { biome_chain } },
+	{ fts = { "json", "jsonc" }, chain = { biome_chain } },
+	{ fts = { "css" }, chain = { biome_chain } },
+	{ fts = { "yaml" }, chain = { yaml_chain } },
+}
+
+-- A project config file pins the toolchain regardless of what else is installed.
+-- Entries without a chain are outside the toolchain and must stay untouched.
+local function pinned_by_ft(pick)
+	local by_ft = {}
+	for _, entry in ipairs(filetypes) do
+		if entry.chain then
+			for _, ft in ipairs(entry.fts) do
+				by_ft[ft] = pick(entry)
+			end
+		end
+	end
+	return by_ft
+end
+
+local projects = {
+	{
+		-- package.yaml is also a prettier config host, but it needs a yaml parser,
+		-- so only the package.json key is honoured here.
+		detect_keys = { ["package.json"] = "prettier" },
+		detects = {
+			".prettierrc",
+			".prettierrc.json",
+			".prettierrc.json5",
+			".prettierrc.yml",
+			".prettierrc.yaml",
+			".prettierrc.toml",
+			".prettierrc.js",
+			".prettierrc.mjs",
+			".prettierrc.cjs",
+			".prettierrc.ts",
+			".prettierrc.mts",
+			".prettierrc.cts",
+			"prettier.config.js",
+			"prettier.config.mjs",
+			"prettier.config.cjs",
+			"prettier.config.ts",
+			"prettier.config.mts",
+			"prettier.config.cts",
+		},
+		formatters_by_ft = pinned_by_ft(function()
+			return prettier_chain
+		end),
+	},
+}
+
+-- A config that lives under a key of a shared file only counts when the key is
+-- actually there, so the file has to be decoded.
+local function has_json_key(path, key)
+	if vim.fn.filereadable(path) ~= 1 then
+		return false
+	end
+
+	local ok, decoded = pcall(vim.json.decode, table.concat(vim.fn.readfile(path), "\n"))
+	return ok and type(decoded) == "table" and decoded[key] ~= nil
+end
+
+local function detected(project, root)
+	for _, marker in ipairs(project.detects) do
+		if vim.fn.filereadable(root .. "/" .. marker) == 1 then
+			return true
+		end
+	end
+
+	for file, key in pairs(project.detect_keys or {}) do
+		if has_json_key(root .. "/" .. file, key) then
+			return true
+		end
+	end
+
+	return false
+end
+
+-- Look for toolchain markers at the repository root of the buffer. A repository
+-- may declare several toolchains at once, so every match contributes and the
+-- earliest one to claim a filetype keeps it.
+local function detect_project(bufnr)
+	local root = vim.fs.root(bufnr, ".git")
+	if not root then
+		return nil
+	end
+
+	local pinned = nil
+	for _, project in ipairs(projects) do
+		if detected(project, root) then
+			pinned = pinned or {}
+			for ft, group in pairs(project.formatters_by_ft) do
+				if pinned[ft] == nil then
+					pinned[ft] = group
+				end
+			end
+		end
+	end
+
+	return pinned
+end
+
+local function available(name, bufnr)
+	return require("conform").get_formatter_info(name, bufnr).available
+end
+
+-- Alternatives need a single member installed, sequences need all of them.
+local function usable(group, bufnr)
+	if group.stop_after_first then
+		for _, name in ipairs(group) do
+			if available(name, bufnr) then
+				return true
+			end
+		end
+		return false
+	end
+
+	for _, name in ipairs(group) do
+		if not available(name, bufnr) then
+			return false
+		end
+	end
+	return true
+end
+
+-- Resolve per buffer so a project-pinned toolchain wins over what is installed
+-- globally, without mutating the shared formatters_by_ft table. Otherwise take
+-- the first usable group, falling back to the last one unconditionally.
+local function resolve(ft, chain)
+	return function(bufnr)
+		local project = detect_project(bufnr)
+		if project and project[ft] then
+			return project[ft]
+		end
+
+		for i, group in ipairs(chain) do
+			if i == #chain or usable(group, bufnr) then
+				return group
+			end
+		end
+	end
+end
+
+---@type table<string, string[]|fun(bufnr: integer): string[]>
+local formatters_by_ft = {}
+
+for _, entry in ipairs(filetypes) do
+	for _, ft in ipairs(entry.fts) do
+		formatters_by_ft[ft] = entry.run or resolve(ft, entry.chain)
+	end
+end
+
 return {
 	{
 		"stevearc/conform.nvim",
@@ -8,24 +182,7 @@ return {
 		cmd = { "ConformInfo" },
 		opts = {
 			-- Define your formatters
-			formatters_by_ft = {
-				lua = { "stylua" },
-				go = { "goimports", "gofumpt" },
-				python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
-				javascript = { "biome", "prettierd", "prettier", stop_after_first = true },
-				javascriptreact = { "biome", "prettierd", "prettier", stop_after_first = true },
-				typescript = { "biome", "prettierd", "prettier", stop_after_first = true },
-				typescriptreact = { "biome", "prettierd", "prettier", stop_after_first = true },
-				cs = { "csharpier" },
-				html = { "biome", "prettierd", "prettier", stop_after_first = true },
-				css = { "biome", "prettierd", "prettier", stop_after_first = true },
-				json = { "biome", "prettierd", "prettier", stop_after_first = true },
-				jsonc = { "biome", "prettierd", "prettier", stop_after_first = true },
-				yaml = { "yamlfmt", "yamlfix", stop_after_first = true },
-				toml = { "taplo", stop_after_first = true },
-				hcl = { "hcl", stop_after_first = true },
-				sh = { "shfmt" },
-			},
+			formatters_by_ft = formatters_by_ft,
 			-- Set default options
 			default_format_opts = {
 				lsp_format = "fallback",
@@ -44,49 +201,6 @@ return {
 		init = function()
 			-- If you want the formatexpr, here is the place to set it
 			vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-
-			-- Replace default formatter to project formatter
-			vim.api.nvim_create_autocmd("BufEnter", {
-				callback = function(args)
-					local bufnr = args.buf
-					local filepath = vim.api.nvim_buf_get_name(bufnr)
-					local root = require("lspconfig.util").root_pattern(".git")(filepath)
-
-					if not root then
-						return
-					end
-
-					local formatters = {
-						{
-							detects = {
-								".prettierrc",
-								".prettierrc.json",
-								".prettierrc.yaml",
-							},
-							comformers = {
-								javascript = { "prettierd", "prettier", stop_after_first = true },
-								javascriptreact = { "prettierd", "prettier", stop_after_first = true },
-								typescript = { "prettierd", "prettier", stop_after_first = true },
-								typescriptreact = { "prettierd", "prettier", stop_after_first = true },
-								html = { "prettierd", "prettier", stop_after_first = true },
-								css = { "prettierd", "prettier", stop_after_first = true },
-								json = { "prettierd", "prettier", stop_after_first = true },
-								jsonc = { "prettierd", "prettier", stop_after_first = true },
-								yaml = { "prettierd", "prettier", stop_after_first = true },
-							},
-						},
-					}
-
-					for _, v in pairs(formatters) do
-						for _, f in pairs(v.detects) do
-							if vim.fn.filereadable(root .. "/" .. f) == 1 then
-								require("conform").formatters_by_ft = v.comformers
-								return
-							end
-						end
-					end
-				end,
-			})
 		end,
 	},
 }
