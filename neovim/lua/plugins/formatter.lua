@@ -1,6 +1,10 @@
 -- Formatter groups shared by several filetypes.
 -- A stop_after_first group is a set of alternatives and only needs one of its
 -- members; the members of any other group run in sequence and are all required.
+-- oxlint fixes lint errors instead of formatting, so it cannot share a
+-- stop_after_first chain and always has to run alongside oxfmt.
+local oxc_script = { "oxlint", "oxfmt" }
+local oxc_only = { "oxfmt" }
 -- stop_after_first picks the first *available* formatter regardless of whether it
 -- handles the filetype, so biome may only front the filetypes it actually supports.
 local biome_chain = { "biome", "prettierd", "prettier", stop_after_first = true }
@@ -18,12 +22,12 @@ local filetypes = {
 	{ fts = { "toml" }, run = { "taplo", stop_after_first = true } },
 	{ fts = { "hcl" }, run = { "hcl", stop_after_first = true } },
 	{ fts = { "sh" }, run = { "shfmt" } },
-	{ fts = { "javascript", "javascriptreact" }, chain = { biome_chain } },
-	{ fts = { "typescript", "typescriptreact" }, chain = { biome_chain } },
-	{ fts = { "html" }, chain = { biome_chain } },
-	{ fts = { "json", "jsonc" }, chain = { biome_chain } },
-	{ fts = { "css" }, chain = { biome_chain } },
-	{ fts = { "yaml" }, chain = { yaml_chain } },
+	{ fts = { "javascript", "javascriptreact" }, chain = { oxc_script, biome_chain } },
+	{ fts = { "typescript", "typescriptreact" }, chain = { oxc_script, biome_chain } },
+	{ fts = { "html" }, chain = { oxc_only, biome_chain } },
+	{ fts = { "json", "jsonc" }, chain = { oxc_only, biome_chain } },
+	{ fts = { "css" }, chain = { oxc_only, biome_chain } },
+	{ fts = { "yaml" }, chain = { yaml_chain, oxc_only } },
 }
 
 -- A project config file pins the toolchain regardless of what else is installed.
@@ -40,7 +44,42 @@ local function pinned_by_ft(pick)
 	return by_ft
 end
 
+-- Listed in priority order: an earlier entry wins every filetype it pins, so a
+-- narrow entry has to come before the broad ones it is meant to carve out of.
 local projects = {
+	{
+		detects = {
+			".yamlfmt",
+			".yamlfmt.yml",
+			".yamlfmt.yaml",
+			"yamlfmt.yml",
+			"yamlfmt.yaml",
+		},
+		-- yamlfmt only owns yaml, so it carves that one filetype out of whatever
+		-- broader toolchain the project also declares.
+		formatters_by_ft = { yaml = yaml_chain },
+	},
+	{
+		detects = {
+			".oxlintrc.json",
+			".oxlintrc.jsonc",
+			"oxlint.config.ts",
+			"oxlint.config.mts",
+			".oxfmtrc.json",
+			".oxfmtrc.jsonc",
+			"oxfmt.config.ts",
+			"oxfmt.config.mts",
+		},
+		-- An oxc project pins the oxc group, which is not always the preferred one:
+		-- yaml prefers yamlfmt by default and only falls back to oxfmt.
+		formatters_by_ft = pinned_by_ft(function(entry)
+			for _, group in ipairs(entry.chain) do
+				if group == oxc_script or group == oxc_only then
+					return group
+				end
+			end
+		end),
+	},
 	{
 		-- package.yaml is also a prettier config host, but it needs a yaml parser,
 		-- so only the package.json key is honoured here.
