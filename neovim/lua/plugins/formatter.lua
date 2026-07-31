@@ -24,10 +24,14 @@ local filetypes = {
 	{ fts = { "sh" }, run = { "shfmt" } },
 	{ fts = { "javascript", "javascriptreact" }, chain = { oxc_script, biome_chain } },
 	{ fts = { "typescript", "typescriptreact" }, chain = { oxc_script, biome_chain } },
+	{ fts = { "vue" }, chain = { oxc_script, prettier_chain } },
 	{ fts = { "html" }, chain = { oxc_only, biome_chain } },
 	{ fts = { "json", "jsonc" }, chain = { oxc_only, biome_chain } },
 	{ fts = { "css" }, chain = { oxc_only, biome_chain } },
+	{ fts = { "scss", "less" }, chain = { oxc_only, prettier_chain } },
+	{ fts = { "graphql" }, chain = { oxc_only, biome_chain } },
 	{ fts = { "yaml" }, chain = { yaml_chain, oxc_only } },
+	{ fts = { "markdown" }, chain = { oxc_only, prettier_chain } },
 }
 
 -- A project config file pins the toolchain regardless of what else is installed.
