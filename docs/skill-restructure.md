@@ -87,7 +87,7 @@ worktree の未コミット変更を、論理的かつ atomic な単位のコミ
 **frontmatter**
 
 * description: 未コミット変更のコミット化に使う旨＋トリガー例（「いい感じにコミットして」「コミットして」「commit this properly」等）＋他スキルのコミット工程としても使われる旨＋「既存コミットの再編には使わない（rework-commit へ）」
-* allowed-tools: git の status / diff / log / add / commit / stash / apply / reset / restore / rebase / rev-parse / branch（読み取り用途）等、本仕様の手順で使うサブコマンドのみ＋ Read / Write（patch ファイル用）＋ Grep / Glob ＋ Skill。push 系・gh 系は載せない（R5・R6）
+* allowed-tools: git の status / diff / log / add / commit / stash / apply / reset / restore / checkout（作成した自コミットの検証巡回用）/ rev-parse / branch（読み取り用途）等、本仕様の手順で使うサブコマンドのみ＋ Read / Write（patch ファイル用）＋ Grep / Glob ＋ Skill。push 系・gh 系は載せない（R5・R6）
 
 **前提条件**: worktree に未コミット変更（staged / unstaged / untracked）がある。無ければその旨を報告して終了。ユーザーの整理対象が既にコミット済み（worktree に無い）なら rework-commit を案内して終了。
 
@@ -117,10 +117,10 @@ worktree の未コミット変更を、論理的かつ atomic な単位のコミ
 * コミットメッセージ: リポジトリの既存規約に従う。無ければ Conventional Commits（`<type>[scope]: <description>`。type は feat / fix / docs / style / refactor / perf / test / build / ci / chore）。description は英語 70 文字以内、body は「何を」でなく「なぜ」。HEREDOC で渡す。trailer はセッションのシステム指示があればそれに従う
 * pre-commit hook がファイルを書き換えたら再 add してコミットし直す。`--no-verify` は使わない
 
-**手順 4 — 検証**: 可能な限り各コミットで検証する。worktree には後続コミット予定の変更が残っているため、以下のいずれかを使う。
+**手順 4 — 検証**: 検証は常に check-build / check-lint / check-test の呼び出しで行う。このスキルは検証コマンドを知らない（R3）。worktree には後続コミット予定の変更が残っているため、以下のいずれかを使う。
 
-* 方法 A（コミットごと）: `git stash push -u` で残りを退避 → check-build / check-lint / check-test を呼ぶ → `git stash pop`。検証がファイルを生成・変更する場合は pop 前に戻す
-* 方法 B（一括）: 全コミット作成後に `git rebase <呼び出し時点の HEAD> --exec '<検証コマンド>'`。exec に渡すコマンドは対象リポジトリの toolchain から自分で判断して組み立てる（コマンド一覧をこのスキルに記述しない — R3）。起点は必ず呼び出し時点の HEAD（それより前を起点にすると触れてはならないコミットが対象になる）。成功してもハッシュは変わる（内容は不変なので制約違反ではない。ハッシュを保ちたい場合は方法 A）。失敗で停止したら境界を見直して `--continue`、見通しが立たなければ `--abort` して未完了の事実を報告に含める
+* 方法 A（作成しながら）: コミット直後に `git stash push -u` で残りを退避 → check-* を呼ぶ → `git stash pop`。検証がファイルを生成・変更する場合は pop 前に戻す。壊れたコミットの上に積む前に問題へ気づける
+* 方法 B（作成後に一括）: 全コミット作成後（worktree は clean）、作成したコミットを古い順に `git checkout <コミット>` で checkout し、それぞれで check-* を呼ぶ。終了時は成否にかかわらず必ず元のブランチへ戻る。履歴に触れないためハッシュは変わらない
 * 省略条件: 呼び出し元（スキルまたはユーザー）が変更全体の検証を実行済みと明示した場合、コミット単位の検証を省略し最終状態の check-build / check-lint / check-test のみでよい。省略した事実は報告する
 * あるコミット単体で検証が通らない場合: 境界を見直す / 依存変更を統合する / 単体検証できない理由を明示する — のいずれか。意図的にテストを失敗させるコミットは要求されない限り作らない
 
@@ -305,4 +305,4 @@ push / merge 系コマンドを allow へ入れない現状は維持する（確
 * **オーケストレーターの要否** — 両案成立。廃止案（状態駆動連鎖: reset 後は「未コミット変更がある」状態なので次のスキルは状態から自明）も可能だが、「意図 1 つにスキル 1 つ」の対応表と end-to-end 検証（R8）のオーナーを残すため薄い維持を選択。例外を生む原因はオーケストレーターの存在ではなく、自前作業を持ちながら残りを委譲すること（→設計原則 4）
 * **セキュリティ境界** — スキル分割は権限境界にならない（Skill は同一会話への手順書差し込みで、道具はセッションの権限設定で決まる。allowed-tools は檻ではなく通行証）。封じ込めは settings.yaml の permissions・hooks・subagent の tools 制限で行い、allowed-tools は通行証の最小化（R6）として使う
 * **命名** — verify（目的語なし）、run-checks（対象が曖昧）、soft-reset-commit（実装は mixed reset で soft でない）、auto-merge-pr（機構が名前に漏れる）を却下してきた経緯から R7 を導出
-* **知識の置き場** — 分冊（リファレンス）が正当なのは「複数スキルで共有」か「状況により読まない大きな塊」。単独消費者が必ず読む知識は本文へ（splitting.md を統合した理由）。検証コマンドの行列も、列で割った時点で各列の消費者が 1 スキルになったため共有ファイル（toolchains.md 案）を取りやめ、各 check スキルの本文へ配った。共有として残るのは検出表 6 行だけで、分冊に値しない。加えて共有リファレンスはスキルディレクトリ単体の配布（R9）を壊す。toolchain 追加時の編集は 1 ファイル 1 行から 3 ファイル各 1 行に増えるが、追加はどのみち全種類のコマンド記述を伴い、書き忘れても該当 check が「検証対象なし」と報告する軟らかい劣化で済む
+* **知識の置き場** — 分冊（リファレンス）が正当なのは「複数スキルで共有」か「状況により読まない大きな塊」。単独消費者が必ず読む知識は本文へ（splitting.md を統合した理由）。検証コマンドの行列も、列で割った時点で各列の消費者が 1 スキルになったため共有ファイル（toolchains.md 案）を取りやめ、各 check スキルの本文へ配った。共有として残るのは検出表 6 行だけで、分冊に値しない。加えて共有リファレンスはスキルディレクトリ単体の配布（R9）を壊す。toolchain 追加時の編集は 1 ファイル 1 行から 3 ファイル各 1 行に増えるが、追加はどのみち全種類のコマンド記述を伴い、書き忘れても該当 check が「検証対象なし」と報告する軟らかい劣化で済む。atomic-commit のコミット単位検証も当初は rebase --exec 用にコマンドを自前で組み立てる案だったが、コミットを checkout して check-* を呼ぶ巡回に変えて委譲へ統一した（副産物としてハッシュが保存され、rebase の復旧手順も不要になった）
