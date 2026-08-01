@@ -77,6 +77,22 @@
 * description の「Do NOT use（use X instead）」はトリガー選択のガイドとして書いてよい（実行時の例外規定ではないので R1 に反しない）
 * コミットメッセージと PR body は英語（リポジトリ既存規約）
 * 対話コマンド（`git add -p`、`git rebase -i`）は使わない。非対話環境で失敗するため
+* allowed-tools は「そのスキルの手順に登場するコマンド・ツールをすべて列挙し、それ以外を載せない」が規範（R6）。各スキル仕様に書いた一覧は、この規範を手順に適用した結果である
+* SKILL.md は次の形式で書く（allowed-tools 以下の 3 キーは任意）
+
+```markdown
+---
+name: <スキル名。小文字とハイフン>
+description: <英語。用途、日英のトリガーフレーズ例、必要なら Do NOT use（use X instead）>
+allowed-tools: <カンマ区切り。例: Bash(git status:*), Read, Skill>
+argument-hint: <引数のヒント。引数を取るスキルのみ>
+disable-model-invocation: true   # スラッシュコマンド専用にする場合のみ
+---
+
+# <スキル名>
+
+<本文。日本語>
+```
 
 ## 3. プリミティブ仕様
 
@@ -88,7 +104,7 @@ worktree の未コミット変更を、論理的かつ atomic な単位のコミ
 **frontmatter**
 
 * description: 未コミット変更のコミット化に使う旨＋トリガー例（「いい感じにコミットして」「コミットして」「commit this properly」等）＋他スキルのコミット工程としても使われる旨＋「既存コミットの再編には使わない（rework-commit へ）」
-* allowed-tools: git の status / diff / log / add / commit / stash / apply / reset / restore / checkout（作成した自コミットの検証巡回用）/ rev-parse / branch（読み取り用途）等、本仕様の手順で使うサブコマンドのみ＋ Read / Write（patch ファイル用）＋ Grep / Glob ＋ Skill。push 系・gh 系は載せない（R5・R6）
+* allowed-tools: git の status / diff / log / add / commit / stash / apply / reset / restore / checkout（作成した自コミットの検証巡回用）/ rev-parse / branch（読み取り用途）＋ Read / Write（patch ファイル用）＋ Grep / Glob ＋ Skill（check-* 呼び出し用）。push 系・gh 系は載せない（R5・R6）
 
 **前提条件**: worktree に未コミット変更（staged / unstaged / untracked）がある。無ければその旨を報告して終了。ユーザーの整理対象が既にコミット済み（worktree に無い）なら rework-commit を案内して終了。
 
@@ -100,7 +116,7 @@ worktree の未コミット変更を、論理的かつ atomic な単位のコミ
 * 機能追加・バグ修正・追加リファクタリングをしない。コミット作成に不要なコード変更をしない
 * 作業開始時と終了時で worktree のファイル内容を変えない
 
-**手順 1 — 現状確認**: ブランチ名（共有ブランチでないこと）、`git status -uall`（ディレクトリ折り畳みで未追跡を見落とすため `-uall` 必須）、`git diff` と `git diff --cached`、`git log --oneline -10`（既存メッセージ規約の把握）、変更が実現した要求事項。
+**手順 1 — 現状確認**: ブランチ名（共有ブランチでないこと）、`git status -uall`（ディレクトリ折り畳みで未追跡を見落とすため `-uall` 必須）、`git diff` と `git diff --cached`、`git log --oneline -10`（既存メッセージ規約の把握）、`git rev-parse HEAD`（呼び出し時点の HEAD の記録。制約と手順 4 方法 B の基準になる）、変更が実現した要求事項。
 
 **手順 2 — 分析と計画**: 差分をファイル単位ではなく**変更意図単位**で分析し、コミット計画を提示する。
 
@@ -113,9 +129,9 @@ worktree の未コミット変更を、論理的かつ atomic な単位のコミ
 **手順 3 — コミット作成**: 計画の順に stage → 確認 → commit を繰り返す。
 
 * パスを明示して `git add <ファイル>`。`git add -A` / `git add .` は使わない
-* 同一ファイルに複数の論理変更が混在する場合の hunk 分割: `git diff -- <ファイル>` を patch ファイルに保存 → stage する hunk だけ残して編集 → `git apply --cached <patch>` → `git diff --cached` で計画と一致確認。patch の編集は hunk 全体の残す/消すの単位で行い、hunk 内部の行を編集した場合は `git apply --cached --recount`。未追跡ファイルの hunk 分割は `git add -N <ファイル>` で追跡化してから
+* 同一ファイルに複数の論理変更が混在する場合の hunk 分割: `git diff -- <ファイル>` を patch ファイルとしてリポジトリ外（一時ディレクトリ）へ保存 → stage する hunk だけ残して編集 → `git apply --cached <patch>` → `git diff --cached` で計画と一致確認。patch の編集は hunk 全体の残す/消すの単位で行い、hunk 内部の行を編集した場合は `git apply --cached --recount`。未追跡ファイルの hunk 分割は `git add -N <ファイル>` で追跡化してから
 * stage 前チェック: `.env` / `*.pem` / `*.key` / `credentials.json` 等の機密ファイル、`node_modules/` `target/` `dist/` 等の成果物が含まれていたらコミットせず警告
-* コミットメッセージ: リポジトリの既存規約に従う。無ければ Conventional Commits（`<type>[scope]: <description>`。type は feat / fix / docs / style / refactor / perf / test / build / ci / chore）。description は英語 70 文字以内、body は「何を」でなく「なぜ」。HEREDOC で渡す。trailer はセッションのシステム指示があればそれに従う
+* コミットメッセージ: リポジトリの既存規約に従う。無ければ Conventional Commits（`<type>[scope]: <description>`）。type の選択基準 — feat: 新機能 / fix: バグ修正 / docs: ドキュメントのみ / style: コードの意味に影響しない変更（空白・フォーマット等） / refactor: 機能追加でもバグ修正でもないコード変更 / perf: 性能改善 / test: テストの追加・修正 / build: ビルドシステム・外部依存の変更 / ci: CI 設定の変更 / chore: その他。description は英語 70 文字以内、body は「何を」でなく「なぜ」。HEREDOC で渡す。trailer はセッションのシステム指示があればそれに従う
 * pre-commit hook がファイルを書き換えたら再 add してコミットし直す。`--no-verify` は使わない
 
 **手順 4 — 検証**: 検証は常に check-build / check-format / check-lint / check-test の呼び出しで行う。このスキルは検証コマンドを知らない（R3）。worktree には後続コミット予定の変更が残っているため、以下のいずれかを使う。
@@ -137,7 +153,7 @@ worktree の未コミット変更を、論理的かつ atomic な単位のコミ
 **frontmatter**
 
 * description: 既存コミットを worktree へ戻す旨＋単独トリガーは限定的（「コミットを一旦バラして」等）＋主に他スキルの部品である旨＋「コミットを積み直すのは atomic-commit」
-* allowed-tools: git の status / log / diff / rev-parse / merge-base / branch / add / reset / write-tree / commit-tree 等＋ Read / Grep / Glob。push 系・gh 系・commit は載せない
+* allowed-tools: git の status / log / diff / rev-parse / merge-base / branch / add / reset / write-tree / commit-tree ＋ Read / Grep / Glob。push 系・gh 系・`git commit` は載せない（バックアップは commit-tree で足りる）
 
 **前提条件**: ベース..HEAD にコミットがある。無ければ何もせず終了。worktree が dirty でも可（バックアップに含め、reset 後に worktree で合流する）。
 
@@ -159,6 +175,7 @@ git reset
 * `git commit-tree` はどのブランチにも接続されない独立コミットを作るため、現在のブランチに影響しない
 * `git add -A` により未追跡ファイルも含まれる。`.gitignore` 済みは含まれないため、保護が必要な生成物があれば別途退避する
 * 作成後 `git rev-parse backup/reset-commit-<timestamp>` で存在を確認する
+* `<timestamp>` は `date +%Y%m%d-%H%M%S` で生成する
 
 **手順 4 — reset**: バックアップの存在確認後、`git reset <ベースコミット>`（mixed）。HEAD はベースへ戻り、全変更が unstaged で worktree に残る。ベース以降に追加されたファイルは untracked になるため `git status -uall` で確認する。
 
@@ -176,7 +193,7 @@ git reset
 * 複数 toolchain の場合は subagent に並列委譲し、ログを subagent に吸収させて要約だけ受け取る（コンテキスト汚染防止）
 * 前提条件: 該当 toolchain が 1 つも検出できなければ「検証対象なし」と報告して終了（下記フォールバックを試した上で）
 * フォールバック: どの行にも該当しない場合、CI 定義（`.github/workflows/`）を確認し、自分の種類に相当するチェックをローカルで再現できる範囲で実行する
-* allowed-tools: 自分の種類で使うコマンド＋ Read / Glob / Grep ＋ subagent 起動。git 変更系・push 系は載せない
+* allowed-tools: 自分の種類の列に登場するコマンド＋ Read / Glob / Grep ＋ Task（subagent 起動）。git 変更系・push 系は載せない
 
 **author 用の元データ**（各スキルの本文には検出列＋自分の列だけを書く。他の列は書かない）
 
@@ -203,8 +220,8 @@ git reset
 * **観点**（本文に書く専有知識）: 正しさ（バグ、エッジケース、エラー処理）/ セキュリティ（機密情報の混入、入力検証、権限）/ 設計（責務、依存方向、既存規約との整合）/ 可読性（命名、コメントの過不足）/ テスト（不足している観点）
 * **報告形式**: 指摘ごとに重要度・対象（`file:line`）・内容・修正案の要旨。重要度は 3 段階 — **重大**（バグ・セキュリティ・データ破壊の可能性。マージすべきでない）/ **改善**（直すべきだが blocker ではない）/ **軽微**（好み・nit）
 * 指摘のみで修正はしない（R4）。修正の実施は呼び出し元またはユーザーの判断
-* allowed-tools: git の diff / log / show 等の読み取り系＋ Read / Grep / Glob ＋ subagent 起動。実行系・変更系のコマンドは載せない
-* description の要旨: 変更内容のコードレビューに使う旨＋トリガー例（「レビューして」「review my changes」等）＋「ビルド・テストの検証は check-build / check-test」
+* allowed-tools: git の diff / log / show / status / rev-parse / merge-base（読み取り系）＋ Read / Grep / Glob ＋ Task（subagent 起動）。実行系・変更系のコマンドは載せない
+* description の要旨: 変更内容のコードレビューに使う旨＋トリガー例（「レビューして」「review my changes」等）＋「機械的な検証は check-build / check-format / check-lint / check-test へ」
 
 ## 5. オーケストレーター仕様
 
@@ -215,7 +232,7 @@ git reset
 **frontmatter**
 
 * description: 既存コミットの再編に使う旨＋トリガー例（「コミット整理して」「コミット分割して」「履歴を綺麗にして」「clean up git history」「make this PR reviewable」等）＋「未コミット変更のコミット化は atomic-commit」
-* allowed-tools: Skill ＋ git の diff / log / rev-parse 等の読み取り系のみ
+* allowed-tools: Skill ＋ git の diff / log / rev-parse（読み取り系のみ）
 
 **手順**
 
@@ -233,7 +250,7 @@ git reset
 * description: PR 作成に使う旨（トリガー: PR 作って、submit changes 等）
 * argument-hint: `[branch-name]`
 * disable-model-invocation: true（スラッシュコマンド専用）
-* allowed-tools（目安）: `Bash(git status:*)` `Bash(git diff:*)` `Bash(git log:*)` `Bash(git branch:*)` `Bash(git switch:*)` `Bash(git fetch:*)` `Bash(git rev-parse:*)` `Bash(git remote:*)` `Bash(git push -u:*)` `Bash(gh repo view:*)` `Bash(gh pr view:*)` `Bash(gh pr create:*)` ＋ Read / Glob / Grep / Skill。cargo / npm 等はチェック層へ委譲したため載せない（R6）
+* allowed-tools: `Bash(git status:*)` `Bash(git diff:*)` `Bash(git log:*)` `Bash(git branch:*)` `Bash(git switch:*)` `Bash(git fetch:*)` `Bash(git rev-parse:*)` `Bash(git remote:*)` `Bash(git push -u:*)` `Bash(gh repo view:*)` `Bash(gh pr view:*)` `Bash(gh pr create:*)` ＋ Read / Glob / Grep / Skill。検証コマンドはチェック層へ、コミット作成は atomic-commit へ委譲するため、cargo / npm 等の実行系と Write / Edit は載せない（R6）
 
 **手順 1 — 現状確認**（並列実行）: `git status -uall` / `git diff` と `git diff --cached` / `git log --oneline -10` / `git branch --show-current` / `gh repo view --json defaultBranchRef,nameWithOwner` / `git remote -v`。コミットすべき変更が無ければ終了。
 
@@ -260,7 +277,7 @@ permissions:
   - "Bash(git push -f:*)"
 ```
 
-push / merge 系コマンドを allow へ入れない現状は維持する（確認プロンプトに落とすため）。
+deny は既存の `permissions:` キーの配下に追加し、`allow` の内容には手を付けない。push / merge 系コマンドは allow に入れない（毎回の確認プロンプトに落とすため）。
 
 ## 7. 作成手順（1 ステップ = 1 コミット）
 
