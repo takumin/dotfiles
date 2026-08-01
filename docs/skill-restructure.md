@@ -36,7 +36,8 @@
 │
 ├ check-build       ビルドが通るか
 ├ check-lint        静的検査（fmt --check 含む）が通るか
-└ check-test        テストが通るか
+├ check-test        テストが通るか
+└ check-review      変更内容に問題がないか（コードレビュー。toolchain 非依存）
 
 リファレンス ── 知識。スキルではない
 │
@@ -166,15 +167,16 @@ git reset
 
 **完了報告**: バックアップブランチ名 / ベースコミット / 戻したコミット一覧（元の変更意図の記録として）/ 作業完了後は `git diff <バックアップ> HEAD` が空になるべきこと。この報告はただの作業記録であり、後続スキルは受け取りを前提にしない（R1）。
 
-## 4. チェック層仕様（check-build / check-lint / check-test）
+## 4. チェック層仕様
+
+チェック層に共通の不変条件（R4）: **リポジトリを変更しない。** 修正・自動整形をしない（formatter は check モード）。git の変更系コマンドを使わない。失敗・指摘の報告だけを返す。
+
+### 4.1 check-build / check-lint / check-test（toolchain 駆動）
 
 3 スキルは同型。違いは実行する「列」だけ。各 SKILL.md は 15 行程度に収まる想定。
 
-**共通仕様**
-
 * 手順: `claude/references/toolchains.md` を読む → 検出ファイルで toolchain を特定（複数該当なら全部） → toolchain ごとに自分の列のコマンドを実行 → 成否と失敗時のログ要点を報告
 * 複数 toolchain の場合は subagent に並列委譲し、ログを subagent に吸収させて要約だけ受け取る（コンテキスト汚染防止）
-* **不変条件（R4）: リポジトリを変更しない。** formatter は check モード。自動修正はしない。git の変更系コマンドを使わない
 * 前提条件: 該当 toolchain が 1 つも検出できなければ「検証対象なし」と報告して終了（toolchains.md のフォールバックを試した上で）
 * allowed-tools: 自分の列で使うコマンド（cargo / pnpm / npm / go / gofmt / make / task 等）＋ Read / Glob / Grep ＋ subagent 起動。git 変更系・push 系は載せない
 
@@ -185,6 +187,18 @@ git reset
 | check-build | build | ビルド（コンパイル）が通るかを検証する |
 | check-lint | lint | lint・format check・type check が通るかを検証する |
 | check-test | test | テストが通るかを検証する |
+
+### 4.2 check-review（モデル駆動）
+
+変更内容をコードレビューし、指摘の一覧を返すスキル。toolchain 非依存で、toolchains.md は使わない。
+
+* **前提条件**: レビュー対象の差分がある。優先順: 呼び出し時に範囲の指定があればそれ → worktree の未コミット変更 → ベース（merge-base または remote-default-ref）..HEAD。いずれも無ければ「対象なし」と報告して終了
+* **手順**: 対象差分を確定 → 差分が大きければファイル群で分割して subagent に並列委譲（差分の読み込みを subagent に吸収させる） → 指摘を集約・重複排除し、重要度をつけて報告
+* **観点**（本文に書く専有知識）: 正しさ（バグ、エッジケース、エラー処理）/ セキュリティ（機密情報の混入、入力検証、権限）/ 設計（責務、依存方向、既存規約との整合）/ 可読性（命名、コメントの過不足）/ テスト（不足している観点）
+* **報告形式**: 指摘ごとに重要度・対象（`file:line`）・内容・修正案の要旨。重要度は 3 段階 — **重大**（バグ・セキュリティ・データ破壊の可能性。マージすべきでない）/ **改善**（直すべきだが blocker ではない）/ **軽微**（好み・nit）
+* 指摘のみで修正はしない（R4）。修正の実施は呼び出し元またはユーザーの判断
+* allowed-tools: git の diff / log / show 等の読み取り系＋ Read / Grep / Glob ＋ subagent 起動。実行系・変更系のコマンドは載せない
+* description の要旨: 変更内容のコードレビューに使う旨＋トリガー例（「レビューして」「review my changes」等）＋「ビルド・テストの検証は check-build / check-test」
 
 ## 5. オーケストレーター仕様
 
@@ -219,7 +233,7 @@ git reset
 
 コミット範囲の起点 `<remote-default-ref>` をここで 1 つに確定する: fork 運用（origin が自分の fork、upstream が本家）なら `upstream/<default-branch>`、それ以外は `origin/<default-branch>`。**ローカルブランチ名（`main` 等）は使わない**（存在しなければ unknown revision で失敗し、存在しても古いと範囲がずれる）。`git rev-parse --verify` で解決を確認し、できなければ `git fetch <remote> <default-branch>` 後に再確認。
 
-**手順 2 — 検証**: check-build / check-lint / check-test を呼ぶ。**失敗したら PR 作成を中断して報告する。**
+**手順 2 — 検証**: check-build / check-lint / check-test / check-review を呼ぶ。**build / lint / test の失敗、または check-review の重大な指摘があれば、PR 作成を中断して報告する**（改善・軽微の指摘は報告のみで続行してよい）。
 
 **手順 3 — ブランチ**: 判定は上から順に評価する。(1) 引数があればそのブランチ名（現在名と一致なら何もしない） / (2) 現在ブランチがデフォルトブランチ以外ならそのまま使う（デフォルトブランチは手順 1 の結果で判定。main / master 決め打ちにしない） / (3) それ以外は変更内容から `<type>/<short-description>` 形式で生成。作成は `git switch -c`。同名ブランチが既に在る場合は `git log --oneline <remote-default-ref>..<branch>` で独自コミットを確認し、無ければ switch、有れば過去作業の混入を避けるため別名を使うかユーザーへ確認。
 
@@ -247,7 +261,7 @@ toolchain 検出と検証コマンドの知識を一元化するファイル（R
 † JS 系は `package.json` の `scripts` に該当スクリプトが定義されている場合のみ実行する。
 
 * フォールバック: どの行にも該当しない場合、CI 定義（`.github/workflows/`）を確認し、そこで実行されているチェックをローカルで再現できる範囲で実行する
-* 拡張ルール: toolchain の追加はこのファイルへの行追加のみ。スキルは増やさない（設計原則 1）
+* 拡張ルール: toolchain の追加はこのファイルへの行追加のみ。スキルは増やさない（設計原則 1）。検証の種類の追加はチェック層スキルの追加で行い、check-review のように toolchain 非依存の種類はこのファイルに関与しない
 
 ## 7. settings.yaml の変更
 
@@ -269,9 +283,10 @@ push / merge 系コマンドを allow へ入れない現状は維持する（確
 | 1 | reset-commit 新規作成（§3.2） | `claude/skills/reset-commit/SKILL.md` 新規 |
 | 2 | atomic-commit を §3.1 の内容で置き換え | `claude/skills/atomic-commit/SKILL.md` 置換、`claude/skills/atomic-commit/references/splitting.md` 削除（内容は §3.1 に統合済み） |
 | 3 | rework-commit を §5.1 の内容で置き換え | `claude/skills/rework-commit/SKILL.md` 置換 |
-| 4 | toolchains.md とチェック層 3 スキルを新規作成（§4・§6） | `claude/references/toolchains.md`、`claude/skills/check-{build,lint,test}/SKILL.md` 新規 |
-| 5 | create-pr を §5.2 の内容で置き換え | `claude/skills/create-pr/SKILL.md` 置換 |
-| 6 | permissions へ deny 追加（§7） | `claude/settings.yaml` 編集 |
+| 4 | toolchains.md と toolchain 駆動チェック 3 スキルを新規作成（§4.1・§6） | `claude/references/toolchains.md`、`claude/skills/check-{build,lint,test}/SKILL.md` 新規 |
+| 5 | check-review 新規作成（§4.2） | `claude/skills/check-review/SKILL.md` 新規 |
+| 6 | create-pr を §5.2 の内容で置き換え | `claude/skills/create-pr/SKILL.md` 置換 |
+| 7 | permissions へ deny 追加（§7） | `claude/settings.yaml` 編集 |
 
 コミットは Conventional Commits（scope: skills）。手順 2 の時点では atomic-commit の検証コマンド参照先（toolchains.md / check-*）がまだ存在しないため、手順 4 の後に参照が成立することをコミットメッセージか本文の注記で明示するか、手順 4 を先に実施してもよい。
 
@@ -299,7 +314,7 @@ push / merge 系コマンドを allow へ入れない現状は維持する（確
 再検討の材料。結論ではなく論拠を残す。
 
 * **例外記述の原因** — スキルの契約を「呼び出し元が誰か」で書くと打ち消しの例外が要る。「呼び出し時点の状態」で書くと条件が自己評価できて例外が消える（例: 「既存コミットを書き換えない」→「呼び出し時点の HEAD より前に触れない」は、reset 直後でも単独でも同じ文で正しい）。分割の変更はこの問題の解決には必須でない
-* **分割の軸** — 検証は「toolchain × 種類」の行列。行（toolchain）はリポジトリ依存なのでスキルに割ると選択が全呼び出し元へ漏れる（→リファレンスへ）。列（build / lint / test）は全リポジトリ共通なのでスキルに割ってよい。工程割り（analyze の分離）は、計画が実行中に見直されるループなので不採用
+* **分割の軸** — 検証は「toolchain × 種類」の行列。行（toolchain）はリポジトリ依存なのでスキルに割ると選択が全呼び出し元へ漏れる（→リファレンスへ）。列（build / lint / test / review）は全リポジトリ共通なのでスキルに割ってよい（review のように toolchain 非依存の列もある）。工程割り（analyze の分離）は、計画が実行中に見直されるループなので不採用
 * **調査系スキル** — 不採用。封じ込める手続き知識が無く（`git status` は 1 コマンド）、スキルには型付き戻り値が無く、「調べる」は単独の意図にならずトリガーが成立しない。唯一の本物の知識（remote-default-ref 確定）はリファレンス化の対象（§9）
 * **オーケストレーターの要否** — 両案成立。廃止案（状態駆動連鎖: reset 後は「未コミット変更がある」状態なので次のスキルは状態から自明）も可能だが、「意図 1 つにスキル 1 つ」の対応表と end-to-end 検証（R8）のオーナーを残すため薄い維持を選択。例外を生む原因はオーケストレーターの存在ではなく、自前作業を持ちながら残りを委譲すること（→設計原則 4）
 * **セキュリティ境界** — スキル分割は権限境界にならない（Skill は同一会話への手順書差し込みで、道具はセッションの権限設定で決まる。allowed-tools は檻ではなく通行証）。封じ込めは settings.yaml の permissions・hooks・subagent の tools 制限で行い、allowed-tools は通行証の最小化（R6）として使う
