@@ -1,223 +1,255 @@
-# コミット系スキル再構成 検討資料（引き継ぎ）
+# コミット系スキル仕様書（引き継ぎ）
 
-本資料は設計議論の記録と、そこから導いた提案である。**結論は拘束しない。**
+`claude/skills/` 配下のコミット系スキル一式を、この文書だけで新規作成できるようにした仕様書。
+既存スキルの内容を読む必要はない。既存ファイルは §8 の作成手順に「置き換え・削除の対象」としてのみ登場する。
 
-* 固定点は「1. 現状の課題」に挙げた検証済みの事実だけ。解決策はゼロベースで再検討してよい
-* 「2. 検討した論点と選択肢」に、議論で出た選択肢を両側の論拠つきで残してある。再検討の材料として使うこと
-* 設計を変える場合も、課題 1〜6 が解消されているかを判断基準にすること
-* 提案を採用する場合は「4. 実装手順」の順に進める。1 ステップ = 1 コミットで独立に成立するよう並べてある
+* 固定点は「§1 要求事項」。§2 以降の設計は提案であり、要求を満たす限りゼロベースで変更してよい。検討の経緯は付録に残してある
+* 提案のまま実装する場合は §8 の順に進める。1 ステップ = 1 コミット
 
-## 1. 現状の課題（検証済みの事実）
+## 1. 要求事項
 
-対象は `claude/skills/` の atomic-commit / rework-commit / create-pr（および消費者としての redundant-comment-sweep）。各項目はファイルを開けば確認できる。
+* **R1** — スキル本文に呼び出し元による分岐（「〜から呼ばれた場合」）を書かない。全スキルは呼び出し時点のリポジトリ状態だけで動作が決まる
+* **R2** — 履歴を戻す・書き換える操作は、事前バックアップなしに行わない。push 済みコミットを戻す場合は、後で force-push が必要になる旨をユーザーへ確認してから行う
+* **R3** — 検証（build / lint / test）コマンドの知識は一箇所（共有リファレンス）にだけ置く
+* **R4** — 検証はリポジトリを変更しない（formatter は check モード）
+* **R5** — push・PR 作成・merge はオーケストレーター層のスキルのみが行う。プリミティブは push しない
+* **R6** — allowed-tools には正規手順で使うコマンドだけを載せる。`Bash(git:*)` `Bash(gh:*)` のような全部入りを書かない
+* **R7** — スキル名は名前だけで挙動が推測できること。基本形は「動詞-目的語」
+* **R8** — コミット再編の前後で最終ツリー内容が同一であることを、機械的に（diff で）確認できる
 
-1. **呼び出し元依存の記述がある**
-   * atomic-commit/SKILL.md:30-32 —「例外: `rework-commit` から呼び出された場合」ブロック。制約の読み替え指示を含む
-   * rework-commit/SKILL.md:85 — 委譲時に「例外規定がある旨」をフラグとして伝える必要がある
-   * atomic-commit/SKILL.md:80 — rebase --exec の起点が「作業開始時の HEAD（呼び出し元から指定されている場合はそのベースコミット）」と呼び出し元で分岐する
-2. **create-pr の allowed-tools が広すぎる** — create-pr/SKILL.md:6 に `Bash(git:*)` `Bash(gh:*)`。スキル実行中は `git push --force` も `gh pr merge` も無確認で通る。settings.yaml で丁寧に絞ったグローバル設定より緩い
-3. **rework-commit は push 済みコミットの確認をしない** — push 済みブランチを整理すると、黙って origin と分岐した状態で完了する（次の push に force が必要なことをユーザーが知る機会がない）
-4. **ビルド・検証コマンドの検出知識が分散している** — create-pr 手順 2（検出表）、atomic-commit/SKILL.md:44（一言）、rework-commit/SKILL.md:42（一言）、redundant-comment-sweep/SKILL.md:109（Rust の例をハードコード）。同じ知識が 4 箇所で別の書かれ方をしている
-5. **splitting.md が分冊の基準を満たしていない** — atomic-commit/references/splitting.md の消費者は atomic-commit のみで、かつ「作業前に必ず読んでください」（SKILL.md:17）指定。共有でも状況依存でもない知識が 2 ファイルに割れている
-6. **将来スキルの予定がある** — update-pr / merge-pr、check（build / lint / test）系。現構造のまま増やすと、課題 1・2・4 の形の記述が呼び出し元の数だけ増える
-
-## 2. 検討した論点と選択肢
-
-### 論点 A: 例外記述（課題 1）の原因はどこにあるか
-
-* **見立て 1: スキルの分割単位が悪い** → 分割の再設計へ（論点 B・C）
-* **見立て 2: 契約が「呼び出し元が誰か」で書かれている** → 状態基準への書き換えで消える
-  * 「既存コミットを書き換えない」→「**呼び出し時点の HEAD より前に触れない。その上に新規コミットのみ**」。reset 後は HEAD = ベースなので、rework 経由でも単独でも同じ文が無修正で成立する
-  * rebase --exec の起点 →「呼び出し時点の HEAD」のみ。括弧書きの分岐が消える
-  * リダイレクト →「整理対象が working tree に無い（コミット済み）なら rework-commit を案内」。reset 後は対象が working tree にあるため条件が自然に偽になり、打ち消しの例外が不要になる
-* 議論の結論: 見立て 2。**呼び出し元基準の条件は打ち消しの例外を必要とし、状態基準の条件は自己評価できる。** 分割の変更はこの課題の解決には必須でない（別の理由で有益な分割はある）
-
-### 論点 B: スキルをどの軸で割るか
-
-候補: 目的（意図）/ 状態遷移 / 工程（analyze 等）/ toolchain。
-
-* **toolchain 割り（build-cargo / test-pnpm 等）**
-  * 利点: toolchain 固有知識の分離。allowed-tools の最小化。subagent の単位として自然
-  * 欠点: どの toolchain かはリポジトリ依存なので、「どれを呼ぶか」の判断が全呼び出し元へ漏れる。調査系スキルの需要を製造する（論点 C）
-  * 整理: 検証は「toolchain × 種類」の行列で考えられる。**行（toolchain）はリポジトリ依存 → リファレンスへ。列（build / lint / test）は全リポジトリ共通 → スキルにしてよい。** 列で割れば呼び出し元は無条件に 3 つ呼ぶだけで、検出は各スキル内部の 1 行に残る
-* **工程割り（analyze-commit の分離）**
-  * 欠点: コミット計画は hunk 分割の失敗やビルド失敗で実行中に見直されるループであり、計画と実行を境界で切ると実行側で再分析することになる。また「どのスキルを使うか」の判断は git status 1 回で済み、スキル 1 本分の実体がない
-* 議論の結論: **目的で割る。** 検証のみ列で 3 分割（check-build / check-lint / check-test。名前の自明性も理由 — 論点 F）
-
-### 論点 C: 調査系スキル（状態を調べるスキル）の要否
-
-* 動機: 分岐の明示化、調べ方の一元化、（当初）権限分離
-* 反対根拠:
-  * 封じ込める手続き知識がない（`git status -uall` は 1 コマンド。知識ゼロの手順書になる）
-  * スキルには型付き戻り値がなく、呼んでも会話に文が増えるだけ。関数分解のアナロジーは、呼び出しコストほぼゼロ・型付きインターフェース・カプセル化があって成立するが、スキルはどれも持たない
-  * 「調べる」は単独の意図にならず、トリガーフレーズが成立しない
-* 救済された部分: create-pr 手順 1 の remote-default-ref 確定・fork 判定は本物の知識（非自明で共有価値がある）。ただし行き先はスキルではなく共有リファレンス（将来の `claude/references/remote.md`）
-* 議論の結論: 作らない。調査は各スキルの手順 1 行と前提条件で表現する。**分岐を網羅する表はどこにも書かず、各スキルの前提条件の集合がディスパッチになる**（3. の表を参照）
-
-### 論点 D: オーケストレーターの要否（ゼロベース検討の余地が最も大きい論点）
-
-* **廃止案（状態駆動の連鎖）**: reset-commit が終わった時点のリポジトリは「未コミットの変更が working tree にある」状態そのものなので、次に atomic-commit が選ばれるのは状態から自明。スキル数最小・真の疎結合。中断しても変更は working tree に全部あり backup も残るため壊れない
-* **維持案（薄いオーケストレーター）**: 「意図 1 つにつきスキル 1 つ」の対応表（整理して → rework-commit）が明示的に残る。end-to-end 検証（バックアップと最終 HEAD のツリー同一性）のオーナーが明確。2 手目に進むかがモデル判断にならない
-* 議論では一度廃止に傾いた後、維持を選択した。**両案とも成立する。** 決め手にしたのは対応表の分かりやすさと検証のオーナー
-* 重要な従属条件: 維持する場合、オーケストレーターは**自前の作業を持たない**（プリミティブの順番と最終確認だけ）。現行の例外を生んでいたのはオーケストレーターの存在ではなく、rework-commit が backup / reset を自前で実施しつつ残り半分を委譲していたこと
-
-### 論点 E: セキュリティ境界をどこに置くか
-
-* 当初案: スキル分割で権限を分ける（調査系は広範なコマンド、コミット系は git だけ）
-* 機構の事実: Skill の起動は同じ会話への手順書の差し込みであり、モデルが使える道具はセッションの権限設定で決まる。frontmatter の allowed-tools は**檻ではなく通行証**（そのスキルの間、確認なしで通すものを増やす事前許可）。暴走や prompt injection の封じ込めとして頼れるのは、常時効いている permissions（allow / ask / deny）、hooks、必要なら subagent の tools 制限
-* 議論の結論: 権限は settings.yaml の permissions で管理し、allowed-tools は「正規手順のコマンドだけを載せる」通行証の最小化として使う。層の分け方（変更なし / ローカル変更 / リモート変更）は権限の段差として利用する。最小権限の意図そのものは正しく、実装先を変えただけ
-* 現状の実害は課題 2
-
-### 論点 F: 命名
-
-* 却下してきた名前と理由: verify（目的語がない）、run-checks（対象がまだ曖昧）、soft-reset-commit（実装は `git reset` = mixed であり soft ではない）、auto-merge-pr（機構が名前に漏れる。目的は「PR をマージまで持っていく」）
-* 原則: **名前だけで挙動が推測できること。基本形は動詞-目的語。** 名前と description はモデルのスキル選択の入力なので、自明性は誤選択率に直結する
-
-### 論点 G: リファレンス（分冊）の基準
-
-* リファレンスが正当化される条件: **複数スキルで共有する知識**、または**状況によっては読まずに済む大きな塊**
-* toolchains.md は消費者 3+（check-* と atomic-commit の rebase --exec）で該当。splitting.md は単独消費者かつ必読で、どちらにも該当しない → 本文へ統合
-* 配備の事実: claude/Makefile:45-48 は `claude/references/` が存在すれば `~/.claude/references` へ symlink する（ディレクトリを作るだけで配備される）
-
-## 3. 提案する構成
+## 2. 全体像
 
 ```
 オーケストレーター層 ── 目的ごと。薄い（順番と最終確認だけ）。リモート操作はここだけ
 │
 ├ rework-commit     「コミット整理して」   = reset-commit → atomic-commit → diff で同一性確認
-│                                           （モデル起動可。ローカル専任なので安全）
 ├ create-pr         「PR 作って」          = check-* → ブランチ → atomic-commit → push → PR 作成
 ├ update-pr ※      「PR 更新して」        = check-* → atomic-commit → push → body 同期
-│                                           履歴再編時: reset-commit → atomic-commit → force-push with lease
 └ merge-pr ※       「マージまで見といて」 = CI 確認 → base 追従 → merge
-                                            （PR 系 3 つは disable-model-invocation: true）
 
 プリミティブ層 ── ローカルの状態を変える。push しない。呼び出し元を知らない
 │
 ├ atomic-commit     worktree の未コミット変更を atomic なコミットに積む
-│                   制約は一文:「呼び出し時点の HEAD より前に触れない」
 └ reset-commit      既存コミットをバックアップしてから worktree へ戻す
-                    （backup は untracked 含む全内容。dirty でも可。push 済みが対象なら確認）
 
-チェック層 ── 検証する。リポジトリを変更しない（fmt は --check）。広範コマンドの置き場
+チェック層 ── 検証する。リポジトリを変更しない。広範なコマンドの置き場
 │
 ├ check-build       ビルドが通るか
-├ check-lint        静的検査が通るか（fmt --check 含む）
+├ check-lint        静的検査（fmt --check 含む）が通るか
 └ check-test        テストが通るか
-                    （toolchain 検出は各スキル内部の 1 行。複数 toolchain は並列 subagent で実行し、
-                      ログを subagent に吸収させて要約だけ返す）
 
 リファレンス ── 知識。スキルではない
 │
-├ claude/references/toolchains.md   toolchain × 種類の行列（検出ファイル、コマンド、flags）
-│                                   check-* が読む。atomic-commit の rebase --exec も直接読む
+├ claude/references/toolchains.md   toolchain × 種類の行列。check-* と atomic-commit が読む
 └ claude/references/remote.md ※    remote-default-ref 確定・fork 判定
 
-消費者 ── redundant-comment-sweep はコミット工程に atomic-commit、検証に check-* を使う ※
-
-※ = 将来（本 PR のスコープ外。手順 7 参照）
+※ = 将来（§9）。本仕様の作成対象は無印の 7 スキルと toolchains.md
 ```
 
 ### ディスパッチ＝前提条件
 
+分岐表はどこにも書かない。各スキルが自分の前提条件を持ち、その集合が選択規則になる。
+
 | スキル | 前提条件 | 満たさないとき |
 |---|---|---|
 | atomic-commit | worktree に未コミット変更がある | 変更なしと報告して終了。整理対象がコミット済みなら rework-commit を案内 |
-| reset-commit | ベース..HEAD にコミットがある | 何もせず終了。push 済みを含むなら「後で force-push が必要になる」旨を確認してから |
-| create-pr | 現ブランチに open PR が無い | update-pr へ（update-pr 実装までは現行 5-2 の「push のみ」挙動を維持） |
-| update-pr ※ | 現ブランチに open PR が有る | create-pr へ |
-
-スキル間の受け渡しは reset-commit の完了報告（バックアップ名・戻したコミット一覧・確認方法）だけ。
-これはプロトコルではなくただの作業報告であり、atomic-commit は受け取りを前提にしない。
+| reset-commit | ベース..HEAD にコミットがある | 何もせず終了。push 済みを含むなら R2 の確認を挟んでから |
+| create-pr | 現ブランチに open PR が無い | push のみ行い既存 PR の URL を報告（update-pr 実装後は委譲に変更） |
 
 ### 権限のグラデーション
 
 | 層 | できること | 実現手段 |
 |---|---|---|
-| チェック層 | 実行するが何も変更しない | check-* の不変条件。コマンド群は settings.yaml で allow 済み |
+| チェック層 | 実行するが何も変更しない | check-* の不変条件（R4） |
 | プリミティブ層 | ローカルの git 変更のみ | allowed-tools は git の狭いサブコマンド＋Read/Write/Skill |
-| オーケストレーター層 | push・PR・merge | `git push -u` は create-pr / update-pr のみ、`gh pr merge` は merge-pr のみ |
+| オーケストレーター層 | push・PR・merge | `git push -u` は create-pr（将来 update-pr も）のみ、`gh pr merge` は merge-pr のみ |
 
-### 設計原則（提案）
+### 設計原則
 
 1. スキルは目的で割る。手段（toolchain）で割らない。ディスパッチは、それで挙動が変わるスキルの内側に置く
 2. 意図はスキル、共有知識はリファレンス、専有知識は本文、分岐は前提条件、権限は permissions
-3. 各スキルは呼び出し時点の状態だけを見る。呼び出し元を知らない。本文に「〜から呼ばれた場合」を書かない
+3. 各スキルは呼び出し時点の状態だけを見る。呼び出し元を知らない
 4. オーケストレーターは自前作業を持たない。プリミティブの順番と最終確認だけを書く
-5. 変更なし＝チェック層、ローカル変更＝プリミティブ層、リモート変更（push・PR・merge）＝オーケストレーター層。上位の権限を下位に持ち込まない
-6. スキル名は名前だけで挙動が推測できること。基本形は「動詞-目的語」
+5. 変更なし＝チェック層、ローカル変更＝プリミティブ層、リモート変更＝オーケストレーター層
+6. スキル名は名前だけで挙動が推測できること
 
-補足: frontmatter の description に書く「Do NOT use（use X instead）」はトリガー選択のガイドであり、実行時の例外規定ではない。これは残してよい。
+### 記述規約（全スキル共通）
 
-## 4. 提案を採用する場合の実装手順（1 ステップ = 1 コミット）
+* SKILL.md 本文は日本語。frontmatter の description は英語で、日本語・英語のトリガーフレーズ例を含める
+* description の「Do NOT use（use X instead）」はトリガー選択のガイドとして書いてよい（実行時の例外規定ではないので R1 に反しない）
+* コミットメッセージと PR body は英語（リポジトリ既存規約）
+* 対話コマンド（`git add -p`、`git rebase -i`）は使わない。非対話環境で失敗するため
 
-### 1. reset-commit 新設
+## 3. プリミティブ仕様
 
-`claude/skills/reset-commit/SKILL.md` を作成する。内容は現行 rework-commit の手順 1〜3 の移植＋前提条件化。
+### 3.1 atomic-commit
 
-* **移植**: 現状確認とベースコミット特定（rework-commit 手順 1）、`git commit-tree` によるスナップショットバックアップ（手順 2。untracked を含む全内容、`.gitignore` 済みは含まれない旨の注意ごと）、`git reset <ベースコミット>`（手順 3。mixed reset。`git rebase -i` 禁止の注意ごと）
-* **バックアップ名**: `backup/reset-commit-<timestamp>` へ変更
-* **新規追加（課題 3 の修正）**: ベース..HEAD のコミットがリモートに存在する場合、「再編後の push には force-push が必要になる」旨をユーザーへ確認してから進む。force-push 自体はこのスキルの責務ではない
-* **前提条件**: ベース..HEAD にコミットがある。無ければ何もせず終了。worktree が dirty でも可（バックアップに含め、reset 後に worktree で合流する）
-* **制約**: push しない。共有ブランチ不可。バックアップ作成前に破壊的操作をしない
-* **完了報告**: バックアップ名、ベースコミット、戻したコミット一覧（元の意図の記録として）、最終確認方法（`git diff <backup> HEAD` が空になるべきこと）
-* **description**: 単独トリガーは限定的（「コミットを一旦バラして」等）。主に rework-commit / update-pr の部品である旨を書く
+worktree の未コミット変更を、論理的かつ atomic な単位のコミットに積むスキル。
+レビュー・revert・bisect・cherry-pick を容易にすることが目的。
 
-### 2. atomic-commit 書き直し
+**frontmatter**
 
-* 「例外: `rework-commit` から呼び出された場合」ブロックを削除する
-* 制約を entry-HEAD 基準の一文にする: 「**呼び出し時点の HEAD より前には一切触れない。その上に新規コミットのみを作る**」
-* リダイレクトを状態条件にする: 「整理対象の変更が working tree に無い（既にコミット済みの）場合は rework-commit を案内して終了」
-* rebase --exec の起点を「作業開始時（呼び出し時点）の HEAD」のみにする
-* `references/splitting.md` を本文へ統合し、ファイルを削除する。統合時に create-pr の Conventional Commits type 表も本文のメッセージ規約へ吸収する
-* 検証を再構成する:
-  * コミット単位検証の方法 A（stash 退避）/ 方法 B（rebase --exec）は維持。実行コマンドは `claude/references/toolchains.md` を読んで組む（手順 4 の後に参照先を差し替え。手順 2 の時点では現行記述のままでよい）
-  * 最終状態の全体検証は check-build / check-lint / check-test の呼び出しにする（同上）
-  * 「呼び出し元が変更全体の検証済みを明示した場合、コミット単位検証を省略できる」パラメータは維持（create-pr / redundant-comment-sweep が使用中）
-* 前提条件: worktree に未コミット変更がある。無ければ報告して終了
-* allowed-tools を追加する。方針: git の狭いサブコマンド（status / diff / log / add / commit / stash / apply / reset / branch / rev-parse / write-tree など実手順で使うもの）＋ Read / Write（patch ファイル用）＋ Skill。push 系・gh 系は載せない
+* description: 未コミット変更のコミット化に使う旨＋トリガー例（「いい感じにコミットして」「コミットして」「commit this properly」等）＋他スキルのコミット工程としても使われる旨＋「既存コミットの再編には使わない（rework-commit へ）」
+* allowed-tools: git の status / diff / log / add / commit / stash / apply / reset / restore / rebase / rev-parse / branch（読み取り用途）等、本仕様の手順で使うサブコマンドのみ＋ Read / Write（patch ファイル用）＋ Grep / Glob ＋ Skill。push 系・gh 系は載せない（R5・R6）
 
-### 3. rework-commit 薄化
+**前提条件**: worktree に未コミット変更（staged / unstaged / untracked）がある。無ければその旨を報告して終了。ユーザーの整理対象が既にコミット済み（worktree に無い）なら rework-commit を案内して終了。
 
-本文を「順番と最終確認だけ」にする。
+**制約**
 
-1. reset-commit を呼ぶ
+* **呼び出し時点の HEAD より前には一切触れない。その上に新規コミットのみを作る**（この一文だけで、単独利用でも reset 直後でも同じ意味で成立する — R1）
+* push しない
+* main / master / develop 等の共有ブランチ上なら、開始前にユーザーへ確認する
+* 機能追加・バグ修正・追加リファクタリングをしない。コミット作成に不要なコード変更をしない
+* 作業開始時と終了時で worktree のファイル内容を変えない
+
+**手順 1 — 現状確認**: ブランチ名（共有ブランチでないこと）、`git status -uall`（ディレクトリ折り畳みで未追跡を見落とすため `-uall` 必須）、`git diff` と `git diff --cached`、`git log --oneline -10`（既存メッセージ規約の把握）、変更が実現した要求事項。
+
+**手順 2 — 分析と計画**: 差分をファイル単位ではなく**変更意図単位**で分析し、コミット計画を提示する。
+
+* 分類観点: 型・インターフェース・スキーマ等の基盤 / ドメインロジック / アプリケーションロジック / 外部統合 / 設定 / テスト / ドキュメント / 純リファクタリング / 自動生成物 / フォーマットのみ / 不要コード削除
+* atomic の定義: 1 つの目的だけを持つ / 単体で意図を説明できる / 可能な限り単体でビルド・テストが通る / 後続コミットを前提にしなくても整合する / 独立して revert・cherry-pick できる / リファクタリングと振る舞い変更を分離する
+* 計画の記載項目（コミットごと）: タイトル / 目的 / 含めるファイルまたは hunk / 含めない関連変更 / 依存する先行コミット / 実行する検証 / 単独 revert 可否
+* 順序: 前提となる型・設定 → 内部実装 → 統合 → テスト → ドキュメント。ただし実際の依存関係を優先。テストは原則対象実装と同じコミット（既存挙動を固定する characterization test 等、明確な理由がある場合のみ分離可）
+* 分割しない判断も明示する: 分割すると中間コミットがビルド不能 / 変更同士が強く結合 / 独立 revert が非現実的 / 分割で意図が読みにくくなる — の場合は 1 コミットにまとめる。逆にリファクタと機能変更、フォーマットとロジック、独立バグ修正同士、無関係な設定変更は分離する
+
+**手順 3 — コミット作成**: 計画の順に stage → 確認 → commit を繰り返す。
+
+* パスを明示して `git add <ファイル>`。`git add -A` / `git add .` は使わない
+* 同一ファイルに複数の論理変更が混在する場合の hunk 分割: `git diff -- <ファイル>` を patch ファイルに保存 → stage する hunk だけ残して編集 → `git apply --cached <patch>` → `git diff --cached` で計画と一致確認。patch の編集は hunk 全体の残す/消すの単位で行い、hunk 内部の行を編集した場合は `git apply --cached --recount`。未追跡ファイルの hunk 分割は `git add -N <ファイル>` で追跡化してから
+* stage 前チェック: `.env` / `*.pem` / `*.key` / `credentials.json` 等の機密ファイル、`node_modules/` `target/` `dist/` 等の成果物が含まれていたらコミットせず警告
+* コミットメッセージ: リポジトリの既存規約に従う。無ければ Conventional Commits（`<type>[scope]: <description>`。type は feat / fix / docs / style / refactor / perf / test / build / ci / chore）。description は英語 70 文字以内、body は「何を」でなく「なぜ」。HEREDOC で渡す。trailer はセッションのシステム指示があればそれに従う
+* pre-commit hook がファイルを書き換えたら再 add してコミットし直す。`--no-verify` は使わない
+
+**手順 4 — 検証**: 可能な限り各コミットで formatter / lint / type check / test / build を実行する。コマンドは `claude/references/toolchains.md` から得る。worktree には後続コミット予定の変更が残っているため、以下のいずれかを使う。
+
+* 方法 A（コミットごと）: `git stash push -u` で残りを退避 → 検証 → `git stash pop`。検証がファイルを生成・変更する場合は pop 前に戻す
+* 方法 B（一括）: 全コミット作成後に `git rebase <呼び出し時点の HEAD> --exec '<検証コマンド>'`。起点は必ず呼び出し時点の HEAD（それより前を起点にすると触れてはならないコミットが対象になる）。成功してもハッシュは変わる（内容は不変なので制約違反ではない。ハッシュを保ちたい場合は方法 A）。失敗で停止したら境界を見直して `--continue`、見通しが立たなければ `--abort` して未完了の事実を報告に含める
+* 省略条件: 呼び出し元（スキルまたはユーザー）が変更全体の検証を実行済みと明示した場合、コミット単位の検証を省略し最終状態の check-build / check-lint / check-test のみでよい。省略した事実は報告する
+* あるコミット単体で検証が通らない場合: 境界を見直す / 依存変更を統合する / 単体検証できない理由を明示する — のいずれか。意図的にテストを失敗させるコミットは要求されない限り作らない
+
+**手順 5 — 最終確認**: worktree が clean / 開始時とファイル内容が一致 / 順序が依存関係に沿う / 各コミットが単一目的 / メッセージが内容と一致。
+
+**完了報告**: コミット一覧（`git log --oneline`）/ 各コミットの目的 / 各コミットで実行した検証 / 最終状態で実行した検証 / 実行しなかった検証と理由 / コミットしなかった変更と理由 / 残リスク。
+
+### 3.2 reset-commit
+
+ブランチの既存コミットを、バックアップを取ってから worktree へ戻す（uncommit する）スキル。
+これ自体はコミットを作らない。主に rework-commit（将来は update-pr）の部品。
+
+**frontmatter**
+
+* description: 既存コミットを worktree へ戻す旨＋単独トリガーは限定的（「コミットを一旦バラして」等）＋主に他スキルの部品である旨＋「コミットを積み直すのは atomic-commit」
+* allowed-tools: git の status / log / diff / rev-parse / merge-base / branch / add / reset / write-tree / commit-tree 等＋ Read / Grep / Glob。push 系・gh 系・commit は載せない
+
+**前提条件**: ベース..HEAD にコミットがある。無ければ何もせず終了。worktree が dirty でも可（バックアップに含め、reset 後に worktree で合流する）。
+
+**制約**: push しない / 共有ブランチ不可 / バックアップ作成前に変更を失う可能性のある操作をしない（R2）。
+
+**手順 1 — 現状確認とベース特定**: ブランチ名（共有ブランチでないこと）、ベースブランチまたは分岐元コミット、ベースとの差分、コミット履歴、staged / unstaged / untracked の有無。ベースコミットが不明確なら merge-base・ブランチ履歴・リモート追跡ブランチから合理的に特定し、以降すべての手順で同じベースを使う。
+
+**手順 2 — push 済み確認（R2）**: 現在ブランチに upstream があり、ベース..HEAD のコミットがリモートに到達済み（例: `git merge-base --is-ancestor <コミット> @{u}`）なら、「reset 後の push には force-push が必要になる」旨をユーザーへ確認してから進む。force-push 自体はこのスキルの責務ではない。
+
+**手順 3 — バックアップ**: バックアップは HEAD ではなく、**未コミット・未追跡を含む作業開始時点のファイル内容全体**を指す必要がある。
+
+```bash
+git add -A
+git branch backup/reset-commit-<timestamp> \
+  "$(git commit-tree "$(git write-tree)" -p HEAD -m 'snapshot before reset-commit')"
+git reset
+```
+
+* `git commit-tree` はどのブランチにも接続されない独立コミットを作るため、現在のブランチに影響しない
+* `git add -A` により未追跡ファイルも含まれる。`.gitignore` 済みは含まれないため、保護が必要な生成物があれば別途退避する
+* 作成後 `git rev-parse backup/reset-commit-<timestamp>` で存在を確認する
+
+**手順 4 — reset**: バックアップの存在確認後、`git reset <ベースコミット>`（mixed）。HEAD はベースへ戻り、全変更が unstaged で worktree に残る。ベース以降に追加されたファイルは untracked になるため `git status -uall` で確認する。
+
+**完了報告**: バックアップブランチ名 / ベースコミット / 戻したコミット一覧（元の変更意図の記録として）/ 作業完了後は `git diff <バックアップ> HEAD` が空になるべきこと。この報告はただの作業記録であり、後続スキルは受け取りを前提にしない（R1）。
+
+## 4. チェック層仕様（check-build / check-lint / check-test）
+
+3 スキルは同型。違いは実行する「列」だけ。各 SKILL.md は 15 行程度に収まる想定。
+
+**共通仕様**
+
+* 手順: `claude/references/toolchains.md` を読む → 検出ファイルで toolchain を特定（複数該当なら全部） → toolchain ごとに自分の列のコマンドを実行 → 成否と失敗時のログ要点を報告
+* 複数 toolchain の場合は subagent に並列委譲し、ログを subagent に吸収させて要約だけ受け取る（コンテキスト汚染防止）
+* **不変条件（R4）: リポジトリを変更しない。** formatter は check モード。自動修正はしない。git の変更系コマンドを使わない
+* 前提条件: 該当 toolchain が 1 つも検出できなければ「検証対象なし」と報告して終了（toolchains.md のフォールバックを試した上で）
+* allowed-tools: 自分の列で使うコマンド（cargo / pnpm / npm / go / gofmt / make / task 等）＋ Read / Glob / Grep ＋ subagent 起動。git 変更系・push 系は載せない
+
+**各スキル**
+
+| スキル | 列 | description の要旨 |
+|---|---|---|
+| check-build | build | ビルド（コンパイル）が通るかを検証する |
+| check-lint | lint | lint・format check・type check が通るかを検証する |
+| check-test | test | テストが通るかを検証する |
+
+## 5. オーケストレーター仕様
+
+### 5.1 rework-commit
+
+現在のブランチの既存コミット履歴を、論理的で atomic な単位に再編するスキル。自前の git 操作は最終確認の diff だけ（設計原則 4）。
+
+**frontmatter**
+
+* description: 既存コミットの再編に使う旨＋トリガー例（「コミット整理して」「コミット分割して」「履歴を綺麗にして」「clean up git history」「make this PR reviewable」等）＋「未コミット変更のコミット化は atomic-commit」
+* allowed-tools: Skill ＋ git の diff / log / rev-parse 等の読み取り系のみ
+
+**手順**
+
+1. reset-commit を呼ぶ（前提条件を満たさなければそこで終了する。それがこのスキルの終了条件にもなる）
 2. atomic-commit を呼ぶ
-3. `git diff <バックアップ> <HEAD>` で最終ツリーの同一性を機械的に確認する
-4. 完了報告（バックアップ名、再編前後のコミット数、同一性確認の結果）
+3. `git diff <バックアップブランチ> HEAD` で最終ツリーの同一性を機械的に確認する（R8）。差分があれば原因を調査し、解消してから完了とする
+4. 完了報告: バックアップブランチ名 / 再編前後のコミット数 / 再編後のコミット一覧 / 同一性確認の結果
 
-* 現行の手順 1〜3（ベース特定・バックアップ・reset）と手順 4 の引き継ぎ 5 項目リストを削除する（reset-commit へ移動済み。atomic-commit への申し送りは不要になった）
-* description のトリガーフレーズ（「コミット整理して」「履歴を綺麗にして」等）は維持
+### 5.2 create-pr
 
-### 4. toolchains.md 作成＋check-build / check-lint / check-test 新設
+ブランチを作成し、コミットし、PR を作成するスキル。
 
-`claude/references/toolchains.md` を作成し、create-pr 手順 2 の検出表を移植・拡張する（課題 4 の一元化）。
+**frontmatter**
+
+* description: PR 作成に使う旨（トリガー: PR 作って、submit changes 等）
+* argument-hint: `[branch-name]`
+* disable-model-invocation: true（スラッシュコマンド専用）
+* allowed-tools（目安）: `Bash(git status:*)` `Bash(git diff:*)` `Bash(git log:*)` `Bash(git branch:*)` `Bash(git switch:*)` `Bash(git fetch:*)` `Bash(git rev-parse:*)` `Bash(git remote:*)` `Bash(git push -u:*)` `Bash(gh repo view:*)` `Bash(gh pr view:*)` `Bash(gh pr create:*)` ＋ Read / Glob / Grep / Skill。cargo / npm 等はチェック層へ委譲したため載せない（R6）
+
+**手順 1 — 現状確認**（並列実行）: `git status -uall` / `git diff` と `git diff --cached` / `git log --oneline -10` / `git branch --show-current` / `gh repo view --json defaultBranchRef,nameWithOwner` / `git remote -v`。コミットすべき変更が無ければ終了。
+
+コミット範囲の起点 `<remote-default-ref>` をここで 1 つに確定する: fork 運用（origin が自分の fork、upstream が本家）なら `upstream/<default-branch>`、それ以外は `origin/<default-branch>`。**ローカルブランチ名（`main` 等）は使わない**（存在しなければ unknown revision で失敗し、存在しても古いと範囲がずれる）。`git rev-parse --verify` で解決を確認し、できなければ `git fetch <remote> <default-branch>` 後に再確認。
+
+**手順 2 — 検証**: check-build / check-lint / check-test を呼ぶ。**失敗したら PR 作成を中断して報告する。**
+
+**手順 3 — ブランチ**: 判定は上から順に評価する。(1) 引数があればそのブランチ名（現在名と一致なら何もしない） / (2) 現在ブランチがデフォルトブランチ以外ならそのまま使う（デフォルトブランチは手順 1 の結果で判定。main / master 決め打ちにしない） / (3) それ以外は変更内容から `<type>/<short-description>` 形式で生成。作成は `git switch -c`。同名ブランチが既に在る場合は `git log --oneline <remote-default-ref>..<branch>` で独自コミットを確認し、無ければ switch、有れば過去作業の混入を避けるため別名を使うかユーザーへ確認。
+
+**手順 4 — コミット**: atomic-commit を Skill として呼び、以下を伝える: `<remote-default-ref>`（範囲の起点）/ 手順 2 で変更全体の検証済みのためコミット単位検証は省略可 / push しないこと。完了後 `git log --oneline <remote-default-ref>..HEAD` で確認。
+
+**手順 5 — push と PR 作成**: `git push -u origin HEAD`。次に `gh pr view --json url,state` で既存 PR を確認 — **PR が無い場合は `no pull requests found` を出して非ゼロ終了するが、これは正常系でありエラー報告・中断しない**。open な PR が既にあれば push のみで完了し URL を報告。無ければ作成する: `.github/PULL_REQUEST_TEMPLATE.md`（大文字小文字両方）があればその構成で、無ければ Summary / Test plan 構成で body を書く。`--base` にはデフォルトブランチ名（ref ではなくブランチ名）を明示。fork 運用では `--repo <upstream の nameWithOwner>` と `--head <owner>:<branch>` を必ず指定（省略すると fork 側に PR が作られるか、対話プロンプトで非対話実行がハングする）。タイトルは英語 70 文字以内で、**作成されたコミットの主要な type に合わせた** Conventional Commits 形式。body は英語。
+
+**手順 6 — 報告**: ブランチ名 / 作成コミット / 実行した検証と結果 / PR の URL。
+
+## 6. 共有リファレンス仕様: claude/references/toolchains.md
+
+toolchain 検出と検証コマンドの知識を一元化するファイル（R3）。check-* が読み、atomic-commit が rebase --exec 用コマンドを組むときにも直接読む。
+
+* 配備: `claude/Makefile` は `claude/references/` ディレクトリが存在すれば `~/.claude/references` へ symlink する実装済み。ディレクトリを作るだけでよい
+* 内容: 次の行列＋各コマンドの注意事項
 
 | 検出ファイル | toolchain | build | lint | test |
 |---|---|---|---|---|
 | Cargo.toml | cargo | `cargo build` | `cargo clippy --all-targets --all-features` / `cargo fmt --all -- --check` | `cargo test` |
-| pnpm-lock.yaml | pnpm | `pnpm build`（script がある場合） | `pnpm lint` / `pnpm typecheck`（同左） | `pnpm test`（同左） |
-| package-lock.json | npm | `npm run build`（script がある場合） | `npm run lint` / `npm run typecheck`（同左） | `npm test`（同左） |
+| pnpm-lock.yaml | pnpm | `pnpm build` † | `pnpm lint` / `pnpm typecheck` † | `pnpm test` † |
+| package-lock.json | npm | `npm run build` † | `npm run lint` / `npm run typecheck` † | `npm test` † |
 | go.mod | go | `go build ./...` | `go vet ./...` / `gofmt -l .` | `go test ./...` |
-| Makefile / Taskfile.yml | make / task | 対応するターゲットがあればそれを使う | 同左 | 同左 |
+| Makefile / Taskfile.yml | make / task | 対応するターゲットが定義されていればそれ | 同左 | 同左 |
 
-* いずれにも該当しない場合のフォールバック（CI 定義 `.github/workflows/` をローカルで再現できる範囲で実行する）も現行 create-pr から移植する
+† JS 系は `package.json` の `scripts` に該当スクリプトが定義されている場合のみ実行する。
 
-`claude/skills/check-build/SKILL.md` / `check-lint` / `check-test` を作成する。各 15 行程度。
+* フォールバック: どの行にも該当しない場合、CI 定義（`.github/workflows/`）を確認し、そこで実行されているチェックをローカルで再現できる範囲で実行する
+* 拡張ルール: toolchain の追加はこのファイルへの行追加のみ。スキルは増やさない（設計原則 1）
 
-* 手順: toolchains.md を読む → 検出ファイルで toolchain を特定（複数該当は全部） → toolchain ごとに自分の列のコマンドを実行（複数 toolchain は並列 subagent に委譲し、ログを吸収させて要約だけ受け取る） → 成否と失敗時のログ要点を報告
-* **不変条件: リポジトリを変更しない**。fmt は `--check`。自動修正はしない
-* allowed-tools 方針: 自分の列で使うコマンド（cargo / pnpm / npm / go / gofmt / make / task）＋ Read / Glob / Grep ＋ subagent 起動。git 変更系・push 系は載せない
-
-### 5. create-pr 縮小
-
-* 手順 2（ビルド検証）を「check-build / check-lint / check-test を呼ぶ。失敗したら中断」に置換し、検出表を削除する
-* 手順 4 の type 表を削除する（atomic-commit 本文へ吸収済み）。PR タイトルの type は「作成されたコミットの主要な type に合わせる」の 1 行にする
-* atomic-commit の検証参照差し替え（手順 2 の残作業）があればここで実施
-* allowed-tools を絞り込む（課題 2 の修正）: `Bash(git:*)` `Bash(gh:*)` と cargo / npm / go / make / task 系（check-* へ移管）を廃止し、正規手順のサブコマンドのみ列挙する。目安: git の status / diff / log / branch / switch / fetch / rev-parse / remote / `push -u` 系、gh の `repo view` / `pr view` / `pr create`、Read / Glob / Grep / Skill。Write / Edit は委譲後は不要のはずなので、残す場合は理由を確認すること
-* 前提条件「open PR が無い」を明記。open PR がある場合の挙動は現行 5-2（push のみ）を維持し、update-pr 実装時に委譲へ切り替える
-
-### 6. settings.yaml へ deny 追加
+## 7. settings.yaml の変更
 
 `claude/settings.yaml` の permissions に deny キーを新設する。
 
@@ -228,30 +260,48 @@ permissions:
   - "Bash(git push -f:*)"
 ```
 
-push / merge 系を allow へ入れない現状は維持（確認に落とすため）。
+push / merge 系コマンドを allow へ入れない現状は維持する（確認プロンプトに落とすため）。
 
-### 7. 将来（本 PR のスコープ外）
+## 8. 作成手順（1 ステップ = 1 コミット）
 
-* update-pr / merge-pr の新設（構成は「3. 提案する構成」の通り）
-* `claude/references/remote.md` の抽出（create-pr 手順 1 の remote-default-ref 確定・fork 判定ロジック。update-pr / merge-pr と共有するため）
-* redundant-comment-sweep の検証手順（ラウンド内の formatter / lint / build / test）を check-* 呼び出しへ置換
-* 各スキルへの allowed-tools 横展開の精査
+| # | 作業 | 対象ファイル |
+|---|---|---|
+| 1 | reset-commit 新規作成（§3.2） | `claude/skills/reset-commit/SKILL.md` 新規 |
+| 2 | atomic-commit を §3.1 の内容で置き換え | `claude/skills/atomic-commit/SKILL.md` 置換、`claude/skills/atomic-commit/references/splitting.md` 削除（内容は §3.1 に統合済み） |
+| 3 | rework-commit を §5.1 の内容で置き換え | `claude/skills/rework-commit/SKILL.md` 置換 |
+| 4 | toolchains.md とチェック層 3 スキルを新規作成（§4・§6） | `claude/references/toolchains.md`、`claude/skills/check-{build,lint,test}/SKILL.md` 新規 |
+| 5 | create-pr を §5.2 の内容で置き換え | `claude/skills/create-pr/SKILL.md` 置換 |
+| 6 | permissions へ deny 追加（§7） | `claude/settings.yaml` 編集 |
 
-## 5. 満たしたい性質（採用時のチェックリスト）
+コミットは Conventional Commits（scope: skills）。手順 2 の時点では atomic-commit の検証コマンド参照先（toolchains.md / check-*）がまだ存在しないため、手順 4 の後に参照が成立することをコミットメッセージか本文の注記で明示するか、手順 4 を先に実施してもよい。
 
-提案が意図した性質。設計を変える場合も、課題 1〜6 の解消をこれに準じて確認する。
+**完了チェックリスト**
 
-* 全 SKILL.md 本文に「〜から呼ばれた場合」という呼び出し元分岐が存在しない
-* rework-commit 経由でも単独でも、atomic-commit の手順記述が同一（例外・読み替え指示なし）
-* rework-commit に自前の git 操作手順がない（同一性確認の diff を除く）
-* `splitting.md` が存在しない（本文統合済み）
-* check-* にリポジトリを変更する記述がない（fmt は `--check`）
-* allowed-tools に `Bash(git:*)` / `Bash(gh:*)` が残っていない
-* reset-commit が push 済みコミットの reset 前にユーザー確認を挟む
+* 全 SKILL.md 本文に「〜から呼ばれた場合」が存在しない（R1）
+* rework-commit 経由でも単独でも atomic-commit の手順記述が同一（R1）
+* rework-commit に自前の git 操作が無い（最終確認の diff を除く）
+* `splitting.md` が存在しない
+* check-* にリポジトリを変更する記述が無い（R4）
+* allowed-tools に `Bash(git:*)` / `Bash(gh:*)` が無い（R6）
+* reset-commit が push 済みコミットの reset 前に確認を挟む（R2）
 * 各ステップが独立したコミットになっている
 
-## 6. 対象外
+## 9. 将来（本仕様のスコープ外）
 
-* `claude/skills/japanese-tech-writing/` — 無関係
-* `claude/skills/redundant-comment-sweep/` — 手順 7 の check-* 置換まで変更しない
-* claude/ 以外のディレクトリ全て
+* **update-pr** — 前提条件「open PR が有る」。check-* → atomic-commit → push → PR body 同期。履歴再編の要求時は reset-commit → atomic-commit → force-push with lease（確認つき）。push 権限はここと create-pr のみ
+* **merge-pr** — CI 確認 → base 追従 → merge。`gh pr merge` はここだけ。disable-model-invocation: true
+* **claude/references/remote.md** — create-pr 手順 1 の remote-default-ref 確定・fork 判定を、update-pr / merge-pr と共有するため抽出
+* **redundant-comment-sweep** — ラウンド内の検証を check-* 呼び出しへ置換
+* create-pr の「open PR が有る場合は push のみ」挙動を update-pr への委譲に変更
+
+## 付録: 検討の記録（要約）
+
+再検討の材料。結論ではなく論拠を残す。
+
+* **例外記述の原因** — スキルの契約を「呼び出し元が誰か」で書くと打ち消しの例外が要る。「呼び出し時点の状態」で書くと条件が自己評価できて例外が消える（例: 「既存コミットを書き換えない」→「呼び出し時点の HEAD より前に触れない」は、reset 直後でも単独でも同じ文で正しい）。分割の変更はこの問題の解決には必須でない
+* **分割の軸** — 検証は「toolchain × 種類」の行列。行（toolchain）はリポジトリ依存なのでスキルに割ると選択が全呼び出し元へ漏れる（→リファレンスへ）。列（build / lint / test）は全リポジトリ共通なのでスキルに割ってよい。工程割り（analyze の分離）は、計画が実行中に見直されるループなので不採用
+* **調査系スキル** — 不採用。封じ込める手続き知識が無く（`git status` は 1 コマンド）、スキルには型付き戻り値が無く、「調べる」は単独の意図にならずトリガーが成立しない。唯一の本物の知識（remote-default-ref 確定）はリファレンス化の対象（§9）
+* **オーケストレーターの要否** — 両案成立。廃止案（状態駆動連鎖: reset 後は「未コミット変更がある」状態なので次のスキルは状態から自明）も可能だが、「意図 1 つにスキル 1 つ」の対応表と end-to-end 検証（R8）のオーナーを残すため薄い維持を選択。例外を生む原因はオーケストレーターの存在ではなく、自前作業を持ちながら残りを委譲すること（→設計原則 4）
+* **セキュリティ境界** — スキル分割は権限境界にならない（Skill は同一会話への手順書差し込みで、道具はセッションの権限設定で決まる。allowed-tools は檻ではなく通行証）。封じ込めは settings.yaml の permissions・hooks・subagent の tools 制限で行い、allowed-tools は通行証の最小化（R6）として使う
+* **命名** — verify（目的語なし）、run-checks（対象が曖昧）、soft-reset-commit（実装は mixed reset で soft でない）、auto-merge-pr（機構が名前に漏れる）を却下してきた経緯から R7 を導出
+* **リファレンスの基準** — 分冊が正当なのは「複数スキルで共有」か「状況により読まない大きな塊」。単独消費者が必ず読む知識は本文へ（splitting.md を統合した理由）
