@@ -1,6 +1,6 @@
 ---
 name: redundant-comment-sweep
-description: Sweep a codebase for comments that merely restate the adjacent code and delete them, running survey → delete → atomic-commit subagent rounds until no candidates remain. Use when the user wants redundant/self-evident comments removed — phrases like "コードを見てわかるコメントを消して", "自明なコメントを削除して", "冗長なコメントを掃除して", "コメント整理して", "remove obvious comments", "delete redundant comments", "clean up comments that restate the code". Do NOT use for writing new comments, translating comments, adding documentation, or general refactoring.
+description: Sweep a codebase for comments that merely restate the adjacent code and delete them, running survey → delete → commit subagent rounds until no candidates remain. Use when the user wants redundant/self-evident comments removed — phrases like "コードを見てわかるコメントを消して", "自明なコメントを削除して", "冗長なコメントを掃除して", "コメント整理して", "remove obvious comments", "delete redundant comments", "clean up comments that restate the code". Do NOT use for writing new comments, translating comments, adding documentation, or general refactoring.
 ---
 
 # redundant-comment-sweep
@@ -122,14 +122,17 @@ scratchpadディレクトリ配下に `comment-sweep/` を作り、以下を維�
 ### 4. コミットサブエージェント
 
 そのラウンドの変更をコミットするサブエージェントを起動してください。
+サブエージェントには `atomic-commit` スキルを使用させ、その手順に従ってコミットさせてください。
 
 サブエージェントへ渡す指示に、以下を必ず含めてください。
 
+* `atomic-commit` スキルを使用すること
 * 変更内容がコメント削除のみであること
-* 意味的なまとまりごとにコミットを分けること。たとえば、モジュールごと、あるいは本体コードとテストコードで分ける。1ラウンド分をまとめて1コミットにしてよいのは、変更が小さく単一のまとまりに収まる場合のみ
-* コミットメッセージはリポジトリの既存規約に従うこと。規約がなければConventional Commits形式の `style:` を使うこと
-* pushしないこと。既存コミットを書き換えないこと。新規コミットのみを作成すること
+* 分割の粒度の目安。モジュールごと、あるいは本体コードとテストコードで分ける。1ラウンド分をまとめて1コミットにしてよいのは、変更が小さく単一のまとまりに収まる場合のみ
+* リポジトリに規約がなければConventional Commits形式の `style:` を使うこと
+* 手順3で変更全体の検証を実行済みであること。したがってコミット単位の検証は省略してよいこと
 * 作業ブランチ以外へコミットしないこと
+* pushしないこと。既存コミットを書き換えないこと。新規コミットのみを作成すること（`atomic-commit` が読み込まれなかった場合の保険として、この行は必ず指示に含める）
 
 コミット後、`git status` がcleanであることを確認し、コミットハッシュを `progress.md` へ記録してください。
 
