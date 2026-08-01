@@ -10,7 +10,7 @@
 
 * **R1** — スキル本文に呼び出し元による分岐（「〜から呼ばれた場合」）を書かない。全スキルは呼び出し時点のリポジトリ状態だけで動作が決まる
 * **R2** — 履歴を戻す・書き換える操作は、事前バックアップなしに行わない。push 済みコミットを戻す場合は、後で force-push が必要になる旨をユーザーへ確認してから行う
-* **R3** — 検証（build / lint / test）コマンドの知識を記述する場所は、対応する check スキルの本文だけ。他のスキルはコマンドを記述せず check-* を呼び出す
+* **R3** — 検証（build / format / lint / test）コマンドの知識を記述する場所は、対応する check スキルの本文だけ。他のスキルはコマンドを記述せず check-* を呼び出す
 * **R4** — 検証はリポジトリを変更しない（formatter は check モード）
 * **R5** — push・PR 作成・merge はオーケストレーター層のスキルのみが行う。プリミティブは push しない
 * **R6** — allowed-tools には正規手順で使うコマンドだけを載せる。`Bash(git:*)` `Bash(gh:*)` のような全部入りを書かない
@@ -36,11 +36,12 @@
 チェック層 ── 検証する。リポジトリを変更しない。広範なコマンドの置き場
 │
 ├ check-build       ビルドが通るか
-├ check-lint        静的検査（fmt --check 含む）が通るか
+├ check-format      フォーマットが適用済みか（formatter の check モード）
+├ check-lint        静的検査が通るか
 ├ check-test        テストが通るか
 └ check-review      変更内容に問題がないか（コードレビュー。toolchain 非依存）
 
-※ = 将来（§8）。本仕様の作成対象は無印の 8 スキル
+※ = 将来（§8）。本仕様の作成対象は無印の 9 スキル
 ```
 
 ### ディスパッチ＝前提条件
@@ -117,11 +118,11 @@ worktree の未コミット変更を、論理的かつ atomic な単位のコミ
 * コミットメッセージ: リポジトリの既存規約に従う。無ければ Conventional Commits（`<type>[scope]: <description>`。type は feat / fix / docs / style / refactor / perf / test / build / ci / chore）。description は英語 70 文字以内、body は「何を」でなく「なぜ」。HEREDOC で渡す。trailer はセッションのシステム指示があればそれに従う
 * pre-commit hook がファイルを書き換えたら再 add してコミットし直す。`--no-verify` は使わない
 
-**手順 4 — 検証**: 検証は常に check-build / check-lint / check-test の呼び出しで行う。このスキルは検証コマンドを知らない（R3）。worktree には後続コミット予定の変更が残っているため、以下のいずれかを使う。
+**手順 4 — 検証**: 検証は常に check-build / check-format / check-lint / check-test の呼び出しで行う。このスキルは検証コマンドを知らない（R3）。worktree には後続コミット予定の変更が残っているため、以下のいずれかを使う。
 
 * 方法 A（作成しながら）: コミット直後に `git stash push -u` で残りを退避 → check-* を呼ぶ → `git stash pop`。検証がファイルを生成・変更する場合は pop 前に戻す。壊れたコミットの上に積む前に問題へ気づける
 * 方法 B（作成後に一括）: 全コミット作成後（worktree は clean）、作成したコミットを古い順に `git checkout <コミット>` で checkout し、それぞれで check-* を呼ぶ。終了時は成否にかかわらず必ず元のブランチへ戻る。履歴に触れないためハッシュは変わらない
-* 省略条件: 呼び出し元（スキルまたはユーザー）が変更全体の検証を実行済みと明示した場合、コミット単位の検証を省略し最終状態の check-build / check-lint / check-test のみでよい。省略した事実は報告する
+* 省略条件: 呼び出し元（スキルまたはユーザー）が変更全体の検証を実行済みと明示した場合、コミット単位の検証を省略し最終状態の check-build / check-format / check-lint / check-test のみでよい。省略した事実は報告する
 * あるコミット単体で検証が通らない場合: 境界を見直す / 依存変更を統合する / 単体検証できない理由を明示する — のいずれか。意図的にテストを失敗させるコミットは要求されない限り作らない
 
 **手順 5 — 最終確認**: worktree が clean / 開始時とファイル内容が一致 / 順序が依存関係に沿う / 各コミットが単一目的 / メッセージが内容と一致。
@@ -167,9 +168,9 @@ git reset
 
 チェック層に共通の不変条件（R4）: **リポジトリを変更しない。** 修正・自動整形をしない（formatter は check モード）。git の変更系コマンドを使わない。失敗・指摘の報告だけを返す。
 
-### 4.1 check-build / check-lint / check-test（toolchain 駆動）
+### 4.1 check-build / check-format / check-lint / check-test（toolchain 駆動）
 
-3 スキルは同型で、違いは実行するコマンドの種類だけ。各スキルは**検出表と自分の種類のコマンドを本文に持ち、スキルディレクトリ単体で完結する**（R9）。共有ファイルは作らない — 各種類のコマンドの消費者は対応するスキル 1 つだけなので専有知識であり（設計原則 2）、検出表（下表の左 2 列）の 3 重複は許容する。toolchain の追加はどのみち全種類のコマンド追記を伴うため、共有化しても編集の手間は減らない。
+4 スキルは同型で、違いは実行するコマンドの種類だけ。各スキルは**検出表と自分の種類のコマンドを本文に持ち、スキルディレクトリ単体で完結する**（R9）。共有ファイルは作らない — 各種類のコマンドの消費者は対応するスキル 1 つだけなので専有知識であり（設計原則 2）、検出表（下表の左 2 列）の 3 重複は許容する。toolchain の追加はどのみち全種類のコマンド追記を伴うため、共有化しても編集の手間は減らない。
 
 * 手順: 本文の検出表で toolchain を特定（複数該当なら全部） → toolchain ごとに自分の種類のコマンドを実行 → 成否と失敗時のログ要点を報告
 * 複数 toolchain の場合は subagent に並列委譲し、ログを subagent に吸収させて要約だけ受け取る（コンテキスト汚染防止）
@@ -179,18 +180,19 @@ git reset
 
 **author 用の元データ**（各スキルの本文には検出列＋自分の列だけを書く。他の列は書かない）
 
-| 検出ファイル | toolchain | check-build | check-lint | check-test |
-|---|---|---|---|---|
-| Cargo.toml | cargo | `cargo build` | `cargo clippy --all-targets --all-features` / `cargo fmt --all -- --check` | `cargo test` |
-| pnpm-lock.yaml | pnpm | `pnpm build` † | `pnpm lint` / `pnpm typecheck` † | `pnpm test` † |
-| package-lock.json | npm | `npm run build` † | `npm run lint` / `npm run typecheck` † | `npm test` † |
-| go.mod | go | `go build ./...` | `go vet ./...` / `gofmt -l .` | `go test ./...` |
-| Makefile / Taskfile.yml | make / task | 対応するターゲットが定義されていればそれ | 同左 | 同左 |
+| 検出ファイル | toolchain | check-build | check-format | check-lint | check-test |
+|---|---|---|---|---|---|
+| Cargo.toml | cargo | `cargo build` | `cargo fmt --all -- --check` | `cargo clippy --all-targets --all-features` | `cargo test` |
+| pnpm-lock.yaml | pnpm | `pnpm build` † | `pnpm format:check` † | `pnpm lint` / `pnpm typecheck` † | `pnpm test` † |
+| package-lock.json | npm | `npm run build` † | `npm run format:check` † | `npm run lint` / `npm run typecheck` † | `npm test` † |
+| go.mod | go | `go build ./...` | `gofmt -l .` ‡ | `go vet ./...` | `go test ./...` |
+| Makefile / Taskfile.yml | make / task | 対応するターゲットが定義されていればそれ | 同左 | 同左 | 同左 |
 
 † JS 系は `package.json` の `scripts` に該当スクリプトが定義されている場合のみ実行する。
+‡ `gofmt -l` は未整形でも終了コードが 0 のまま、未整形ファイル名を出力する。出力が空でないことを失敗として扱う。
 
-* 拡張ルール: toolchain の追加は 3 スキルそれぞれへ検出行＋自分の種類のコマンドを 1 行ずつ追記する。検証の種類の追加はチェック層スキルの追加で行う
-* description の要旨: check-build「ビルド（コンパイル）が通るかを検証する」/ check-lint「lint・format check・type check が通るかを検証する」/ check-test「テストが通るかを検証する」
+* 拡張ルール: toolchain の追加は 4 スキルそれぞれへ検出行＋自分の種類のコマンドを 1 行ずつ追記する。検証の種類の追加はチェック層スキルの追加で行う
+* description の要旨: check-build「ビルド（コンパイル）が通るかを検証する」/ check-format「フォーマットが適用済みかを検証する」/ check-lint「lint・type check が通るかを検証する」/ check-test「テストが通るかを検証する」
 
 ### 4.2 check-review（モデル駆動）
 
@@ -237,7 +239,7 @@ git reset
 
 コミット範囲の起点 `<remote-default-ref>` をここで 1 つに確定する: fork 運用（origin が自分の fork、upstream が本家）なら `upstream/<default-branch>`、それ以外は `origin/<default-branch>`。**ローカルブランチ名（`main` 等）は使わない**（存在しなければ unknown revision で失敗し、存在しても古いと範囲がずれる）。`git rev-parse --verify` で解決を確認し、できなければ `git fetch <remote> <default-branch>` 後に再確認。
 
-**手順 2 — 検証**: check-build / check-lint / check-test / check-review を呼ぶ。**build / lint / test の失敗、または check-review の重大な指摘があれば、PR 作成を中断して報告する**（改善・軽微の指摘は報告のみで続行してよい）。
+**手順 2 — 検証**: check-build / check-format / check-lint / check-test / check-review を呼ぶ。**build / format / lint / test の失敗、または check-review の重大な指摘があれば、PR 作成を中断して報告する**（改善・軽微の指摘は報告のみで続行してよい）。
 
 **手順 3 — ブランチ**: 判定は上から順に評価する。(1) 引数があればそのブランチ名（現在名と一致なら何もしない） / (2) 現在ブランチがデフォルトブランチ以外ならそのまま使う（デフォルトブランチは手順 1 の結果で判定。main / master 決め打ちにしない） / (3) それ以外は変更内容から `<type>/<short-description>` 形式で生成。作成は `git switch -c`。同名ブランチが既に在る場合は `git log --oneline <remote-default-ref>..<branch>` で独自コミットを確認し、無ければ switch、有れば過去作業の混入を避けるため別名を使うかユーザーへ確認。
 
@@ -267,7 +269,7 @@ push / merge 系コマンドを allow へ入れない現状は維持する（確
 | 1 | reset-commit 新規作成（§3.2） | `claude/skills/reset-commit/SKILL.md` 新規 |
 | 2 | atomic-commit を §3.1 の内容で置き換え | `claude/skills/atomic-commit/SKILL.md` 置換、`claude/skills/atomic-commit/references/splitting.md` 削除（内容は §3.1 に統合済み） |
 | 3 | rework-commit を §5.1 の内容で置き換え | `claude/skills/rework-commit/SKILL.md` 置換 |
-| 4 | toolchain 駆動チェック 3 スキルを新規作成（§4.1） | `claude/skills/check-{build,lint,test}/SKILL.md` 新規 |
+| 4 | toolchain 駆動チェック 4 スキルを新規作成（§4.1） | `claude/skills/check-{build,format,lint,test}/SKILL.md` 新規 |
 | 5 | check-review 新規作成（§4.2） | `claude/skills/check-review/SKILL.md` 新規 |
 | 6 | create-pr を §5.2 の内容で置き換え | `claude/skills/create-pr/SKILL.md` 置換 |
 | 7 | permissions へ deny 追加（§6） | `claude/settings.yaml` 編集 |
@@ -280,7 +282,7 @@ push / merge 系コマンドを allow へ入れない現状は維持する（確
 * rework-commit 経由でも単独でも atomic-commit の手順記述が同一（R1）
 * rework-commit に自前の git 操作が無い（最終確認の diff を除く）
 * `splitting.md` が存在しない
-* ビルド・lint・テストのコマンド一覧を本文に持つのは check-build / check-lint / check-test だけ（R3）
+* ビルド・format・lint・テストのコマンド一覧を本文に持つのは check-build / check-format / check-lint / check-test だけ（R3）
 * check-* にリポジトリを変更する記述が無い（R4）
 * allowed-tools に `Bash(git:*)` / `Bash(gh:*)` が無い（R6）
 * reset-commit が push 済みコミットの reset 前に確認を挟む（R2）
@@ -300,7 +302,7 @@ push / merge 系コマンドを allow へ入れない現状は維持する（確
 再検討の材料。結論ではなく論拠を残す。
 
 * **例外記述の原因** — スキルの契約を「呼び出し元が誰か」で書くと打ち消しの例外が要る。「呼び出し時点の状態」で書くと条件が自己評価できて例外が消える（例: 「既存コミットを書き換えない」→「呼び出し時点の HEAD より前に触れない」は、reset 直後でも単独でも同じ文で正しい）。分割の変更はこの問題の解決には必須でない
-* **分割の軸** — 検証は「toolchain × 種類」の行列。行（toolchain）はリポジトリ依存なのでスキルに割ると選択が全呼び出し元へ漏れる（→各 check スキル本文内の検出表へ）。列（build / lint / test / review）は全リポジトリ共通なのでスキルに割ってよい（review のように toolchain 非依存の列もある）。工程割り（analyze の分離）は、計画が実行中に見直されるループなので不採用
+* **分割の軸** — 検証は「toolchain × 種類」の行列。行（toolchain）はリポジトリ依存なのでスキルに割ると選択が全呼び出し元へ漏れる（→各 check スキル本文内の検出表へ）。列（build / format / lint / test / review）は全リポジトリ共通なのでスキルに割ってよい（review のように toolchain 非依存の列もある）。工程割り（analyze の分離）は、計画が実行中に見直されるループなので不採用
 * **調査系スキル** — 不採用。封じ込める手続き知識が無く（`git status` は 1 コマンド）、スキルには型付き戻り値が無く、「調べる」は単独の意図にならずトリガーが成立しない。唯一の本物の知識（remote-default-ref 確定）は §8 で扱う
 * **オーケストレーターの要否** — 両案成立。廃止案（状態駆動連鎖: reset 後は「未コミット変更がある」状態なので次のスキルは状態から自明）も可能だが、「意図 1 つにスキル 1 つ」の対応表と end-to-end 検証（R8）のオーナーを残すため薄い維持を選択。例外を生む原因はオーケストレーターの存在ではなく、自前作業を持ちながら残りを委譲すること（→設計原則 4）
 * **セキュリティ境界** — スキル分割は権限境界にならない（Skill は同一会話への手順書差し込みで、道具はセッションの権限設定で決まる。allowed-tools は檻ではなく通行証）。封じ込めは settings.yaml の permissions・hooks・subagent の tools 制限で行い、allowed-tools は通行証の最小化（R6）として使う
