@@ -70,51 +70,36 @@ allowed-tools: Bash(git:*), Bash(gh:*), Bash(cargo:*), Bash(npm:*), Bash(go:*), 
 
 ### 4. コミット作成
 
-変更内容を分析し、Conventional Commits 形式でコミットメッセージを作成する。
+コミットの作成は `atomic-commit` スキルへ委譲する。Skill ツールで `atomic-commit` を呼び出し、以下を伝える。
 
-#### Conventional Commits 形式
+- 手順 1 で確定した `<remote-default-ref>`（コミット範囲の起点）
+- 手順 2 で**変更全体のビルド検証を実行済み**であること。したがってコミット単位の検証は省略し、最終状態の確認のみでよい
+- 実行したビルド検証のコマンドと結果
+- push しないこと。既存コミットを書き換えないこと。新規コミットのみを作成すること
 
-```
-<type>[optional scope]: <description>
+委譲後、`git log --oneline <remote-default-ref>..HEAD` で作成されたコミットを確認し、手順 5 へ進む。
 
-[optional body]
+以下は `atomic-commit` の判断基準を補足するもので、create-pr 固有の要件である。
 
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
+- コミットメッセージは Conventional Commits 形式を使う（type の選択基準は下記）
+- description は英語で簡潔に（70 文字以内）
+- body には「なぜ」この変更が必要かを書く（「何を」変えたかではない）
+- trailer（`Co-Authored-By` 等）は、セッションのシステム指示で形式が与えられている場合はそれに従う。ここでは固定の trailer を定義しない
 
 #### Type の選択基準
 
-| Type | 用途 |
-|------|------|
-| `feat` | 新機能の追加 |
-| `fix` | バグ修正 |
-| `docs` | ドキュメントのみの変更 |
-| `style` | コードの意味に影響しない変更（空白、フォーマット等） |
-| `refactor` | バグ修正でも機能追加でもないコード変更 |
-| `perf` | パフォーマンス改善 |
-| `test` | テストの追加・修正 |
-| `build` | ビルドシステムや外部依存の変更 |
-| `ci` | CI 設定ファイルやスクリプトの変更 |
-| `chore` | その他の変更 |
-
-#### ルール
-
-- description は英語で簡潔に（70文字以内）
-- body には「なぜ」この変更が必要かを書く（「何を」変えたかではない）
-- 複数の論理的変更がある場合は、分割コミットを検討する
-- `.env`, `credentials.json` 等の機密ファイルはコミットしない（警告を出す）
-- HEREDOC 形式でコミットメッセージを渡す:
-
-```bash
-git commit -m "$(cat <<'EOF'
-<type>[scope]: <description>
-
-<body>
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-EOF
-)"
-```
+| Type       | 用途                                                 |
+| ---------- | ---------------------------------------------------- |
+| `feat`     | 新機能の追加                                         |
+| `fix`      | バグ修正                                             |
+| `docs`     | ドキュメントのみの変更                               |
+| `style`    | コードの意味に影響しない変更（空白、フォーマット等） |
+| `refactor` | バグ修正でも機能追加でもないコード変更               |
+| `perf`     | パフォーマンス改善                                   |
+| `test`     | テストの追加・修正                                   |
+| `build`    | ビルドシステムや外部依存の変更                       |
+| `ci`       | CI 設定ファイルやスクリプトの変更                    |
+| `chore`    | その他の変更                                         |
 
 ### 5. プッシュと PR 作成
 
