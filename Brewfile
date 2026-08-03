@@ -72,6 +72,7 @@ brew "glab"
 brew "lazygit"
 brew "lefthook"
 brew "pre-commit"
+brew "prek"
 
 # Editor
 brew "editorconfig-checker"
