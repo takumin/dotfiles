@@ -58,7 +58,7 @@ alias df="df -h"
 alias su="su -l"
 
 if [[ -x "$(whence -- tree)" ]]; then
-	alias tree="tree --charset ASCII"
+	alias tree="tree --charset ASCII -N -a -I 'Thumbs.db|\.DS_Store|\.git|node_modules|vendor\/bundle|target'"
 fi
 
 if [[ -x "$(whence -- hub)" ]]; then
