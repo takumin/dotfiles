@@ -125,6 +125,13 @@ brew "lua-language-server"
 brew "luarocks"
 brew "stylua"
 
+# Swift
+brew "periphery"
+brew "swift"
+brew "swift-format"
+brew "swiftlint"
+brew "xcbeautify"
+
 # Zig
 brew "zig"
 
@@ -234,6 +241,8 @@ if OS.mac?
   brew "mas"
   brew "mactop" if Hardware::CPU.arm?
   brew "pam-reattach"
+  brew "swiftgen"
+  brew "xcodegen"
 
   # macOS Cask
   cask "1password"
