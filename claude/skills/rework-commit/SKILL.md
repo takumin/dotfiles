@@ -1,6 +1,6 @@
 ---
 name: rework-commit
-description: Reorganize the current branch's existing commit history into logical, atomic commits structured around the TDD RED-GREEN-REFACTOR cycle (create a backup branch first, never push, keep the final tree identical). Use when commits already exist and the user wants them split, restructured, or cleaned up before review — phrases like "コミット整理して", "コミット分割して", "履歴を綺麗にして", "コミットまとめ直して", "split commits", "clean up git history", "rework commit history", "make this PR reviewable". Do NOT use when the changes are still uncommitted in the working tree (use atomic-commit), or for writing a single commit message, resolving merge conflicts, reverting changes, or merging branches.
+description: Reorganize the current branch's existing commit history into logical, atomic commits — every commit green, each behavior's test and implementation folded into one commit, refactors kept separate (create a backup branch first, never push, keep the final tree identical). Use when commits already exist and the user wants them split, restructured, or cleaned up before review — phrases like "コミット整理して", "コミット分割して", "履歴を綺麗にして", "コミットまとめ直して", "split commits", "clean up git history", "rework commit history", "make this PR reviewable". Do NOT use when the changes are still uncommitted in the working tree (use atomic-commit), or for writing a single commit message, resolving merge conflicts, reverting changes, or merging branches.
 ---
 
 # rework-commit
@@ -8,15 +8,17 @@ description: Reorganize the current branch's existing commit history into logica
 あなたはGit履歴の再編を担当します。
 
 現在のブランチには、要求された機能の実装と動作確認が完了したコミットが積まれています。
-これをTDDのRED-GREEN-REFACTORサイクルに沿った、論理的かつatomicな単位のコミットへ再編してください。
+これを論理的かつatomicな単位のコミットへ再編してください。
 
 ## 目的
 
 レビュー、revert、bisect、cherry-pickが容易になるように、既存の履歴を意味のある最小単位へ組み替えます。
-あわせて、どの振る舞いをどのテストが駆動したのかが履歴から読み取れるようにします。
+あわせて、どの振る舞いをどのテストが検証しているのかが履歴から読み取れるようにします。
+
+再編後の**すべてのコミットがgreenでなければなりません**。テストが失敗するコミットを履歴へ残すと `git bisect` が誤った結果を報告します。ある振る舞いのテストとその実装は、1つのコミットへ畳みます。
 
 このスキルが担当するのは**履歴を安全に書き換えるための外枠**です。
-「変更をどの単位へ分けるか」の判断と実際のコミット作成は `atomic-commit` スキルへ委譲します。TDDサイクルへの分割基準も `atomic-commit` 側（`references/splitting.md`）に記載されています。
+「変更をどの単位へ分けるか」の判断と実際のコミット作成は `atomic-commit` スキルへ委譲します。分割基準も `atomic-commit` 側（`references/splitting.md`）に記載されています。
 
 ## 最重要制約
 
@@ -25,8 +27,9 @@ description: Reorganize the current branch's existing commit history into logica
 * force pushしないこと
 * main、master、developなど共有ブランチを変更しないこと
 * 最終的なworking treeの内容を、再編前の状態から変更しないこと
+* テストが失敗するコミットを作らないこと
 * 機能追加、バグ修正、追加リファクタリングを行わないこと
-* コミット再編に不要なコード変更を行わないこと。TDDサイクルを成立させるためであっても、再編前に存在しないコードを新たに書かないこと
+* コミット再編に不要なコード変更を行わないこと。コミット境界を成立させるためであっても、再編前に存在しないコードを新たに書かないこと
 * 変更内容を失う可能性がある操作を、バックアップ作成前に実行しないこと
 
 まだコミットされていない変更をコミットするだけであれば、履歴の書き換えは不要です。その場合はこのスキルではなく `atomic-commit` を直接使用してください。
@@ -41,12 +44,9 @@ description: Reorganize the current branch's existing commit history into logica
 * 現在のコミット履歴。各コミットがどの振る舞いを追加・修正したものかを読み取る
 * staged、unstaged、untrackedファイルの有無
 * 実行可能なビルド、lint、テストコマンド
-* 単一のテストまたはテストファイルだけを実行する方法。REDコミットの検証に使う
 
 ベースコミットが明確でない場合は、merge-base、ブランチ履歴、リモート追跡ブランチを調査して合理的に特定してください。
 特定したベースコミットは、以降の手順すべてで同じものを使います。
-
-再編前の履歴に既に `Test-Status: red` trailerを持つコミットがある場合は、それがどの振る舞いのREDだったかを記録しておき、手順4で `atomic-commit` へ伝えてください。
 
 ### 2. バックアップ
 
@@ -90,10 +90,9 @@ HEADはベースコミットへ戻り、全変更はunstagedとしてworking tre
 * 手順1で特定したベースコミット
 * 手順2で作成したバックアップブランチ名
 * 再編前の履歴と、そこから読み取れる変更の意図。特に、どのコミットがどの振る舞いを追加・修正したか
-* 再編前に `Test-Status: red` trailerを持つコミットがあった場合はその対応関係
-* 実行可能なビルド、lint、テストコマンドと、単一テストの実行方法
+* 実行可能なビルド、lint、テストコマンド
 
-コミット単位の検証も `atomic-commit` の手順に含まれます。方法Bの一括検証を使う場合は、`git rebase <ベースコミット> --exec '<検証コマンド>'` の起点に手順1のベースコミットを指定してください。REDコミットではテストが失敗するため、`atomic-commit` に記載のとおり `Test-Status: red` trailerで分岐する検証コマンドを使ってください。
+コミット単位の検証も `atomic-commit` の手順に含まれます。方法Aの一括検証を使う場合は、`git rebase <ベースコミット> --exec '<検証コマンド>'` の起点に手順1のベースコミットを指定してください。すべてのコミットがgreenであるため、検証コマンドを分岐させる必要はありません。
 
 ### 5. 最終確認
 
@@ -102,11 +101,10 @@ HEADはベースコミットへ戻り、全変更はunstagedとしてworking tre
 * **再編前バックアップと再編後HEADの最終ツリーが同一であること**
 * 意図しないファイル差分がないこと
 * working treeがcleanであること
-* 最終コミットで、全体のビルド、lint、テストが成功すること
+* **各コミットで、ビルド、lint、テストのすべてが成功すること**
 * コミット順序が依存関係に沿っていること
-* 各RED-GREENが隣接し、間に無関係なコミットが挟まっていないこと
-* `Test-Status: red` trailerが、REDコミットにのみ付与されていること
 * 各コミットが1つの論理的目的を持つこと
+* 振る舞いを追加・変更するコミットに、対応するテストが含まれていること
 * コミットメッセージが変更内容と一致していること
 
 最終ツリーの同一性は、可能であれば以下のような方法で機械的に確認してください。
@@ -117,22 +115,16 @@ HEADはベースコミットへ戻り、全変更はunstagedとしてworking tre
 
 `git diff <backup-branch> HEAD` は、履歴ではなく最終ファイル内容について差分がない状態にしてください。
 
-REDコミットの一覧は以下で確認できます。
-
-```bash
-git log --format='%H %s' --grep='^Test-Status: red$' <ベースコミット>..HEAD
-```
-
 ## 完了報告
 
 1. 作成したバックアップブランチ名
 2. 特定したベースコミット
 3. 再編前と再編後のコミット数
 4. 再編後のコミット一覧
-5. 各コミットの目的と、TDDサイクル上の位置（RED / GREEN / REFACTOR / サイクル外）
-6. REDコミットのハッシュ一覧と、`git bisect` 実行時は `git bisect skip` の対象になる旨
-7. RED-GREEN-REFACTORサイクルへ分割できず統合したものがあれば、その内容と理由
-8. 各コミットで実行した検証と、期待結果と一致したこと
+5. 各コミットの目的と種類（振る舞い / REFACTOR / テストを伴わない変更）
+6. 振る舞いコミットについて、どのテストがどの振る舞いを検証しているか
+7. 1コミットへ統合した変更があれば、その内容と理由
+8. 各コミットで実行した検証と、すべて成功したこと
 9. 最終状態で実行した検証
 10. 再編前後の最終ツリーが同一であることの確認結果
 11. 実行しなかった検証と、その理由
