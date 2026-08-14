@@ -1,6 +1,6 @@
 ---
 name: atomic-commit
-description: Commit the working tree's uncommitted changes as logical, atomic commits (never rewrite existing history, never push). Use when implementation is done and the changes still sit in the working tree — phrases like "いい感じにコミットして", "コミットして", "変更をコミットに分けて", "commit this properly", "split these changes into commits". Also used by other skills that need a commit step. Do NOT use for rewriting commits that already exist (use rework-commit), writing a single commit message for an already-staged change, resolving merge conflicts, or merging branches.
+description: Commit the working tree's uncommitted changes as logical, atomic commits structured around the TDD RED-GREEN-REFACTOR cycle (never rewrite existing history, never push). Use when implementation is done and the changes still sit in the working tree — phrases like "いい感じにコミットして", "コミットして", "変更をコミットに分けて", "commit this properly", "split these changes into commits". Also used by other skills that need a commit step. Do NOT use for rewriting commits that already exist (use rework-commit), writing a single commit message for an already-staged change, resolving merge conflicts, or merging branches.
 ---
 
 # atomic-commit
@@ -8,13 +8,14 @@ description: Commit the working tree's uncommitted changes as logical, atomic co
 あなたはコミット作成を担当します。
 
 現在のworking treeには、実装と動作確認が完了した未コミットの変更があります。
-これを論理的かつatomicな単位のコミットへ分けて作成してください。
+これをTDDのRED-GREEN-REFACTORサイクルに沿った、論理的かつatomicな単位のコミットへ分けて作成してください。
 
 ## 目的
 
 レビュー、revert、bisect、cherry-pickが容易になるように、変更を意味のある最小単位へ分割してコミットします。
+あわせて、どの振る舞いをどのテストが駆動したのかが履歴から読み取れるようにします。
 
-atomic commitの定義、変更の分類観点、hunk単位のstage手順、コミットメッセージ規約、分割の判断基準は、このスキルディレクトリ内の `references/splitting.md` に記載しています。**作業前に必ず読んでください。**
+atomic commitの定義、TDDサイクルの単位と作れない場合の判断基準、変更の分類観点、hunk単位のstage手順、コミットメッセージ規約、分割の判断基準は、このスキルディレクトリ内の `references/splitting.md` に記載しています。**作業前に必ず読んでください。**
 
 ## 最重要制約
 
@@ -22,7 +23,7 @@ atomic commitの定義、変更の分類観点、hunk単位のstage手順、コ�
 * リモートブランチへpushしないこと
 * main、master、developなど共有ブランチへコミットしないこと。作業ブランチ上にいない場合は、開始前にユーザーへ確認すること
 * 機能追加、バグ修正、追加リファクタリングを行わないこと
-* コミット作成に不要なコード変更を行わないこと
+* コミット作成に不要なコード変更を行わないこと。**TDDサイクルを成立させるためであっても、スタブ、未実装マーカー、テストの一時的な書き換えなど、working treeに存在しないコードを新たに書かないこと**
 * 最終的なworking treeの内容を、作業開始前の状態から変更しないこと
 
 既にコミット済みの履歴を分割・再編する必要がある場合は、このスキルではなく `rework-commit` を使用してください。
@@ -42,13 +43,19 @@ atomic commitの定義、変更の分類観点、hunk単位のstage手順、コ�
 * `git diff` と `git diff --cached` — 変更内容
 * `git log --oneline -10` — 既存のコミットメッセージ規約
 * 実行可能なビルド、lint、テストコマンド
+* 単一のテストまたはテストファイルだけを実行する方法。REDコミットの検証に使う
+* pre-commit hookの有無と、そこでテストが実行されるか（`references/splitting.md` の該当節を参照）
 * 変更によって実現された要求事項
 
 コミットすべき変更がない場合は、その旨を伝えて終了してください。
 
 ### 2. 変更の分析とコミット計画
 
-`references/splitting.md` の分類観点に従って差分を分析し、コミット計画を提示してください。
+`references/splitting.md` の分類観点に従って差分を分析してください。
+
+テストを伴う変更については、どの振る舞いをどのテストが検証しているかを対応付け、RED-GREEN-REFACTORのサイクルへ再構成します。サイクルは機能単位ではなく振る舞い単位で回してください。
+サイクルを作れない変更がある場合は、`references/splitting.md` の「サイクルを作れない場合」に照らして判断し、その理由を計画へ明記してください。
+
 計画に記載する項目と、コミット順序の原則も同ファイルに記載しています。
 
 ### 3. コミット作成
@@ -56,26 +63,45 @@ atomic commitの定義、変更の分類観点、hunk単位のstage手順、コ�
 コミット計画の順序どおりに、stageとcommitを繰り返してください。
 
 * パスを明示して `git add <ファイル>` する
+* REDコミットには対象の振る舞いのテストのみを、GREENコミットにはそれを通す実装のみをstageする
 * 同一ファイル内に複数の論理変更が混在する場合は、`references/splitting.md` のhunk単位のstage手順に従う
 * commit前に `git diff --cached` でstage内容が計画と一致することを確認する
+* REDコミットには `Test-Status: red` trailerを付与する
 
 ### 4. 検証
 
 可能な限り、各コミットについて formatter、lint、type check、unit test、build を実行してください。
+
+期待結果はコミットの種類によって異なります。
+
+* **REDコミット**: ビルド、lint、フォーマットチェックは成功しなければならない。テストは、そのコミットで追加したテストのみが失敗し、既存のテストはすべて成功しなければならない。**この失敗は期待される結果であり、修正してはいけません。** 追加したテストが成功してしまう場合、または既存のテストが失敗する場合は、分割を誤っているため計画を見直してください
+* **GREENコミット**: ビルド、lint、フォーマットチェック、テストのすべてが成功しなければならない。直前のREDコミットで失敗していたテストが成功に転じることを確認する
+* **REFACTORコミット**: すべてが成功しなければならない。加えて、テストファイルに差分がないことを確認する
+* **サイクル外のコミット**: すべてが成功しなければならない
 
 reset方式ではなくworking treeから順にコミットするため、コミット作成直後のworking treeには後続コミット予定の変更が残っています。そのまま検証してもそのコミット単体の検証にはなりません。以下のいずれかの方法を使ってください。
 
 **方法A: コミットごとに退避して検証する**
 
 1. コミット作成直後に `git stash push -u` で残りの変更を退避する
-2. 検証コマンドを実行する
+2. 検証コマンドを実行し、上記の期待結果と一致することを確認する
 3. `git stash pop` で変更を復元し、次のコミット作業へ進む
 
 検証がファイルを生成または変更する場合は、`git stash pop` の前にworking treeを検証前の状態へ戻してください。
 
+REDコミットの検証を含められるのはこの方法だけです。REDコミットがある場合はこちらを推奨します。
+
 **方法B: 全コミット作成後に一括で検証する**
 
 すべてのコミットを作成した後、`git rebase <開始時点のコミット> --exec '<検証コマンド>'` を実行してください。各コミットをcheckoutした状態で検証コマンドが順に実行され、失敗したコミットで停止します。
+
+REDコミットはテストが失敗するため、検証コマンドをそのまま実行するとそこで停止します。REDコミットではテストを除外し、ビルドとlintのみを実行してください。
+
+```bash
+git rebase <開始時点のコミット> --exec 'if git log -1 --format=%B | grep -q "^Test-Status: red$"; then <ビルド・lintコマンド>; else <全検証コマンド>; fi'
+```
+
+この方法では「REDコミットで対象テストが実際に失敗すること」は確認できません。REDコミットの検証は別途、方法Aの手順か個別のcheckoutで行い、その結果を完了報告に含めてください。
 
 この方法は**あなたがこのセッションで作成したコミットのみを対象**とします。`<開始時点のコミット>` には必ず作業開始時のHEAD（呼び出し元から指定されている場合はそのベースコミット）を指定してください。それより前を起点にすると、書き換えてはならない既存コミットまでrebaseの対象になります。なお、検証が全て成功した場合でも、rebaseの性質上あなたが作成したコミットのハッシュは変わります。内容は変わらないため、最重要制約には反しません。ハッシュを変えたくない場合は方法Aを使ってください。
 
@@ -85,28 +111,43 @@ reset方式ではなくworking treeから順にコミットするため、コミ
 
 呼び出し元のスキルやユーザーが、コミット作成の直前に変更全体のビルド・lint・テストを実行済みで、その結果が成功している場合は、コミット単位の検証を省略して最終状態の確認のみとしてかまいません。省略した事実は完了報告に含めてください。
 
-各コミットでビルドやテストを成功させられない場合は、安易に無視せず、次のいずれかを行ってください。
+ただしこの省略が保証するのは最終状態の健全性のみです。REDコミットで対象テストが実際に失敗するかは検証されないため、その旨も報告してください。
+
+**GREEN以降で検証を成功させられない場合**
+
+REDコミット以外でビルドやテストを成功させられない場合は、安易に無視せず、次のいずれかを行ってください。
 
 * コミット境界を見直す
 * 依存する変更を同じコミットへ統合する
 * そのコミット単独では検証できない理由を明示する
 
-テストを意図的に失敗させるコミットは、明示的に要求されていない限り作成しないでください。
+REDコミット以外で意図的にテストを失敗させるコミットは作成しないでください。
 
 ### 5. 最終確認
 
 * working treeがcleanであること。意図せず未コミットで残った変更がないこと
 * 作業開始時点と最終コミット時点で、ファイル内容が一致していること
+* 最終コミットで、ビルド、lint、テストのすべてが成功すること
 * コミット順序が依存関係に沿っていること
+* 各RED-GREENが隣接し、間に無関係なコミットが挟まっていないこと
+* `Test-Status: red` trailerが、REDコミットにのみ付与されていること
 * 各コミットが1つの論理的目的を持つこと
 * コミットメッセージが変更内容と一致していること
+
+REDコミットの一覧は以下で確認できます。
+
+```bash
+git log --format='%H %s' --grep='^Test-Status: red$' <ベースコミット>..HEAD
+```
 
 ## 完了報告
 
 1. 作成したコミット一覧（`git log --oneline`）
-2. 各コミットの目的
-3. 各コミットで実行した検証
-4. 最終状態で実行した検証
-5. 実行しなかった検証と、その理由
-6. コミットしなかった変更があればその内容と理由
-7. 残っているリスクまたは判断が必要な事項
+2. 各コミットの目的と、TDDサイクル上の位置（RED / GREEN / REFACTOR / サイクル外）
+3. REDコミットのハッシュ一覧と、`git bisect` 実行時は `git bisect skip` の対象になる旨
+4. RED-GREEN-REFACTORサイクルへ分割できず統合したものがあれば、その内容と理由
+5. 各コミットで実行した検証と、期待結果と一致したこと（REDコミットについては、どのテストが失敗したか）
+6. 最終状態で実行した検証
+7. 実行しなかった検証と、その理由
+8. コミットしなかった変更があればその内容と理由
+9. 残っているリスクまたは判断が必要な事項
