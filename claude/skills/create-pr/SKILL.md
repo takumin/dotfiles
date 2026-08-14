@@ -73,7 +73,8 @@ allowed-tools: Bash(git:*), Bash(gh:*), Bash(cargo:*), Bash(npm:*), Bash(go:*), 
 コミットの作成は `atomic-commit` スキルへ委譲する。Skill ツールで `atomic-commit` を呼び出し、以下を伝える。
 
 - 手順 1 で確定した `<remote-default-ref>`（コミット範囲の起点）
-- 手順 2 で**変更全体のビルド検証を実行済み**であること。したがってコミット単位の検証は省略し、最終状態の確認のみでよい
+- 手順 2 で**変更全体のビルド検証を実行済み**であること。したがって GREEN 以降のコミット単位の検証は省略し、最終状態の確認のみでよい
+- ただし RED コミットについては、対象テストが実際に失敗することを個別に確認すること。手順 2 の検証は最終状態のみを保証するため、この確認を代替しない
 - 実行したビルド検証のコマンドと結果
 - push しないこと。既存コミットを書き換えないこと。新規コミットのみを作成すること
 
@@ -100,6 +101,14 @@ allowed-tools: Bash(git:*), Bash(gh:*), Bash(cargo:*), Bash(npm:*), Bash(go:*), 
 | `build`    | ビルドシステムや外部依存の変更                       |
 | `ci`       | CI 設定ファイルやスクリプトの変更                    |
 | `chore`    | その他の変更                                         |
+
+コミットは TDD の RED-GREEN-REFACTOR サイクルへ分割される（`atomic-commit` の `references/splitting.md` を参照）。
+
+- RED コミットは `test` type を使い、`Test-Status: red` trailer を付与する
+- GREEN コミットは振る舞いに応じて `feat` / `fix` / `perf` を使う
+- REFACTOR コミットは `refactor` を使う
+
+RED コミットはテストが失敗する状態で履歴に残る。GitHub Actions の標準的な PR / push トリガーは HEAD のみを対象とするため通常は影響しないが、全コミットに対して CI を回す設定や merge queue を使うリポジトリでは RED コミットで失敗する。該当する場合は PR 作成前にユーザーへ報告し、判断を仰ぐ。
 
 ### 5. プッシュと PR 作成
 
