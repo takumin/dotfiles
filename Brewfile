@@ -1,17 +1,5 @@
 # vim: set ft=ruby :
 
-# Tap
-tap "fujiwara/tap"
-tap "hashicorp/tap"
-tap "k1low/tap"
-tap "kayac/tap"
-tap "lintnet/lintnet"
-tap "reviewdog/tap"
-tap "suzuki-shunsuke/ci-info"
-tap "suzuki-shunsuke/cmdx"
-tap "suzuki-shunsuke/ghalint"
-tap "suzuki-shunsuke/pinact"
-
 # Shell & Terminal
 brew "bash"
 brew "bash-completion@2"
@@ -181,10 +169,6 @@ brew "hcl2json"
 brew "helm"
 brew "kubernetes-cli"
 brew "tenv"
-brew "fujiwara/tap/lambroll"
-brew "hashicorp/tap/packer"
-brew "hashicorp/tap/terraform-ls"
-brew "kayac/tap/ecspresso"
 
 # CI/CD & Automation
 brew "act"
@@ -198,14 +182,6 @@ brew "nfpm"
 brew "renovate"
 brew "wrkflw"
 brew "zizmor"
-brew "k1low/tap/octocov"
-brew "k1low/tap/runn"
-brew "lintnet/lintnet/lintnet"
-brew "reviewdog/tap/reviewdog"
-cask "suzuki-shunsuke/ci-info/ci-info"
-cask "suzuki-shunsuke/cmdx/cmdx"
-cask "suzuki-shunsuke/ghalint/ghalint"
-cask "suzuki-shunsuke/pinact/pinact"
 
 # Security & Signing
 brew "age"
