@@ -1,13 +1,11 @@
 # vim: set ft=ruby :
 
 # Tap
-tap "bufbuild/buf"
 tap "fujiwara/tap"
 tap "hashicorp/tap"
 tap "k1low/tap"
 tap "kayac/tap"
 tap "lintnet/lintnet"
-tap "oven-sh/bun"
 tap "reviewdog/tap"
 tap "suzuki-shunsuke/ci-info"
 tap "suzuki-shunsuke/cmdx"
@@ -98,6 +96,7 @@ brew "rustup-init"
 
 # JavaScript / TypeScript
 brew "biome"
+brew "bun"
 brew "deno"
 brew "marp-cli"
 brew "oxlint"
@@ -107,7 +106,6 @@ brew "prettierd"
 brew "typescript-language-server"
 brew "yarn"
 brew "yarn-completion"
-brew "oven-sh/bun/bun"
 
 # Python
 brew "ruff"
@@ -147,12 +145,12 @@ brew "ninja"
 brew "sccache"
 
 # Protocol Buffers
+brew "buf"
 brew "protobuf"
 brew "protoc-gen-go"
 brew "protoc-gen-go-grpc"
 brew "protoc-gen-grpc-web"
 brew "protoc-gen-js"
-brew "bufbuild/buf/buf"
 
 # Linters & Formatters (General)
 brew "bash-language-server"
