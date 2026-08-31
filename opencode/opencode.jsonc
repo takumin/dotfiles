@@ -1,5 +1,14 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 12000,
+  },
+  "tool_output": {
+    "max_lines": 1000,
+    "max_bytes": 32768,
+  },
   "model": "ollama/qwen3.8:27b",
   "provider": {
     "ollama": {
@@ -11,6 +20,25 @@
       "models": {
         "qwen3.8:27b": {
           "name": "Qwen3.8 27B",
+          "reasoning": true,
+          "options": {
+            "reasoningEffort": "medium",
+          },
+          "limit": {
+            "context": 65536,
+            "output": 8192,
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low",
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+            },
+          },
         },
       },
     },
