@@ -5,5 +5,6 @@ require("core.opts")
 require("core.cmds")
 -- neovim only
 if not vim.g.vscode then
+	require("core.keymaps")
 	require("core.lazy")
 end
