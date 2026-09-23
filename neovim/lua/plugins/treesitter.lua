@@ -1,11 +1,12 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter",
+		branch = "main",
 		lazy = false,
 		build = ":TSUpdate",
-		opts = {
-			auto_install = true,
-			ensure_installed = {
+		config = function()
+			local ts = require("nvim-treesitter")
+			ts.install({
 				-- Vimdocを開く時エラーになるため
 				"vimdoc",
 				-- neovimのLua設定ファイルを開く時、自動でインストールされないため
@@ -14,16 +15,39 @@ return {
 				"diff",
 				-- markdownでWiki Link表示している場合、自動でインストールされないため
 				"markdown_inline",
-			},
-			highlight = {
-				enable = true,
-				additional_vim_regex_highlighting = { "markdown" },
-			},
-			indent = {
-				enable = true,
-				disable = {},
-			},
-		},
+			})
+
+			local function attach(buf, lang)
+				if not pcall(vim.treesitter.start, buf, lang) then
+					return
+				end
+				vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+				if lang == "markdown" then
+					vim.bo[buf].syntax = "on"
+				end
+			end
+
+			-- mainブランチにはauto_installが無いため、FileType毎に不足しているparserを入れる
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					local lang = vim.treesitter.language.get_lang(args.match)
+					if not lang then
+						return
+					end
+					if vim.list_contains(ts.get_installed(), lang) then
+						attach(args.buf, lang)
+					elseif vim.list_contains(ts.get_available(), lang) then
+						ts.install(lang):await(function()
+							vim.schedule(function()
+								if vim.api.nvim_buf_is_valid(args.buf) then
+									attach(args.buf, lang)
+								end
+							end)
+						end)
+					end
+				end,
+			})
+		end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter-context",
