@@ -42,7 +42,7 @@ Host *
 	IdentitiesOnly		yes
 	SendEnv			TERM TERM_PROGRAM COLORTERM
 	AddKeysToAgent		yes
-	Compression		yes
+	Compression		no
 	ForwardX11		no
 	ForwardAgent		yes
 	TCPKeepAlive		yes
