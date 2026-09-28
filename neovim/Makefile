@@ -15,7 +15,8 @@ install: \
 	${HOME}/.local/state/nvim/swap \
 	${HOME}/.local/state/nvim/undo \
 	${HOME}/.config/nvim/init.lua \
-	${HOME}/.config/nvim/lua
+	${HOME}/.config/nvim/lua \
+	${HOME}/.config/nvim/queries
 
 .PHONY: clean
 clean:
@@ -53,4 +54,9 @@ ${HOME}/.config/nvim/init.lua: ${HOME}/.config/nvim
 ${HOME}/.config/nvim/lua: ${HOME}/.config/nvim
 	@if [ ! -L "$@" ]; then \
 		ln -s $(CURDIR)/lua $@; \
+	fi
+
+${HOME}/.config/nvim/queries: ${HOME}/.config/nvim
+	@if [ ! -L "$@" ]; then \
+		ln -s $(CURDIR)/queries $@; \
 	fi
