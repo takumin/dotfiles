@@ -1,1 +1,11 @@
 [tools]
+actionlint = "latest"
+editorconfig-checker = "latest"
+ghalint = "latest"
+jq = "latest"
+node = "latest"
+pinact = "latest"
+pnpm = "latest"
+reviewdog = "latest"
+shellcheck = "latest"
+zizmor = "latest"
