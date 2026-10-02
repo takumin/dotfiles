@@ -13,10 +13,7 @@ brew "zsh"
 brew "zsh-completions"
 
 # Core Utilities
-brew "coreutils"
 brew "curl"
-brew "diffutils"
-brew "findutils"
 brew "gawk"
 brew "gnu-sed"
 brew "jq"
@@ -24,6 +21,9 @@ brew "less"
 brew "lesspipe"
 brew "make"
 brew "openssh"
+brew "uutils-coreutils"
+brew "uutils-diffutils"
+brew "uutils-findutils"
 
 # File & Search
 brew "aria2"
