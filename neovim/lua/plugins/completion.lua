@@ -260,7 +260,7 @@ return {
 
 			-- TypeScript 7 replaced `tsserver.js` with a native (Go) binary that speaks LSP
 			-- directly, so `typescript-language-server` cannot serve such a workspace and
-			-- `tsgo` cannot serve a TypeScript 5 one. Decide from what the workspace ships.
+			-- `tsc --lsp` cannot serve a TypeScript 5 one. Decide from what the workspace ships.
 
 			---@param dir string
 			---@return "tsserver"|"native"|nil
@@ -300,27 +300,16 @@ return {
 				vim.lsp.enable("ts_ls")
 			end
 
-			-- `tsgo` ships inside the workspace, so there is no global executable to probe.
-			vim.lsp.config("tsgo", {
+			-- The default `root_dir` picks a `--lsp` capable `tsc` or `tsgo` from the workspace
+			-- or `$PATH`, so a global TypeScript 7 would otherwise attach to TypeScript 5 too.
+			vim.lsp.config("tsc", {
 				capabilities = capabilities,
 
-				-- TypeScript 7 installs it as `tsc`; `@typescript/native-preview` as `tsgo`.
-				-- Prefer `tsc`: it is the `typescript` package `typescript_flavor` inspected,
-				-- whereas a leftover native-preview may ship a different version.
-				cmd = function(dispatchers, config)
-					local root = (config or {}).root_dir or vim.fn.getcwd()
-					local bin = root .. "/node_modules/.bin/tsc"
-					if vim.fn.executable(bin) == 0 then
-						bin = root .. "/node_modules/.bin/tsgo"
-					end
-					return vim.lsp.rpc.start({ bin, "--lsp", "--stdio" }, dispatchers)
-				end,
-
-				root_dir = root_dir_filter("tsgo", function(dir)
+				root_dir = root_dir_filter("tsc", function(dir)
 					return typescript_flavor(dir) == "native"
 				end),
 			})
-			vim.lsp.enable("tsgo")
+			vim.lsp.enable("tsc")
 
 			if vim.fn.executable("biome") == 1 then
 				vim.lsp.config("biome", {
