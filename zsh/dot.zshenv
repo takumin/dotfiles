@@ -528,6 +528,11 @@ export GHQ_ROOT="${HOME}/.usr/src"
 #
 export AQUA_ROOT_DIR="${XDG_DATA_HOME:-"${HOME}/.local/share"}/aquaproj-aqua"
 export AQUA_KEYRING_ENABLED=true
+# aqua detects musl by the mere presence of /lib/ld-musl-*.so.1, so a glibc
+# host with the musl package installed gets musl builds unless told otherwise.
+if getconf GNU_LIBC_VERSION >/dev/null 2>&1; then
+	export AQUA_LIBC=glibc
+fi
 
 ## etcd
 #
