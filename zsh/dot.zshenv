@@ -622,6 +622,7 @@ esac
 ## homebrew configuration
 #
 export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_FORCE_VENDOR_RUBY=1
 case "${OSTYPE}" in
 	darwin*)
 		if [[ -x "$(whence -- brew)" ]]; then
