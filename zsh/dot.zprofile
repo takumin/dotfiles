@@ -36,7 +36,7 @@ if [[ -z "${SSH_AUTH_SOCK}" ]]; then
 		if [[ -r "${HOME}/.ssh/id_rsa" ]]; then
 			keychain -q "${HOME}/.ssh/id_rsa"
 		fi
-		for key in "$(find ${HOME}/.ssh -type f -name '*.key')"; do
+		for key in ${HOME}/.ssh/**/*.key(N.); do
 			keychain -q "${key}"
 		done
 		if [[ -r "${HOME}/.keychain/${HOST}-sh" ]]; then
