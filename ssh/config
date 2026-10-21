@@ -16,10 +16,19 @@ Host github.com
 	Port			443
 
 ################################################################################
+# GitLab
+################################################################################
+
+Host gitlab.com
+	User			git
+	HostName		altssh.gitlab.com
+	Port			443
+
+################################################################################
 # HTTP Proxy
 ################################################################################
 
-Match originalhost github.com exec "~/.ssh/proxy-command check %h"
+Match originalhost github.com,gitlab.com exec "~/.ssh/proxy-command check %h"
 	ProxyCommand		~/.ssh/proxy-command %h %p
 
 ################################################################################
