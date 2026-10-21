@@ -1,0 +1,66 @@
+#!/bin/sh
+# vim: set ft=sh ts=8 sw=8 sts=0 noet :
+#
+# Tunnel SSH through the HTTP proxy given by the *_proxy environment variables.
+#
+# Usage:
+#   proxy-command check <host>    exit 0 if <host> should go through the proxy
+#   proxy-command <host> <port>   connect to <host>:<port> via the proxy
+
+set -eu
+
+proxy="${https_proxy:-${HTTPS_PROXY:-${http_proxy:-${HTTP_PROXY:-}}}}"
+noproxy="${no_proxy:-${NO_PROXY:-}}"
+
+find_connect() {
+	for cmd in connect-proxy connect; do
+		if command -v "${cmd}" >/dev/null 2>&1; then
+			echo "${cmd}"
+			return 0
+		fi
+	done
+	return 1
+}
+
+is_bypassed() {
+	host="$1"
+	oldifs="${IFS}"
+	IFS=','
+	for entry in ${noproxy}; do
+		entry="$(echo "${entry}" | tr -d '[:space:]')"
+		case "${entry}" in
+		'') ;;
+		'*') IFS="${oldifs}"; return 0 ;;
+		.*) case "${host}" in *"${entry}") IFS="${oldifs}"; return 0 ;; esac ;;
+		*) case "${host}" in "${entry}"|*."${entry}") IFS="${oldifs}"; return 0 ;; esac ;;
+		esac
+	done
+	IFS="${oldifs}"
+	return 1
+}
+
+if [ "${1:-}" = "check" ]; then
+	[ -n "${proxy}" ] || exit 1
+	find_connect >/dev/null || exit 1
+	is_bypassed "${2:?host required}" && exit 1
+	exit 0
+fi
+
+host="${1:?host required}"
+port="${2:?port required}"
+
+# http://user:pass@proxy.example:8080/ -> user, pass, proxy.example:8080
+hostport="${proxy#*://}"
+hostport="${hostport%%/*}"
+case "${hostport}" in
+*@*)
+	userinfo="${hostport%@*}"
+	hostport="${hostport##*@}"
+	export HTTP_PROXY_USER="${userinfo%%:*}"
+	case "${userinfo}" in
+	*:*) export HTTP_PROXY_PASSWORD="${userinfo#*:}" ;;
+	esac
+	;;
+esac
+
+exec "$(find_connect)" -H "${hostport}" "${host}" "${port}"
