@@ -303,3 +303,12 @@ if [[ -x "$(whence -- manaita)" ]]; then
 		compdef _manaita manaita
 	fi
 fi
+
+# seiro completion
+#
+if [[ -x "$(whence -- seiro)" ]]; then
+	if completion="$(seiro completion zsh 2>/dev/null)"; then
+		source <(echo "${completion}") 2>/dev/null
+		compdef _seiro seiro
+	fi
+fi
