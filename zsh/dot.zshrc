@@ -53,7 +53,7 @@ fi
 ## coredump size
 [[ ${OSTYPE} != "cygwin" ]] && limit coredumpsize 0
 ## new file mask
-umask="022"
+umask 022
 
 ## auto change directory
 setopt auto_cd
