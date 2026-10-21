@@ -304,12 +304,14 @@ return {
 			vim.lsp.config("tsgo", {
 				capabilities = capabilities,
 
-				-- `@typescript/native-preview` installs it as `tsgo`; TypeScript 7 as `tsc`.
+				-- TypeScript 7 installs it as `tsc`; `@typescript/native-preview` as `tsgo`.
+				-- Prefer `tsc`: it is the `typescript` package `typescript_flavor` inspected,
+				-- whereas a leftover native-preview may ship a different version.
 				cmd = function(dispatchers, config)
 					local root = (config or {}).root_dir or vim.fn.getcwd()
-					local bin = root .. "/node_modules/.bin/tsgo"
+					local bin = root .. "/node_modules/.bin/tsc"
 					if vim.fn.executable(bin) == 0 then
-						bin = root .. "/node_modules/.bin/tsc"
+						bin = root .. "/node_modules/.bin/tsgo"
 					end
 					return vim.lsp.rpc.start({ bin, "--lsp", "--stdio" }, dispatchers)
 				end,
