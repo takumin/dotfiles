@@ -26,6 +26,16 @@ fi
 case "${UID}" in
 0)
 	case "${TERM}" in
+	screen*|tmux*)
+		if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
+			PROMPT_COMMAND='echo -ne "\033k[$(whoami)@$(hostname)]${WINDOW:+[${WINDOW}]} $(pwd | sed "s@$HOME@\~@g")\033\134"'
+			PS1=""
+		else
+			PROMPT_COMMAND='echo -ne "\033k[$(whoami)]${WINDOW:+[${WINDOW}]} $(pwd | sed "s@$HOME@\~@g")\033\134"'
+			PS1=""
+		fi
+		PS2="${WINDOW:+[${WINDOW}]}\$ "
+		;;
 	*)
 		if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
 			PROMPT_COMMAND='echo -ne "\033]0;[$(whoami)@$(hostname)] $(pwd | sed "s@$HOME@\~@g")\007"'
@@ -36,20 +46,20 @@ case "${UID}" in
 		fi
 		PS2="\$ "
 		;;
-	screen*)
-		if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
-			PROMPT_COMMAND 'echo -n -e "\033k[$(whoami)@$(hostname)][${WINDOW}] $(pwd | sed "s@$HOME@\~@g")\033\134"'
-			PS1=""
-		else
-			PROMPT_COMMAND 'echo -n -e "\033k[$(whoami)][${WINDOW}] $(pwd | sed "s@$HOME@\~@g")\033\134"'
-			PS1=""
-		fi
-		PS2="[${WINDOW}]\$ "
-		;;
 	esac
 	;;
 *)
 	case "${TERM}" in
+	screen*|tmux*)
+		if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
+			PROMPT_COMMAND='echo -ne "\033k[$(whoami)@$(hostname)]${WINDOW:+[${WINDOW}]} $(pwd | sed "s@$HOME@\~@g")\033\134"'
+			PS1="${COLOR_FG_5FD75F}${STYLE_BOLD}[\D{%Y/%m/%d} \A]${STYLE_DEFAULT}${COLOR_FG_5FD7FF}[\u@\H]${STYLE_DEFAULT} ${COLOR_FG_FFFF87}\w${STYLE_DEFAULT}\n\$ "
+		else
+			PROMPT_COMMAND='echo -ne "\033k[$(whoami)]${WINDOW:+[${WINDOW}]} $(pwd | sed "s@$HOME@\~@g")\033\134"'
+			PS1="${COLOR_FG_5FD75F}${STYLE_BOLD}[\D{%Y/%m/%d} \A]${STYLE_DEFAULT}${COLOR_FG_5FD7FF}[\u]${STYLE_DEFAULT} ${COLOR_FG_FFFF87}\w${STYLE_DEFAULT}\n\$ "
+		fi
+		PS2="${WINDOW:+[${WINDOW}]}\$ "
+		;;
 	*)
 		if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
 			PROMPT_COMMAND='echo -ne "\033]0;[$(whoami)@$(hostname)] $(pwd | sed "s@$HOME@\~@g")\007"'
@@ -59,16 +69,6 @@ case "${UID}" in
 			PS1="${COLOR_FG_5FD75F}${STYLE_BOLD}[\D{%Y/%m/%d} \A]${STYLE_DEFAULT}${COLOR_FG_5FD7FF}[\u]${STYLE_DEFAULT} ${COLOR_FG_FFFF87}\w${STYLE_DEFAULT}\n\$ "
 		fi
 		PS2="\$ "
-		;;
-	screen*)
-		if [[ -n "${REMOTEHOST}${SSH_CONNECTION}" ]]; then
-			PROMPT_COMMAND 'echo -n -e "\033k[$(whoami)@$(hostname)][${WINDOW}] $(pwd | sed "s@$HOME@\~@g")\033\134"'
-			PS1=""
-		else
-			PROMPT_COMMAND 'echo -n -e "\033k[$(whoami)][${WINDOW}] $(pwd | sed "s@$HOME@\~@g")\033\134"'
-			PS1=""
-		fi
-		PS2="[${WINDOW}]\$ "
 		;;
 	esac
 	;;
