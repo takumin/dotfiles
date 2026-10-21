@@ -48,6 +48,7 @@ brew "vivid"
 # Git & VCS
 brew "aicommits"
 brew "cocogitto"
+brew "forgejo-cli"
 brew "gh"
 brew "ghq"
 brew "git"
