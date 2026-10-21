@@ -23,6 +23,7 @@ install: ${DIRS} ${FILES}
 clean:
 	@rm -f ${FILES}
 	@rm -f ${HOME}/.zsh/.zcompdump
+	@rm -f ${HOME}/.zshenv.zwc ${HOME}/.zshenv.zwc.old ${HOME}/.zsh/.*.zwc ${HOME}/.zsh/.*.zwc.old
 	@rm -fr ${PLUGINS}
 	@rm -fr ${HOME}/.zsh/cache
 
