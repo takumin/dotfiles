@@ -294,3 +294,12 @@ if [[ -x "$(whence -- pnpm)" ]]; then
 	# fi
 	compdef pp="pnpm"
 fi
+
+# manaita completion
+#
+if [[ -x "$(whence -- manaita)" ]]; then
+	if completion="$(manaita completion zsh 2>/dev/null)"; then
+		source <(echo "${completion}") 2>/dev/null
+		compdef _manaita manaita
+	fi
+fi
