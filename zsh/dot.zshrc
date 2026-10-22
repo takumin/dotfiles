@@ -179,17 +179,18 @@ zstyle :compinstall                       filename "${ZDOTDIR}/.zshrc"
 #
 # compinit
 autoload -Uz compinit
-if [[ -f "${ZDOTDIR}/.zcompdump" ]]; then
+[[ -d "${ZDOTDIR}/cache" ]] || mkdir -p "${ZDOTDIR}/cache"
+if [[ -f "${ZDOTDIR}/cache/zcompdump" ]]; then
 	local now="$(date +"%s")"
-	local updated="$(date -r "${ZDOTDIR}/.zcompdump" +"%s")"
+	local updated="$(date -r "${ZDOTDIR}/cache/zcompdump" +"%s")"
 	local threshold="$((60 * 60 * 8))"
 	if [[ $((${now} - ${updated})) -gt ${threshold} ]]; then
-		compinit
+		compinit -d "${ZDOTDIR}/cache/zcompdump"
 	else
-		compinit -C
+		compinit -C -d "${ZDOTDIR}/cache/zcompdump"
 	fi
 else
-	compinit -iu
+	compinit -d "${ZDOTDIR}/cache/zcompdump" -iu
 fi
 # bashcompinit
 autoload -U +X bashcompinit && bashcompinit
